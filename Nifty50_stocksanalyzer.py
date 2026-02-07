@@ -3,13 +3,14 @@ NIFTY 50 COMPLETE STOCK ANALYZER
 Technical + Fundamental Analysis with Email Delivery
 
 Requirements:
-pip install yfinance pandas numpy openpyxl
+pip install yfinance pandas numpy openpyxl pytz
 """
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import pytz
 import warnings
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -76,6 +77,11 @@ class Nifty50CompleteAnalyzer:
         }
         
         self.results = []
+    
+    def get_ist_time(self):
+        """Get current time in IST timezone"""
+        ist = pytz.timezone('Asia/Kolkata')
+        return datetime.now(ist)
     
     def calculate_rsi(self, prices, period=14):
         """Calculate RSI"""
@@ -290,10 +296,10 @@ class Nifty50CompleteAnalyzer:
             if combined_score >= 75:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY"
                 recommendation = "STRONG BUY"
-            elif combined_score >= 55:  # Changed from 70 to 55
+            elif combined_score >= 55:
                 rating = "⭐⭐⭐⭐ BUY"
                 recommendation = "BUY"
-            elif combined_score >= 45:  # Changed from 50 to 45
+            elif combined_score >= 45:
                 rating = "⭐⭐⭐ HOLD"
                 recommendation = "HOLD"
             elif combined_score >= 30:
@@ -416,11 +422,12 @@ class Nifty50CompleteAnalyzer:
         return top_buys, top_sells
     
     def generate_email_html(self):
-        """Generate beautiful HTML email with dark-friendly colors"""
+        """Generate beautiful HTML email with BLACK background"""
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
         
-        now = datetime.now()
+        # Get IST time
+        now = self.get_ist_time()
         time_of_day = "Morning" if now.hour < 12 else "Evening"
         
         # Count recommendations
@@ -433,20 +440,21 @@ class Nifty50CompleteAnalyzer:
         html = f"""<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
         body {{
             font-family: 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
             color: #e0e0e0;
-            background-color: #1a1a1a;
+            background-color: #000000 !important;
             margin: 0;
             padding: 0;
         }}
         .email-container {{
             max-width: 1000px;
             margin: 20px auto;
-            background-color: #2d2d2d;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: #1a1a1a !important;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
             border-radius: 10px;
             overflow: hidden;
         }}
@@ -468,6 +476,7 @@ class Nifty50CompleteAnalyzer:
         }}
         .content {{
             padding: 30px 20px;
+            background-color: #1a1a1a !important;
         }}
         .summary-box {{
             background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
@@ -519,13 +528,13 @@ class Nifty50CompleteAnalyzer:
             border-collapse: collapse;
             width: 100%;
             margin: 20px 0;
-            background-color: #3a3a3a;
+            background-color: #2d2d2d !important;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }}
         th {{
-            background: #4a4a4a;
+            background: #3a3a3a !important;
             color: #ffffff;
             padding: 16px 12px;
             text-align: left;
@@ -535,22 +544,23 @@ class Nifty50CompleteAnalyzer:
             letter-spacing: 0.5px;
         }}
         .buy-section th {{
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
         }}
         .sell-section th {{
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
         }}
         td {{
-            border-bottom: 1px solid #4a4a4a;
+            border-bottom: 1px solid #404040;
             padding: 14px 12px;
             font-size: 13px;
             color: #e0e0e0;
+            background-color: #2d2d2d !important;
         }}
         tr:last-child td {{
             border-bottom: none;
         }}
-        tr:hover {{
-            background-color: #454545;
+        tr:hover td {{
+            background-color: #353535 !important;
         }}
         .stock-name {{
             font-weight: 600;
@@ -583,7 +593,7 @@ class Nifty50CompleteAnalyzer:
             color: #fbbf24;
         }}
         .footer {{
-            background-color: #1f1f1f;
+            background-color: #0d0d0d !important;
             color: #9ca3af;
             padding: 25px;
             text-align: center;
@@ -617,11 +627,11 @@ class Nifty50CompleteAnalyzer:
         }}
     </style>
 </head>
-<body>
+<body style="background-color: #000000 !important;">
     <div class="email-container">
         <div class="header">
             <h1>📊 NIFTY 50 Stock Analysis Report</h1>
-            <p>{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p IST')}</p>
+            <p>{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
         </div>
         
         <div class="content">
@@ -765,7 +775,8 @@ class Nifty50CompleteAnalyzer:
                 print("   Set GMAIL_USER and GMAIL_APP_PASSWORD")
                 return False
             
-            now = datetime.now()
+            # Get IST time
+            now = self.get_ist_time()
             time_of_day = "Morning" if now.hour < 12 else "Evening"
             
             # Create message
@@ -795,9 +806,11 @@ class Nifty50CompleteAnalyzer:
     
     def generate_complete_report(self, send_email_flag=True, recipient_email=None):
         """Generate complete analysis report"""
+        ist_time = self.get_ist_time()
+        
         print("=" * 70)
         print("📊 NIFTY 50 STOCK ANALYZER")
-        print(f"Started: {datetime.now().strftime('%d %b %Y, %I:%M %p IST')}")
+        print(f"Started: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         print()
         
