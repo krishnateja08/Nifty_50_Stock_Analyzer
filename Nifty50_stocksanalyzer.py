@@ -286,14 +286,14 @@ class Nifty50CompleteAnalyzer:
             # Combined score (50% technical + 50% fundamental)
             combined_score = (tech_score_normalized * 0.5) + (fund_score * 0.5)
             
-            # Rating
-            if combined_score >= 90:
+            # Rating - ADJUSTED THRESHOLDS FOR MORE RECOMMENDATIONS
+            if combined_score >= 75:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY"
                 recommendation = "STRONG BUY"
-            elif combined_score >= 70:
+            elif combined_score >= 55:  # Changed from 70 to 55
                 rating = "⭐⭐⭐⭐ BUY"
                 recommendation = "BUY"
-            elif combined_score >= 50:
+            elif combined_score >= 45:  # Changed from 50 to 45
                 rating = "⭐⭐⭐ HOLD"
                 recommendation = "HOLD"
             elif combined_score >= 30:
@@ -407,16 +407,16 @@ class Nifty50CompleteAnalyzer:
         """Get top 10 buy and sell recommendations"""
         df = pd.DataFrame(self.results)
         
-        # Top 10 Buy (highest combined scores)
+        # Top 10 Buy (highest combined scores from BUY + STRONG BUY)
         top_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])].nlargest(10, 'Combined_Score')
         
-        # Top 10 Sell (lowest combined scores)
+        # Top 10 Sell (lowest combined scores from SELL + STRONG SELL)
         top_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])].nsmallest(10, 'Combined_Score')
         
         return top_buys, top_sells
     
     def generate_email_html(self):
-        """Generate beautiful HTML email"""
+        """Generate beautiful HTML email with dark-friendly colors"""
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
         
@@ -435,157 +435,184 @@ class Nifty50CompleteAnalyzer:
 <head>
     <style>
         body {{
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f4f4f4;
+            color: #e0e0e0;
+            background-color: #1a1a1a;
             margin: 0;
             padding: 0;
         }}
         .email-container {{
-            max-width: 900px;
+            max-width: 1000px;
             margin: 20px auto;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #2d2d2d;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 10px;
+            overflow: hidden;
         }}
         .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
         }}
         .header h1 {{
             margin: 0 0 10px 0;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 700;
         }}
         .header p {{
             margin: 0;
             font-size: 16px;
-            opacity: 0.9;
+            opacity: 0.95;
         }}
         .content {{
             padding: 30px 20px;
         }}
         .summary-box {{
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             margin-bottom: 30px;
         }}
         .summary-grid {{
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-top: 15px;
         }}
         .summary-item {{
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
             border-radius: 8px;
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }}
         .summary-item strong {{
             display: block;
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
         }}
         .summary-item span {{
             font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
         h2 {{
-            color: #2c3e50;
-            border-bottom: 3px solid #3498db;
+            color: #4a90e2;
+            border-bottom: 3px solid #4a90e2;
             padding-bottom: 10px;
             margin-top: 40px;
+            font-size: 24px;
         }}
         .buy-section h2 {{
-            border-bottom: 3px solid #27ae60;
+            color: #10b981;
+            border-bottom: 3px solid #10b981;
         }}
         .sell-section h2 {{
-            border-bottom: 3px solid #e74c3c;
+            color: #ef4444;
+            border-bottom: 3px solid #ef4444;
         }}
         table {{
             border-collapse: collapse;
             width: 100%;
             margin: 20px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }}
         th {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 12px;
+            background: #4a4a4a;
+            color: #ffffff;
+            padding: 16px 12px;
             text-align: left;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
         .buy-section th {{
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         }}
         .sell-section th {{
-            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
         }}
         td {{
-            border: 1px solid #e0e0e0;
-            padding: 12px;
+            border-bottom: 1px solid #4a4a4a;
+            padding: 14px 12px;
             font-size: 13px;
+            color: #e0e0e0;
         }}
-        tr:nth-child(even) {{
-            background-color: #f9f9f9;
+        tr:last-child td {{
+            border-bottom: none;
         }}
         tr:hover {{
-            background-color: #f0f0f0;
+            background-color: #454545;
+        }}
+        .stock-name {{
+            font-weight: 600;
+            color: #ffffff;
         }}
         .rating {{
             font-weight: bold;
             font-size: 12px;
         }}
         .positive {{
-            color: #27ae60;
+            color: #10b981;
             font-weight: bold;
         }}
         .negative {{
-            color: #e74c3c;
+            color: #ef4444;
             font-weight: bold;
         }}
+        .neutral {{
+            color: #f59e0b;
+        }}
         .disclaimer {{
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            border-left: 4px solid #f39c12;
+            background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+            border-left: 4px solid #f59e0b;
             padding: 20px;
             margin: 30px 0;
-            border-radius: 5px;
+            border-radius: 8px;
+            color: #fef3c7;
         }}
         .disclaimer strong {{
-            color: #c0392b;
+            color: #fbbf24;
         }}
         .footer {{
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
+            background-color: #1f1f1f;
+            color: #9ca3af;
+            padding: 25px;
             text-align: center;
-            font-size: 12px;
+            font-size: 13px;
+        }}
+        .footer strong {{
+            color: #e0e0e0;
         }}
         .badge {{
             display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 5px 10px;
+            border-radius: 5px;
             font-size: 11px;
             font-weight: bold;
         }}
         .badge-excellent {{
-            background-color: #27ae60;
+            background-color: #10b981;
             color: white;
         }}
         .badge-good {{
-            background-color: #3498db;
+            background-color: #3b82f6;
             color: white;
         }}
         .badge-average {{
-            background-color: #f39c12;
+            background-color: #f59e0b;
             color: white;
         }}
         .badge-poor {{
-            background-color: #e74c3c;
+            background-color: #ef4444;
             color: white;
         }}
     </style>
@@ -599,7 +626,7 @@ class Nifty50CompleteAnalyzer:
         
         <div class="content">
             <div class="summary-box">
-                <h2 style="margin: 0 0 15px 0; color: white; border: none;">📈 Market Summary</h2>
+                <h2 style="margin: 0 0 15px 0; color: white; border: none; font-size: 20px;">📈 Market Summary</h2>
                 <div class="summary-grid">
                     <div class="summary-item">
                         <strong>{len(self.results)}</strong>
@@ -643,13 +670,14 @@ class Nifty50CompleteAnalyzer:
 """
             for idx, row in top_buys.iterrows():
                 quality_badge = f"badge-{row['Quality'].lower()}"
+                upside_color = "positive" if row['Upside'] > 0 else "negative"
                 html += f"""
                         <tr>
-                            <td><strong>{row['Name']}</strong></td>
+                            <td class="stock-name">{row['Name']}</td>
                             <td>₹{row['Price']:,.0f}</td>
                             <td class="rating">{row['Rating']}</td>
                             <td><strong>{row['Combined_Score']:.0f}</strong></td>
-                            <td class="positive">{row['Upside']:+.1f}%</td>
+                            <td class="{upside_color}">{row['Upside']:+.1f}%</td>
                             <td>₹{row['Target_1']:,.0f}</td>
                             <td>₹{row['Stop_Loss']:,.0f}</td>
                             <td><span class="badge {quality_badge}">{row['Quality']}</span></td>
@@ -682,13 +710,14 @@ class Nifty50CompleteAnalyzer:
 """
             for idx, row in top_sells.iterrows():
                 quality_badge = f"badge-{row['Quality'].lower()}"
+                rsi_color = "negative" if row['RSI'] > 70 else ("positive" if row['RSI'] < 30 else "neutral")
                 html += f"""
                         <tr>
-                            <td><strong>{row['Name']}</strong></td>
+                            <td class="stock-name">{row['Name']}</td>
                             <td>₹{row['Price']:,.0f}</td>
                             <td class="rating">{row['Rating']}</td>
                             <td><strong>{row['Combined_Score']:.0f}</strong></td>
-                            <td class="negative">{row['RSI']:.0f}</td>
+                            <td class="{rsi_color}">{row['RSI']:.0f}</td>
                             <td>{row['MACD']}</td>
                             <td><span class="badge {quality_badge}">{row['Quality']}</span></td>
                         </tr>
