@@ -3,7 +3,7 @@ NIFTY 50 COMPLETE STOCK ANALYZER
 Technical + Fundamental Analysis with Email Delivery
 
 Requirements:
-pip install yfinance pandas numpy tabulate openpyxl
+pip install yfinance pandas numpy openpyxl
 """
 
 import yfinance as yf
@@ -11,12 +11,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import warnings
-from tabulate import tabulate
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
 import os
 
 warnings.filterwarnings('ignore')
@@ -53,7 +50,7 @@ class Nifty50CompleteAnalyzer:
             'ONGC.NS': 'ONGC',
             'TECHM.NS': 'Tech Mahindra',
             'M&M.NS': 'M&M',
-            'TMCV.NS': 'Tata Motors',
+            'TATAMOTORS.NS': 'Tata Motors',
             'TATASTEEL.NS': 'Tata Steel',
             'INDUSINDBK.NS': 'IndusInd Bank',
             'ADANIPORTS.NS': 'Adani Ports',
@@ -79,7 +76,6 @@ class Nifty50CompleteAnalyzer:
         }
         
         self.results = []
-        self.email_body = []
     
     def calculate_rsi(self, prices, period=14):
         """Calculate RSI"""
@@ -397,14 +393,15 @@ class Nifty50CompleteAnalyzer:
     
     def analyze_all_stocks(self):
         """Analyze all Nifty 50 stocks"""
-        print(f"Analyzing {len(self.nifty50_stocks)} stocks...")
+        print(f"🔍 Analyzing {len(self.nifty50_stocks)} NIFTY 50 stocks...")
         
-        for symbol, name in self.nifty50_stocks.items():
+        for idx, (symbol, name) in enumerate(self.nifty50_stocks.items(), 1):
             result = self.analyze_stock(symbol, name)
             if result:
                 self.results.append(result)
+            print(f"  [{idx}/{len(self.nifty50_stocks)}] {name}")
         
-        print(f"✅ Analysis complete: {len(self.results)} stocks analyzed")
+        print(f"✅ Analysis complete: {len(self.results)} stocks analyzed\n")
     
     def get_top_recommendations(self):
         """Get top 10 buy and sell recommendations"""
@@ -418,133 +415,314 @@ class Nifty50CompleteAnalyzer:
         
         return top_buys, top_sells
     
-    def create_html_table(self, df, title, columns):
-        """Create HTML table for email"""
-        html = f"<h2 style='color: #2c3e50;'>{title}</h2>\n"
-        html += "<table style='border-collapse: collapse; width: 100%; margin-bottom: 30px;'>\n"
-        html += "<tr style='background-color: #3498db; color: white;'>\n"
-        
-        for col in columns:
-            html += f"<th style='border: 1px solid #ddd; padding: 12px; text-align: left;'>{col}</th>\n"
-        html += "</tr>\n"
-        
-        for idx, row in df.iterrows():
-            bg_color = "#f2f2f2" if idx % 2 == 0 else "white"
-            html += f"<tr style='background-color: {bg_color};'>\n"
-            
-            for col in columns:
-                value = row.get(col, '')
-                html += f"<td style='border: 1px solid #ddd; padding: 10px;'>{value}</td>\n"
-            html += "</tr>\n"
-        
-        html += "</table>\n"
-        return html
-    
-    def generate_email_body(self):
-        """Generate HTML email body"""
+    def generate_email_html(self):
+        """Generate beautiful HTML email"""
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
         
         now = datetime.now()
         time_of_day = "Morning" if now.hour < 12 else "Evening"
         
-        html = f"""
-        <html>
-        <head>
-            <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                .header {{ background-color: #2c3e50; color: white; padding: 20px; text-align: center; }}
-                .content {{ padding: 20px; }}
-                .footer {{ background-color: #ecf0f1; padding: 15px; text-align: center; font-size: 12px; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>📊 NIFTY 50 Stock Analysis Report</h1>
-                <p>{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p IST')}</p>
+        # Count recommendations
+        strong_buy_count = len(df[df['Recommendation'] == 'STRONG BUY'])
+        buy_count = len(df[df['Recommendation'] == 'BUY'])
+        hold_count = len(df[df['Recommendation'] == 'HOLD'])
+        sell_count = len(df[df['Recommendation'] == 'SELL'])
+        strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
+        
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }}
+        .email-container {{
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }}
+        .header p {{
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }}
+        .content {{
+            padding: 30px 20px;
+        }}
+        .summary-box {{
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }}
+        .summary-grid {{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }}
+        .summary-item {{
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }}
+        .summary-item strong {{
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }}
+        .summary-item span {{
+            font-size: 13px;
+        }}
+        h2 {{
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }}
+        .buy-section h2 {{
+            border-bottom: 3px solid #27ae60;
+        }}
+        .sell-section h2 {{
+            border-bottom: 3px solid #e74c3c;
+        }}
+        table {{
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }}
+        th {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }}
+        .buy-section th {{
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }}
+        .sell-section th {{
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }}
+        td {{
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            font-size: 13px;
+        }}
+        tr:nth-child(even) {{
+            background-color: #f9f9f9;
+        }}
+        tr:hover {{
+            background-color: #f0f0f0;
+        }}
+        .rating {{
+            font-weight: bold;
+            font-size: 12px;
+        }}
+        .positive {{
+            color: #27ae60;
+            font-weight: bold;
+        }}
+        .negative {{
+            color: #e74c3c;
+            font-weight: bold;
+        }}
+        .disclaimer {{
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }}
+        .disclaimer strong {{
+            color: #c0392b;
+        }}
+        .footer {{
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+        }}
+        .badge {{
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }}
+        .badge-excellent {{
+            background-color: #27ae60;
+            color: white;
+        }}
+        .badge-good {{
+            background-color: #3498db;
+            color: white;
+        }}
+        .badge-average {{
+            background-color: #f39c12;
+            color: white;
+        }}
+        .badge-poor {{
+            background-color: #e74c3c;
+            color: white;
+        }}
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>📊 NIFTY 50 Stock Analysis Report</h1>
+            <p>{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p IST')}</p>
+        </div>
+        
+        <div class="content">
+            <div class="summary-box">
+                <h2 style="margin: 0 0 15px 0; color: white; border: none;">📈 Market Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <strong>{len(self.results)}</strong>
+                        <span>Stocks Analyzed</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>{strong_buy_count}</strong>
+                        <span>Strong Buy</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>{buy_count}</strong>
+                        <span>Buy</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>{hold_count}</strong>
+                        <span>Hold</span>
+                    </div>
+                </div>
             </div>
-            
-            <div class="content">
-                <h2 style='color: #27ae60;'>📈 Summary</h2>
-                <p><strong>Total Stocks Analyzed:</strong> {len(self.results)}</p>
-                <p><strong>Strong Buy Opportunities:</strong> {len(df[df['Recommendation'] == 'STRONG BUY'])}</p>
-                <p><strong>Buy Opportunities:</strong> {len(df[df['Recommendation'] == 'BUY'])}</p>
-                <p><strong>Hold Recommendations:</strong> {len(df[df['Recommendation'] == 'HOLD'])}</p>
-        """
+"""
         
         # Top 10 Buy Recommendations
         if not top_buys.empty:
-            buy_data = []
+            html += """
+            <div class="buy-section">
+                <h2>🟢 TOP 10 BUY RECOMMENDATIONS</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Score</th>
+                            <th>Upside %</th>
+                            <th>Target</th>
+                            <th>Stop Loss</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+"""
             for idx, row in top_buys.iterrows():
-                buy_data.append({
-                    'Stock': row['Name'],
-                    'Price': f"₹{row['Price']:,.0f}",
-                    'Rating': row['Rating'],
-                    'Score': f"{row['Combined_Score']:.0f}",
-                    'Upside': f"{row['Upside']:+.1f}%",
-                    'Target': f"₹{row['Target_1']:,.0f}",
-                    'Stop Loss': f"₹{row['Stop_Loss']:,.0f}"
-                })
-            buy_df = pd.DataFrame(buy_data)
-            html += self.create_html_table(buy_df, "🟢 TOP 10 BUY RECOMMENDATIONS", 
-                                          ['Stock', 'Price', 'Rating', 'Score', 'Upside', 'Target', 'Stop Loss'])
+                quality_badge = f"badge-{row['Quality'].lower()}"
+                html += f"""
+                        <tr>
+                            <td><strong>{row['Name']}</strong></td>
+                            <td>₹{row['Price']:,.0f}</td>
+                            <td class="rating">{row['Rating']}</td>
+                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
+                            <td class="positive">{row['Upside']:+.1f}%</td>
+                            <td>₹{row['Target_1']:,.0f}</td>
+                            <td>₹{row['Stop_Loss']:,.0f}</td>
+                            <td><span class="badge {quality_badge}">{row['Quality']}</span></td>
+                        </tr>
+"""
+            html += """
+                    </tbody>
+                </table>
+            </div>
+"""
         
         # Top 10 Sell Recommendations
         if not top_sells.empty:
-            sell_data = []
+            html += """
+            <div class="sell-section">
+                <h2>🔴 TOP 10 SELL RECOMMENDATIONS</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Score</th>
+                            <th>RSI</th>
+                            <th>MACD</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+"""
             for idx, row in top_sells.iterrows():
-                sell_data.append({
-                    'Stock': row['Name'],
-                    'Price': f"₹{row['Price']:,.0f}",
-                    'Rating': row['Rating'],
-                    'Score': f"{row['Combined_Score']:.0f}",
-                    'RSI': f"{row['RSI']:.0f}",
-                    'MACD': row['MACD']
-                })
-            sell_df = pd.DataFrame(sell_data)
-            html += self.create_html_table(sell_df, "🔴 TOP 10 SELL RECOMMENDATIONS", 
-                                          ['Stock', 'Price', 'Rating', 'Score', 'RSI', 'MACD'])
+                quality_badge = f"badge-{row['Quality'].lower()}"
+                html += f"""
+                        <tr>
+                            <td><strong>{row['Name']}</strong></td>
+                            <td>₹{row['Price']:,.0f}</td>
+                            <td class="rating">{row['Rating']}</td>
+                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
+                            <td class="negative">{row['RSI']:.0f}</td>
+                            <td>{row['MACD']}</td>
+                            <td><span class="badge {quality_badge}">{row['Quality']}</span></td>
+                        </tr>
+"""
+            html += """
+                    </tbody>
+                </table>
+            </div>
+"""
         
-        html += """
-                <div style='background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;'>
-                    <p><strong>⚠️ DISCLAIMER:</strong> This analysis is for EDUCATIONAL purposes only. NOT financial advice. 
-                    Always do your own research and consult a SEBI registered advisor before investing.</p>
-                </div>
+        # Disclaimer and Footer
+        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
+        html += f"""
+            <div class="disclaimer">
+                <p><strong>⚠️ DISCLAIMER:</strong> This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
+                <ul style="margin: 10px 0;">
+                    <li>Do your own research</li>
+                    <li>Consult a SEBI registered financial advisor</li>
+                    <li>Use proper risk management and stop losses</li>
+                    <li>Never invest more than you can afford to lose</li>
+                </ul>
             </div>
-            
-            <div class="footer">
-                <p>© 2025 NIFTY 50 Analyzer | Automated Stock Analysis System</p>
-            </div>
-        </body>
-        </html>
-        """
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0 0 5px 0;"><strong>© 2025 NIFTY 50 Analyzer</strong></p>
+            <p style="margin: 0;">Automated Stock Analysis System | Next Update: {next_update} IST</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
         
         return html
-    
-    def export_to_excel(self, filename="Nifty50_Analysis.xlsx"):
-        """Export all results to Excel"""
-        try:
-            df = pd.DataFrame(self.results)
-            df_sorted = df.sort_values('Combined_Score', ascending=False)
-            
-            with pd.ExcelWriter(filename, engine='openpyxl') as writer:
-                # All stocks
-                df_sorted.to_excel(writer, sheet_name='All Stocks', index=False)
-                
-                # Top Buys
-                top_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])].nlargest(10, 'Combined_Score')
-                top_buys.to_excel(writer, sheet_name='Top 10 Buys', index=False)
-                
-                # Top Sells
-                top_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])].nsmallest(10, 'Combined_Score')
-                top_sells.to_excel(writer, sheet_name='Top 10 Sells', index=False)
-            
-            print(f"✅ Excel report created: {filename}")
-            return filename
-            
-        except Exception as e:
-            print(f"❌ Error exporting to Excel: {e}")
-            return None
     
     def send_email(self, to_email):
         """Send email with analysis report"""
@@ -555,6 +733,7 @@ class Nifty50CompleteAnalyzer:
             
             if not from_email or not password:
                 print("❌ Gmail credentials not found in environment variables")
+                print("   Set GMAIL_USER and GMAIL_APP_PASSWORD")
                 return False
             
             now = datetime.now()
@@ -567,39 +746,31 @@ class Nifty50CompleteAnalyzer:
             msg['Subject'] = f"📊 NIFTY 50 Analysis - {time_of_day} Report ({now.strftime('%d %b %Y')})"
             
             # Generate email body
-            html_body = self.generate_email_body()
+            html_body = self.generate_email_html()
             msg.attach(MIMEText(html_body, 'html'))
             
-            # Attach Excel file
-            excel_file = self.export_to_excel()
-            if excel_file and os.path.exists(excel_file):
-                with open(excel_file, 'rb') as f:
-                    part = MIMEBase('application', 'octet-stream')
-                    part.set_payload(f.read())
-                    encoders.encode_base64(part)
-                    part.add_header('Content-Disposition', f'attachment; filename={excel_file}')
-                    msg.attach(part)
-            
             # Send email
+            print(f"📧 Sending email to {to_email}...")
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(from_email, password)
             server.send_message(msg)
             server.quit()
             
-            print(f"✅ Email sent successfully to {to_email}")
+            print(f"✅ Email sent successfully!\n")
             return True
             
         except Exception as e:
-            print(f"❌ Error sending email: {e}")
+            print(f"❌ Error sending email: {e}\n")
             return False
     
     def generate_complete_report(self, send_email_flag=True, recipient_email=None):
         """Generate complete analysis report"""
-        print("="*60)
+        print("=" * 70)
         print("📊 NIFTY 50 STOCK ANALYZER")
-        print(f"Started: {datetime.now().strftime('%d-%b-%Y %H:%M IST')}")
-        print("="*60)
+        print(f"Started: {datetime.now().strftime('%d %b %Y, %I:%M %p IST')}")
+        print("=" * 70)
+        print()
         
         # Analyze all stocks
         self.analyze_all_stocks()
@@ -608,9 +779,9 @@ class Nifty50CompleteAnalyzer:
         if send_email_flag and recipient_email:
             self.send_email(recipient_email)
         
-        print("="*60)
-        print("✅ Analysis Complete!")
-        print("="*60)
+        print("=" * 70)
+        print("✅ ANALYSIS COMPLETE!")
+        print("=" * 70)
 
 
 def main():
@@ -618,7 +789,12 @@ def main():
     analyzer = Nifty50CompleteAnalyzer()
     
     # Get recipient email from environment variable
-    recipient = os.environ.get('RECIPIENT_EMAIL', 'your-email@gmail.com')
+    recipient = os.environ.get('RECIPIENT_EMAIL')
+    
+    if not recipient:
+        print("⚠️  RECIPIENT_EMAIL environment variable not set")
+        print("   Please set it to receive email reports")
+        recipient = None
     
     # Generate report and send email
     analyzer.generate_complete_report(send_email_flag=True, recipient_email=recipient)
