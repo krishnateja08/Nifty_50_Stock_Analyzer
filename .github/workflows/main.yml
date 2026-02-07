@@ -1,12 +1,14 @@
 name: NIFTY 50 Stock Analyzer
 
 on:
+  push:
+    branches: [ main ]  # Runs immediately when you push/save to main
   schedule:
     # Run at 09:30 IST (04:00 UTC) every day
     - cron: '0 4 * * *'
     # Run at 16:30 IST (11:00 UTC) every day
     - cron: '0 11 * * *'
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:     # Allows you to click "Run workflow" manually
 
 jobs:
   analyze-stocks:
@@ -14,12 +16,13 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4  # Updated to v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5  # Updated to v5
       with:
         python-version: '3.10'
+        cache: 'pip' # Optional: speeds up future runs
     
     - name: Install dependencies
       run: |
@@ -28,14 +31,16 @@ jobs:
     
     - name: Run stock analyzer
       env:
+        # Ensure these exact names are in your GitHub Repo Secrets
         GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASS }}
         RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
       run: |
         python Nifty50_stocksanalyzer.py
     
     - name: Upload Excel report as artifact
-      uses: actions/upload-artifact@v3
+      if: always() # Ensures the file is uploaded even if the email step fails
+      uses: actions/upload-artifact@v4  # FIXED: Updated from v3 to v4
       with:
         name: nifty50-report-${{ github.run_number }}
         path: Nifty50_Analysis.xlsx
