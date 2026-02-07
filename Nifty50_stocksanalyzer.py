@@ -53,7 +53,7 @@ class Nifty50CompleteAnalyzer:
             'ONGC.NS': 'ONGC',
             'TECHM.NS': 'Tech Mahindra',
             'M&M.NS': 'M&M',
-            'TATAMOTORS.NS': 'Tata Motors',
+            'TMCV.NS': 'Tata Motors',
             'TATASTEEL.NS': 'Tata Steel',
             'INDUSINDBK.NS': 'IndusInd Bank',
             'ADANIPORTS.NS': 'Adani Ports',
