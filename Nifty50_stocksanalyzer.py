@@ -442,45 +442,45 @@ class Nifty50CompleteAnalyzer:
 <head>
     <meta charset="UTF-8">
 </head>
-<body bgcolor="#000000" style="margin:0; padding:0; font-family: Arial, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000">
+<body bgcolor="#ffffff" style="margin:0; padding:0; font-family: Arial, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff">
         <tr>
             <td align="center" style="padding: 20px;">
-                <table width="900" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a1a1a" style="border-radius: 10px;">
+                <table width="900" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f9fa">
                     <!-- Header -->
                     <tr>
-                        <td bgcolor="#2a5298" align="center" style="padding: 30px; border-radius: 10px 10px 0 0;">
-                            <h1 style="color: white; margin: 0; font-size: 32px;">📊 NIFTY 50 Stock Analysis Report</h1>
-                            <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
+                        <td bgcolor="#1e40af" align="center" style="padding: 30px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 32px;">📊 NIFTY 50 Stock Analysis Report</h1>
+                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
                         </td>
                     </tr>
                     
                     <!-- Content -->
                     <tr>
-                        <td bgcolor="#1a1a1a" style="padding: 30px;">
+                        <td bgcolor="#ffffff" style="padding: 30px;">
                             
                             <!-- Summary Box -->
-                            <table width="100%" cellpadding="15" cellspacing="0" border="0" bgcolor="#4a90e2" style="border-radius: 10px; margin-bottom: 30px;">
+                            <table width="100%" cellpadding="15" cellspacing="0" border="0" bgcolor="#1e40af" style="border-radius: 10px; margin-bottom: 30px;">
                                 <tr>
                                     <td>
-                                        <h2 style="color: white; margin: 0 0 15px 0; font-size: 20px;">📈 Market Summary</h2>
+                                        <h2 style="color: #ffffff; margin: 0 0 15px 0; font-size: 20px;">📈 Market Summary</h2>
                                         <table width="100%" cellpadding="10" cellspacing="10" border="0">
                                             <tr>
-                                                <td width="25%" bgcolor="rgba(255,255,255,0.2)" align="center" style="border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                                                    <strong style="color: white; font-size: 32px; display: block;">{len(self.results)}</strong>
-                                                    <span style="color: white; font-size: 13px;">STOCKS ANALYZED</span>
+                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
+                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{len(self.results)}</strong>
+                                                    <span style="color: #ffffff; font-size: 13px;">STOCKS ANALYZED</span>
                                                 </td>
-                                                <td width="25%" bgcolor="rgba(255,255,255,0.2)" align="center" style="border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                                                    <strong style="color: white; font-size: 32px; display: block;">{strong_buy_count}</strong>
-                                                    <span style="color: white; font-size: 13px;">STRONG BUY</span>
+                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
+                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{strong_buy_count}</strong>
+                                                    <span style="color: #ffffff; font-size: 13px;">STRONG BUY</span>
                                                 </td>
-                                                <td width="25%" bgcolor="rgba(255,255,255,0.2)" align="center" style="border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                                                    <strong style="color: white; font-size: 32px; display: block;">{buy_count}</strong>
-                                                    <span style="color: white; font-size: 13px;">BUY</span>
+                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
+                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{buy_count}</strong>
+                                                    <span style="color: #ffffff; font-size: 13px;">BUY</span>
                                                 </td>
-                                                <td width="25%" bgcolor="rgba(255,255,255,0.2)" align="center" style="border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                                                    <strong style="color: white; font-size: 32px; display: block;">{hold_count}</strong>
-                                                    <span style="color: white; font-size: 13px;">HOLD</span>
+                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
+                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{hold_count}</strong>
+                                                    <span style="color: #ffffff; font-size: 13px;">HOLD</span>
                                                 </td>
                                             </tr>
                                         </table>
@@ -493,41 +493,52 @@ class Nifty50CompleteAnalyzer:
         if not top_buys.empty:
             html += """
                             <!-- BUY Section -->
-                            <h2 style="color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; margin-top: 40px;">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="0" bgcolor="#2d2d2d" style="border-radius: 8px; margin: 20px 0;">
-                                <tr bgcolor="#10b981">
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">UPSIDE %</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">TARGET</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">STOP LOSS</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
+                            <h2 style="color: #15803d; border-bottom: 3px solid #15803d; padding-bottom: 10px; margin-top: 40px;">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
+                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#d1d5db" style="border-collapse: collapse; margin: 20px 0;">
+                                <tr bgcolor="#15803d">
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">UPSIDE %</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">TARGET</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOP LOSS</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
                                 </tr>
 """
+            row_num = 0
             for idx, row in top_buys.iterrows():
-                upside_color = "#10b981" if row['Upside'] > 0 else "#ef4444"
+                row_num += 1
+                row_bg = "#ffffff" if row_num % 2 == 1 else "#f9fafb"
                 
+                # Upside color - HIGHLY VISIBLE
+                if row['Upside'] > 0:
+                    upside_color = "#15803d"  # Dark green
+                elif row['Upside'] < 0:
+                    upside_color = "#dc2626"  # Dark red
+                else:
+                    upside_color = "#000000"  # Black
+                
+                # Quality badge color
                 if row['Quality'] == 'Excellent':
-                    badge_color = "#10b981"
+                    badge_color = "#15803d"
                 elif row['Quality'] == 'Good':
                     badge_color = "#3b82f6"
                 elif row['Quality'] == 'Average':
                     badge_color = "#f59e0b"
                 else:
-                    badge_color = "#ef4444"
+                    badge_color = "#dc2626"
                 
                 html += f"""
-                                <tr bgcolor="#2d2d2d">
-                                    <td style="color: #ffffff; font-weight: 600; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['Name']}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #ffffff; font-weight: bold; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {upside_color}; font-weight: bold; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['Upside']:+.1f}%</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040;">₹{row['Target_1']:,.0f}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040;">₹{row['Stop_Loss']:,.0f}</td>
-                                    <td style="padding: 14px 12px; border-bottom: 1px solid #404040;"><span style="background-color: {badge_color}; color: white; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
+                                <tr bgcolor="{row_bg}">
+                                    <td style="color: #000000; font-weight: 600; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Name']}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Price']:,.0f}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
+                                    <td style="color: #000000; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Combined_Score']:.0f}</td>
+                                    <td style="color: {upside_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 16px;">{row['Upside']:+.1f}%</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Target_1']:,.0f}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Stop_Loss']:,.0f}</td>
+                                    <td style="padding: 14px 12px; border: 1px solid #d1d5db;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
                                 </tr>
 """
             html += """
@@ -538,39 +549,50 @@ class Nifty50CompleteAnalyzer:
         if not top_sells.empty:
             html += """
                             <!-- SELL Section -->
-                            <h2 style="color: #ef4444; border-bottom: 3px solid #ef4444; padding-bottom: 10px; margin-top: 40px;">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="0" bgcolor="#2d2d2d" style="border-radius: 8px; margin: 20px 0;">
-                                <tr bgcolor="#ef4444">
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">RSI</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">MACD</th>
-                                    <th style="color: white; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
+                            <h2 style="color: #dc2626; border-bottom: 3px solid #dc2626; padding-bottom: 10px; margin-top: 40px;">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
+                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#d1d5db" style="border-collapse: collapse; margin: 20px 0;">
+                                <tr bgcolor="#dc2626">
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RSI</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">MACD</th>
+                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
                                 </tr>
 """
+            row_num = 0
             for idx, row in top_sells.iterrows():
-                rsi_color = "#ef4444" if row['RSI'] > 70 else ("#10b981" if row['RSI'] < 30 else "#f59e0b")
+                row_num += 1
+                row_bg = "#ffffff" if row_num % 2 == 1 else "#f9fafb"
                 
+                # RSI color - HIGHLY VISIBLE
+                if row['RSI'] > 70:
+                    rsi_color = "#dc2626"  # Dark red - Overbought
+                elif row['RSI'] < 30:
+                    rsi_color = "#15803d"  # Dark green - Oversold
+                else:
+                    rsi_color = "#f59e0b"  # Orange - Neutral
+                
+                # Quality badge color
                 if row['Quality'] == 'Excellent':
-                    badge_color = "#10b981"
+                    badge_color = "#15803d"
                 elif row['Quality'] == 'Good':
                     badge_color = "#3b82f6"
                 elif row['Quality'] == 'Average':
                     badge_color = "#f59e0b"
                 else:
-                    badge_color = "#ef4444"
+                    badge_color = "#dc2626"
                 
                 html += f"""
-                                <tr bgcolor="#2d2d2d">
-                                    <td style="color: #ffffff; font-weight: 600; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['Name']}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #ffffff; font-weight: bold; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {rsi_color}; font-weight: bold; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['RSI']:.0f}</td>
-                                    <td style="color: #e0e0e0; padding: 14px 12px; border-bottom: 1px solid #404040;">{row['MACD']}</td>
-                                    <td style="padding: 14px 12px; border-bottom: 1px solid #404040;"><span style="background-color: {badge_color}; color: white; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
+                                <tr bgcolor="{row_bg}">
+                                    <td style="color: #000000; font-weight: 600; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Name']}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Price']:,.0f}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
+                                    <td style="color: #000000; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Combined_Score']:.0f}</td>
+                                    <td style="color: {rsi_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 16px;">{row['RSI']:.0f}</td>
+                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">{row['MACD']}</td>
+                                    <td style="padding: 14px 12px; border: 1px solid #d1d5db;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
                                 </tr>
 """
             html += """
@@ -581,11 +603,11 @@ class Nifty50CompleteAnalyzer:
         next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
         html += f"""
                             <!-- Disclaimer -->
-                            <table width="100%" cellpadding="20" cellspacing="0" border="0" bgcolor="#92400e" style="border-radius: 8px; border-left: 4px solid #f59e0b; margin: 30px 0;">
+                            <table width="100%" cellpadding="20" cellspacing="0" border="2" bordercolor="#f59e0b" bgcolor="#fef3c7" style="margin: 30px 0;">
                                 <tr>
                                     <td>
-                                        <p style="color: #fef3c7; margin: 0 0 10px 0;"><strong style="color: #fbbf24;">⚠️ DISCLAIMER:</strong> This analysis is for <strong style="color: #fbbf24;">EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
-                                        <ul style="color: #fef3c7; margin: 10px 0; padding-left: 20px;">
+                                        <p style="color: #000000; margin: 0 0 10px 0;"><strong style="color: #dc2626;">⚠️ DISCLAIMER:</strong> This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
+                                        <ul style="color: #000000; margin: 10px 0; padding-left: 20px;">
                                             <li>Do your own research</li>
                                             <li>Consult a SEBI registered financial advisor</li>
                                             <li>Use proper risk management and stop losses</li>
@@ -600,9 +622,9 @@ class Nifty50CompleteAnalyzer:
                     
                     <!-- Footer -->
                     <tr>
-                        <td bgcolor="#0d0d0d" align="center" style="padding: 25px; border-radius: 0 0 10px 10px;">
-                            <p style="color: #e0e0e0; margin: 0 0 5px 0; font-size: 13px;"><strong>© 2025 NIFTY 50 Analyzer</strong></p>
-                            <p style="color: #9ca3af; margin: 0; font-size: 13px;">Automated Stock Analysis System | Next Update: {next_update} IST</p>
+                        <td bgcolor="#1f2937" align="center" style="padding: 25px;">
+                            <p style="color: #ffffff; margin: 0 0 5px 0; font-size: 13px;"><strong>© 2025 NIFTY 50 Analyzer</strong></p>
+                            <p style="color: #d1d5db; margin: 0; font-size: 13px;">Automated Stock Analysis System | Next Update: {next_update} IST</p>
                         </td>
                     </tr>
                 </table>
