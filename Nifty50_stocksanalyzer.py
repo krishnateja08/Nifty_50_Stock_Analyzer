@@ -719,3 +719,19 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+###############################
+if __name__ == "__main__":
+    analyzer = SP500CompleteAnalyzer()
+    analyzer.analyze_all_stocks()
+    
+    # 1. Generate the HTML content
+    report_html = analyzer.generate_email_html()
+    
+    # 2. Save it as index.html (This is what GitHub Pages will display)
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(report_html)
+    
+    # 3. Keep your existing email logic here
+    # analyzer.send_email(report_html) 
+    print("✅ Report saved to index.html and sent to email.")
