@@ -43,21 +43,3 @@ jobs:
         name: nifty50-report
         path: Nifty50_Analysis.xlsx
         retention-days: 7
-# NEW STEP: Deploy the generated index.html to GitHub Pages
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./ # Looks for index.html in your main folder
-        publish_branch: gh-pages
-    
-    - name: Upload analysis results (Artifacts)
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: analysis-logs
-        path: |
-          *.log
-          *.txt
-          index.html
-        retention-days: 7
