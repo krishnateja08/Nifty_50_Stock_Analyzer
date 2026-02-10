@@ -4,9 +4,15 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '7 4 * * *'
-    - cron: '7 11 * * *'
+    - cron: '7 4 * * *'    # 9:37 AM IST
+    - cron: '7 11 * * *'   # 4:37 PM IST
   workflow_dispatch:
+
+# Add permissions for GitHub Pages deployment
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   analyze-stocks:
@@ -20,12 +26,11 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        # Removed the cache option to stop the requirement.txt warning
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install yfinance pandas numpy tabulate openpyxl
+        pip install yfinance pandas numpy tabulate openpyxl pytz
     
     - name: Run stock analyzer
       env:
@@ -33,11 +38,22 @@ jobs:
         GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
       run: |
-        # Ensure this filename exactly matches your file in GitHub!
         python Nifty50_stocksanalyzer.py
     
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        publish_branch: gh-pages
+        keep_files: false
+        enable_jekyll: false
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'Update NIFTY 50 analysis - ${{ github.event.head_commit.message }}'
+    
     - name: Upload Excel report as artifact
-      if: always() 
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: nifty50-report
