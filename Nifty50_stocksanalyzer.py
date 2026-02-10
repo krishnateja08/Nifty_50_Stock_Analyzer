@@ -1,6 +1,6 @@
 """
 NIFTY 50 COMPLETE STOCK ANALYZER
-Technical + Fundamental Analysis with Email Delivery
+Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 Requirements:
 pip install yfinance pandas numpy openpyxl pytz
@@ -51,8 +51,7 @@ class Nifty50CompleteAnalyzer:
             'ONGC.NS': 'ONGC',
             'TECHM.NS': 'Tech Mahindra',
             'M&M.NS': 'M&M',
-            'TMCV.NS': 'Tata Motors Commercial',
-            'TMPV.NS': 'Tata Motors Passenger',
+            'TATAMOTORS.NS': 'Tata Motors',
             'TATASTEEL.NS': 'Tata Steel',
             'INDUSINDBK.NS': 'IndusInd Bank',
             'ADANIPORTS.NS': 'Adani Ports',
@@ -422,6 +421,428 @@ class Nifty50CompleteAnalyzer:
         
         return top_buys, top_sells
     
+    def generate_github_pages_html(self, output_file='index.html'):
+        """Generate beautiful HTML for GitHub Pages"""
+        df = pd.DataFrame(self.results)
+        top_buys, top_sells = self.get_top_recommendations()
+        
+        now = self.get_ist_time()
+        time_of_day = "Morning" if now.hour < 12 else "Evening"
+        
+        # Count recommendations
+        strong_buy_count = len(df[df['Recommendation'] == 'STRONG BUY'])
+        buy_count = len(df[df['Recommendation'] == 'BUY'])
+        hold_count = len(df[df['Recommendation'] == 'HOLD'])
+        sell_count = len(df[df['Recommendation'] == 'SELL'])
+        strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
+        
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIFTY 50 Stock Analysis - Live Report</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }}
+        
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }}
+        
+        .header {{
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }}
+        
+        .header h1 {{
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }}
+        
+        .header p {{
+            font-size: 18px;
+            opacity: 0.9;
+        }}
+        
+        .last-updated {{
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+        }}
+        
+        .summary-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }}
+        
+        .summary-card {{
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }}
+        
+        .summary-card:hover {{
+            transform: translateY(-5px);
+        }}
+        
+        .summary-card .number {{
+            font-size: 48px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }}
+        
+        .summary-card .label {{
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        
+        .content {{
+            padding: 40px;
+        }}
+        
+        .section {{
+            margin-bottom: 50px;
+        }}
+        
+        .section-title {{
+            font-size: 32px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #15803d;
+            color: #15803d;
+        }}
+        
+        .section-title.sell {{
+            border-bottom-color: #dc2626;
+            color: #dc2626;
+        }}
+        
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }}
+        
+        thead {{
+            background: #15803d;
+            color: white;
+        }}
+        
+        thead.sell {{
+            background: #dc2626;
+        }}
+        
+        th {{
+            padding: 18px 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        td {{
+            padding: 16px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }}
+        
+        tr:hover {{
+            background-color: #f9fafb;
+        }}
+        
+        .stock-name {{
+            font-weight: 600;
+            color: #1f2937;
+        }}
+        
+        .rating {{
+            font-weight: bold;
+            font-size: 12px;
+        }}
+        
+        .upside-positive {{
+            color: #15803d;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        
+        .upside-negative {{
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        
+        .rsi-overbought {{
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        
+        .rsi-oversold {{
+            color: #15803d;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        
+        .rsi-neutral {{
+            color: #f59e0b;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        
+        .quality-badge {{
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }}
+        
+        .quality-excellent {{ background: #15803d; }}
+        .quality-good {{ background: #3b82f6; }}
+        .quality-average {{ background: #f59e0b; }}
+        .quality-poor {{ background: #dc2626; }}
+        
+        .disclaimer {{
+            background: #fef3c7;
+            border: 3px solid #f59e0b;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+        }}
+        
+        .disclaimer h3 {{
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }}
+        
+        .disclaimer ul {{
+            margin-left: 25px;
+            margin-top: 15px;
+            line-height: 1.8;
+        }}
+        
+        .footer {{
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }}
+        
+        .footer p {{
+            margin: 5px 0;
+        }}
+        
+        @media (max-width: 768px) {{
+            .header h1 {{ font-size: 28px; }}
+            .summary-grid {{ grid-template-columns: repeat(2, 1fr); }}
+            table {{ font-size: 12px; }}
+            th, td {{ padding: 10px 8px; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 NIFTY 50 Stock Analysis</h1>
+            <p>{time_of_day} Market Report</p>
+            <div class="last-updated">
+                Last Updated: {now.strftime('%d %b %Y, %I:%M %p')} IST
+            </div>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="number">{len(self.results)}</div>
+                <div class="label">Stocks Analyzed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number">{strong_buy_count}</div>
+                <div class="label">Strong Buy</div>
+            </div>
+            <div class="summary-card">
+                <div class="number">{buy_count}</div>
+                <div class="label">Buy</div>
+            </div>
+            <div class="summary-card">
+                <div class="number">{hold_count}</div>
+                <div class="label">Hold</div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+"""
+        
+        # Top 10 Buy Recommendations
+        if not top_buys.empty:
+            html += """
+            <div class="section">
+                <h2 class="section-title">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Score</th>
+                            <th>Upside %</th>
+                            <th>Target</th>
+                            <th>Stop Loss</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+"""
+            for idx, row in top_buys.iterrows():
+                upside_class = "upside-positive" if row['Upside'] > 0 else "upside-negative"
+                
+                quality_class = {
+                    'Excellent': 'quality-excellent',
+                    'Good': 'quality-good',
+                    'Average': 'quality-average',
+                    'Poor': 'quality-poor'
+                }.get(row['Quality'], 'quality-average')
+                
+                html += f"""
+                        <tr>
+                            <td class="stock-name">{row['Name']}</td>
+                            <td>₹{row['Price']:,.0f}</td>
+                            <td class="rating">{row['Rating']}</td>
+                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
+                            <td class="{upside_class}">{row['Upside']:+.1f}%</td>
+                            <td>₹{row['Target_1']:,.0f}</td>
+                            <td>₹{row['Stop_Loss']:,.0f}</td>
+                            <td><span class="quality-badge {quality_class}">{row['Quality']}</span></td>
+                        </tr>
+"""
+            html += """
+                    </tbody>
+                </table>
+            </div>
+"""
+        
+        # Top 10 Sell Recommendations
+        if not top_sells.empty:
+            html += """
+            <div class="section">
+                <h2 class="section-title sell">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
+                <table>
+                    <thead class="sell">
+                        <tr>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                            <th>Score</th>
+                            <th>RSI</th>
+                            <th>MACD</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+"""
+            for idx, row in top_sells.iterrows():
+                if row['RSI'] > 70:
+                    rsi_class = "rsi-overbought"
+                elif row['RSI'] < 30:
+                    rsi_class = "rsi-oversold"
+                else:
+                    rsi_class = "rsi-neutral"
+                
+                quality_class = {
+                    'Excellent': 'quality-excellent',
+                    'Good': 'quality-good',
+                    'Average': 'quality-average',
+                    'Poor': 'quality-poor'
+                }.get(row['Quality'], 'quality-average')
+                
+                html += f"""
+                        <tr>
+                            <td class="stock-name">{row['Name']}</td>
+                            <td>₹{row['Price']:,.0f}</td>
+                            <td class="rating">{row['Rating']}</td>
+                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
+                            <td class="{rsi_class}">{row['RSI']:.0f}</td>
+                            <td>{row['MACD']}</td>
+                            <td><span class="quality-badge {quality_class}">{row['Quality']}</span></td>
+                        </tr>
+"""
+            html += """
+                    </tbody>
+                </table>
+            </div>
+"""
+        
+        # Disclaimer
+        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
+        html += f"""
+            <div class="disclaimer">
+                <h3>⚠️ DISCLAIMER</h3>
+                <p>This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice.</p>
+                <ul>
+                    <li>Do your own research</li>
+                    <li>Consult a SEBI registered financial advisor</li>
+                    <li>Use proper risk management and stop losses</li>
+                    <li>Never invest more than you can afford to lose</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>© 2025 NIFTY 50 Analyzer</strong></p>
+            <p>Automated Stock Analysis System | Next Update: {next_update} IST</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        
+        # Write to file
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(html)
+        
+        print(f"✅ GitHub Pages HTML generated: {output_file}\n")
+        return output_file
+    
     def generate_email_html(self):
         """Generate beautiful HTML email with BLACK background"""
         df = pd.DataFrame(self.results)
@@ -679,7 +1100,7 @@ class Nifty50CompleteAnalyzer:
             print(f"❌ Error sending email: {e}\n")
             return False
     
-    def generate_complete_report(self, send_email_flag=True, recipient_email=None):
+    def generate_complete_report(self, send_email_flag=True, recipient_email=None, generate_github_pages=True):
         """Generate complete analysis report"""
         ist_time = self.get_ist_time()
         
@@ -691,6 +1112,10 @@ class Nifty50CompleteAnalyzer:
         
         # Analyze all stocks
         self.analyze_all_stocks()
+        
+        # Generate GitHub Pages HTML
+        if generate_github_pages:
+            self.generate_github_pages_html('index.html')
         
         # Send email if requested
         if send_email_flag and recipient_email:
@@ -713,11 +1138,13 @@ def main():
         print("   Please set it to receive email reports")
         recipient = None
     
-    # Generate report and send email
-    analyzer.generate_complete_report(send_email_flag=True, recipient_email=recipient)
+    # Generate report, GitHub Pages HTML, and send email
+    analyzer.generate_complete_report(
+        send_email_flag=True, 
+        recipient_email=recipient,
+        generate_github_pages=True
+    )
 
 
 if __name__ == "__main__":
     main()
-
-
