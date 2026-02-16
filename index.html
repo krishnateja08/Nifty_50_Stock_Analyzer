@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIFTY 50 Stock Analysis - Live Report</title>
+    <title>NIFTY 50 Stock Analysis - Royal Sapphire</title>
     <style>
         * {
             margin: 0;
@@ -12,8 +12,8 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Georgia', serif;
+            background: #0a0e27;
             padding: 20px;
             min-height: 100vh;
         }
@@ -21,37 +21,61 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: #1a237e;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(63,81,181,0.4);
             overflow: hidden;
+            border: 3px solid #3f51b5;
         }
         
         .header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: white;
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: #ffffff;
             padding: 40px;
             text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 20px 20px;
+            opacity: 0.3;
         }
         
         .header h1 {
             font-size: 42px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
         }
         
         .header p {
             font-size: 18px;
-            opacity: 0.9;
+            opacity: 0.95;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
         }
         
         .last-updated {
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
             padding: 10px 20px;
             border-radius: 25px;
             display: inline-block;
             margin-top: 15px;
             font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 1;
         }
         
         .summary-grid {
@@ -59,38 +83,43 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             padding: 40px;
-            background: #f8f9fa;
+            background: #0f1535;
         }
         
         .summary-card {
-            background: white;
+            background: linear-gradient(145deg, #283593, #1a237e);
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(63,81,181,0.3);
             text-align: center;
             transition: transform 0.3s ease;
+            border: 2px solid #3f51b5;
         }
         
         .summary-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(63,81,181,0.5);
+            border-color: #5c6bc0;
         }
         
         .summary-card .number {
             font-size: 48px;
             font-weight: bold;
-            color: #1e40af;
+            color: #9fa8da;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(159,168,218,0.5);
         }
         
         .summary-card .label {
             font-size: 14px;
-            color: #6b7280;
+            color: #c5cae9;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
         .content {
             padding: 40px;
+            background: #0f1535;
         }
         
         .section {
@@ -101,54 +130,56 @@
             font-size: 32px;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 4px solid #15803d;
-            color: #15803d;
+            border-bottom: 4px solid #3f51b5;
+            color: #7986cb;
+            text-shadow: 0 0 10px rgba(121,134,203,0.3);
         }
         
         .section-title.sell {
-            border-bottom-color: #dc2626;
-            color: #dc2626;
+            border-bottom-color: #f44336;
+            color: #ef5350;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: #1a237e;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         
         thead {
-            background: #15803d;
-            color: white;
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: #ffffff;
         }
         
         thead.sell {
-            background: #dc2626;
+            background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
         }
         
         th {
             padding: 18px 15px;
             text-align: left;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         td {
             padding: 16px 15px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #283593;
+            color: #e8eaf6;
         }
         
         tr:hover {
-            background-color: #f9fafb;
+            background-color: #283593;
         }
         
         .stock-name {
             font-weight: 600;
-            color: #1f2937;
+            color: #9fa8da;
         }
         
         .rating {
@@ -157,31 +188,31 @@
         }
         
         .upside-positive {
-            color: #15803d;
+            color: #66bb6a;
             font-weight: bold;
             font-size: 16px;
         }
         
         .upside-negative {
-            color: #dc2626;
+            color: #ef5350;
             font-weight: bold;
             font-size: 16px;
         }
         
         .rsi-overbought {
-            color: #dc2626;
+            color: #ef5350;
             font-weight: bold;
             font-size: 16px;
         }
         
         .rsi-oversold {
-            color: #15803d;
+            color: #66bb6a;
             font-weight: bold;
             font-size: 16px;
         }
         
         .rsi-neutral {
-            color: #f59e0b;
+            color: #ffa726;
             font-weight: bold;
             font-size: 16px;
         }
@@ -195,34 +226,39 @@
             display: inline-block;
         }
         
-        .quality-excellent { background: #15803d; }
-        .quality-good { background: #3b82f6; }
-        .quality-average { background: #f59e0b; }
-        .quality-poor { background: #dc2626; }
+        .quality-excellent { background: #5c6bc0; }
+        .quality-good { background: #7986cb; }
+        .quality-average { background: #9fa8da; }
+        .quality-poor { background: #ef5350; }
         
         .disclaimer {
-            background: #fef3c7;
-            border: 3px solid #f59e0b;
+            background: #1a237e;
+            border: 3px solid #ffa726;
             border-radius: 15px;
             padding: 30px;
             margin: 40px 0;
         }
         
         .disclaimer h3 {
-            color: #dc2626;
+            color: #ef5350;
             margin-bottom: 15px;
             font-size: 20px;
+        }
+        
+        .disclaimer p {
+            color: #e8eaf6;
         }
         
         .disclaimer ul {
             margin-left: 25px;
             margin-top: 15px;
             line-height: 1.8;
+            color: #e8eaf6;
         }
         
         .footer {
-            background: #1f2937;
-            color: white;
+            background: #0a0e27;
+            color: #9fa8da;
             text-align: center;
             padding: 30px;
         }
@@ -243,10 +279,10 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📊 NIFTY 50 Stock Analysis</h1>
-            <p>Evening Market Report</p>
+            <h1>💎 NIFTY 50 Stock Analysis</h1>
+            <p>Morning Market Report - Royal Sapphire Edition</p>
             <div class="last-updated">
-                Last Updated: 15 Feb 2026, 04:59 PM IST
+                Last Updated: 16 Feb 2026, 08:20 AM IST
             </div>
         </div>
         
@@ -538,8 +574,8 @@
         
         <!-- Footer -->
         <div class="footer">
-            <p><strong>© 2025 NIFTY 50 Analyzer</strong></p>
-            <p>Automated Stock Analysis System | Next Update: 9:30 AM (Next Day) IST</p>
+            <p><strong>© 2025 NIFTY 50 Analyzer - Royal Sapphire Edition</strong></p>
+            <p>Premium Elite Trading Analysis | Next Update: 4:30 PM IST</p>
         </div>
     </div>
 </body>
