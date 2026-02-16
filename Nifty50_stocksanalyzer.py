@@ -1,5 +1,5 @@
 """
-NIFTY 50 COMPLETE STOCK ANALYZER
+NIFTY 50 COMPLETE STOCK ANALYZER - ROYAL SAPPHIRE THEME
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 Requirements:
@@ -422,7 +422,7 @@ class Nifty50CompleteAnalyzer:
         return top_buys, top_sells
     
     def generate_github_pages_html(self, output_file='index.html'):
-        """Generate beautiful HTML for GitHub Pages"""
+        """Generate beautiful HTML for GitHub Pages - ROYAL SAPPHIRE THEME"""
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
         
@@ -441,7 +441,7 @@ class Nifty50CompleteAnalyzer:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIFTY 50 Stock Analysis - Live Report</title>
+    <title>NIFTY 50 Stock Analysis - Royal Sapphire</title>
     <style>
         * {{
             margin: 0;
@@ -450,8 +450,8 @@ class Nifty50CompleteAnalyzer:
         }}
         
         body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Georgia', serif;
+            background: #0a0e27;
             padding: 20px;
             min-height: 100vh;
         }}
@@ -459,37 +459,61 @@ class Nifty50CompleteAnalyzer:
         .container {{
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: #1a237e;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(63,81,181,0.4);
             overflow: hidden;
+            border: 3px solid #3f51b5;
         }}
         
         .header {{
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: white;
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: #ffffff;
             padding: 40px;
             text-align: center;
+            position: relative;
+        }}
+        
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 20px 20px;
+            opacity: 0.3;
         }}
         
         .header h1 {{
             font-size: 42px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
         }}
         
         .header p {{
             font-size: 18px;
-            opacity: 0.9;
+            opacity: 0.95;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
         }}
         
         .last-updated {{
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
             padding: 10px 20px;
             border-radius: 25px;
             display: inline-block;
             margin-top: 15px;
             font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 1;
         }}
         
         .summary-grid {{
@@ -497,38 +521,43 @@ class Nifty50CompleteAnalyzer:
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             padding: 40px;
-            background: #f8f9fa;
+            background: #0f1535;
         }}
         
         .summary-card {{
-            background: white;
+            background: linear-gradient(145deg, #283593, #1a237e);
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(63,81,181,0.3);
             text-align: center;
             transition: transform 0.3s ease;
+            border: 2px solid #3f51b5;
         }}
         
         .summary-card:hover {{
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(63,81,181,0.5);
+            border-color: #5c6bc0;
         }}
         
         .summary-card .number {{
             font-size: 48px;
             font-weight: bold;
-            color: #1e40af;
+            color: #9fa8da;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(159,168,218,0.5);
         }}
         
         .summary-card .label {{
             font-size: 14px;
-            color: #6b7280;
+            color: #c5cae9;
             text-transform: uppercase;
             letter-spacing: 1px;
         }}
         
         .content {{
             padding: 40px;
+            background: #0f1535;
         }}
         
         .section {{
@@ -539,54 +568,56 @@ class Nifty50CompleteAnalyzer:
             font-size: 32px;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 4px solid #15803d;
-            color: #15803d;
+            border-bottom: 4px solid #3f51b5;
+            color: #7986cb;
+            text-shadow: 0 0 10px rgba(121,134,203,0.3);
         }}
         
         .section-title.sell {{
-            border-bottom-color: #dc2626;
-            color: #dc2626;
+            border-bottom-color: #f44336;
+            color: #ef5350;
         }}
         
         table {{
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: #1a237e;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }}
         
         thead {{
-            background: #15803d;
-            color: white;
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: #ffffff;
         }}
         
         thead.sell {{
-            background: #dc2626;
+            background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
         }}
         
         th {{
             padding: 18px 15px;
             text-align: left;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }}
         
         td {{
             padding: 16px 15px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #283593;
+            color: #e8eaf6;
         }}
         
         tr:hover {{
-            background-color: #f9fafb;
+            background-color: #283593;
         }}
         
         .stock-name {{
             font-weight: 600;
-            color: #1f2937;
+            color: #9fa8da;
         }}
         
         .rating {{
@@ -595,31 +626,31 @@ class Nifty50CompleteAnalyzer:
         }}
         
         .upside-positive {{
-            color: #15803d;
+            color: #66bb6a;
             font-weight: bold;
             font-size: 16px;
         }}
         
         .upside-negative {{
-            color: #dc2626;
+            color: #ef5350;
             font-weight: bold;
             font-size: 16px;
         }}
         
         .rsi-overbought {{
-            color: #dc2626;
+            color: #ef5350;
             font-weight: bold;
             font-size: 16px;
         }}
         
         .rsi-oversold {{
-            color: #15803d;
+            color: #66bb6a;
             font-weight: bold;
             font-size: 16px;
         }}
         
         .rsi-neutral {{
-            color: #f59e0b;
+            color: #ffa726;
             font-weight: bold;
             font-size: 16px;
         }}
@@ -633,34 +664,39 @@ class Nifty50CompleteAnalyzer:
             display: inline-block;
         }}
         
-        .quality-excellent {{ background: #15803d; }}
-        .quality-good {{ background: #3b82f6; }}
-        .quality-average {{ background: #f59e0b; }}
-        .quality-poor {{ background: #dc2626; }}
+        .quality-excellent {{ background: #5c6bc0; }}
+        .quality-good {{ background: #7986cb; }}
+        .quality-average {{ background: #9fa8da; }}
+        .quality-poor {{ background: #ef5350; }}
         
         .disclaimer {{
-            background: #fef3c7;
-            border: 3px solid #f59e0b;
+            background: #1a237e;
+            border: 3px solid #ffa726;
             border-radius: 15px;
             padding: 30px;
             margin: 40px 0;
         }}
         
         .disclaimer h3 {{
-            color: #dc2626;
+            color: #ef5350;
             margin-bottom: 15px;
             font-size: 20px;
+        }}
+        
+        .disclaimer p {{
+            color: #e8eaf6;
         }}
         
         .disclaimer ul {{
             margin-left: 25px;
             margin-top: 15px;
             line-height: 1.8;
+            color: #e8eaf6;
         }}
         
         .footer {{
-            background: #1f2937;
-            color: white;
+            background: #0a0e27;
+            color: #9fa8da;
             text-align: center;
             padding: 30px;
         }}
@@ -681,8 +717,8 @@ class Nifty50CompleteAnalyzer:
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📊 NIFTY 50 Stock Analysis</h1>
-            <p>{time_of_day} Market Report</p>
+            <h1>💎 NIFTY 50 Stock Analysis</h1>
+            <p>{time_of_day} Market Report - Royal Sapphire Edition</p>
             <div class="last-updated">
                 Last Updated: {now.strftime('%d %b %Y, %I:%M %p')} IST
             </div>
@@ -828,8 +864,8 @@ class Nifty50CompleteAnalyzer:
         
         <!-- Footer -->
         <div class="footer">
-            <p><strong>© 2025 NIFTY 50 Analyzer</strong></p>
-            <p>Automated Stock Analysis System | Next Update: {next_update} IST</p>
+            <p><strong>© 2025 NIFTY 50 Analyzer - Royal Sapphire Edition</strong></p>
+            <p>Premium Elite Trading Analysis | Next Update: {next_update} IST</p>
         </div>
     </div>
 </body>
@@ -844,7 +880,7 @@ class Nifty50CompleteAnalyzer:
         return output_file
     
     def generate_email_html(self):
-        """Generate beautiful HTML email with BLACK background"""
+        """Generate beautiful HTML email - ROYAL SAPPHIRE THEME"""
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
         
@@ -864,45 +900,45 @@ class Nifty50CompleteAnalyzer:
 <head>
     <meta charset="UTF-8">
 </head>
-<body bgcolor="#ffffff" style="margin:0; padding:0; font-family: Arial, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff">
+<body bgcolor="#0a0e27" style="margin:0; padding:0; font-family: Georgia, serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0e27">
         <tr>
             <td align="center" style="padding: 20px;">
-                <table width="900" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f9fa">
+                <table width="900" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a237e" style="border-radius: 20px; border: 3px solid #3f51b5;">
                     <!-- Header -->
                     <tr>
-                        <td bgcolor="#1e40af" align="center" style="padding: 30px;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 32px;">📊 NIFTY 50 Stock Analysis Report</h1>
-                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">{time_of_day} Update - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
+                        <td bgcolor="#3f51b5" align="center" style="padding: 30px; background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 32px;">💎 NIFTY 50 Stock Analysis</h1>
+                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">{time_of_day} Update - Royal Sapphire Edition - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
                         </td>
                     </tr>
                     
                     <!-- Content -->
                     <tr>
-                        <td bgcolor="#ffffff" style="padding: 30px;">
+                        <td bgcolor="#0f1535" style="padding: 30px;">
                             
                             <!-- Summary Box -->
-                            <table width="100%" cellpadding="15" cellspacing="0" border="0" bgcolor="#1e40af" style="border-radius: 10px; margin-bottom: 30px;">
+                            <table width="100%" cellpadding="15" cellspacing="0" border="0" bgcolor="#283593" style="border-radius: 10px; margin-bottom: 30px; border: 2px solid #3f51b5;">
                                 <tr>
                                     <td>
-                                        <h2 style="color: #ffffff; margin: 0 0 15px 0; font-size: 20px;">📈 Market Summary</h2>
+                                        <h2 style="color: #9fa8da; margin: 0 0 15px 0; font-size: 20px;">📈 Market Summary</h2>
                                         <table width="100%" cellpadding="10" cellspacing="10" border="0">
                                             <tr>
-                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
-                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{len(self.results)}</strong>
-                                                    <span style="color: #ffffff; font-size: 13px;">STOCKS ANALYZED</span>
+                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
+                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{len(self.results)}</strong>
+                                                    <span style="color: #c5cae9; font-size: 13px;">STOCKS ANALYZED</span>
                                                 </td>
-                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
-                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{strong_buy_count}</strong>
-                                                    <span style="color: #ffffff; font-size: 13px;">STRONG BUY</span>
+                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
+                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{strong_buy_count}</strong>
+                                                    <span style="color: #c5cae9; font-size: 13px;">STRONG BUY</span>
                                                 </td>
-                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
-                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{buy_count}</strong>
-                                                    <span style="color: #ffffff; font-size: 13px;">BUY</span>
+                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
+                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{buy_count}</strong>
+                                                    <span style="color: #c5cae9; font-size: 13px;">BUY</span>
                                                 </td>
-                                                <td width="25%" bgcolor="#3b82f6" align="center" style="border-radius: 8px;">
-                                                    <strong style="color: #ffffff; font-size: 32px; display: block;">{hold_count}</strong>
-                                                    <span style="color: #ffffff; font-size: 13px;">HOLD</span>
+                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
+                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{hold_count}</strong>
+                                                    <span style="color: #c5cae9; font-size: 13px;">HOLD</span>
                                                 </td>
                                             </tr>
                                         </table>
@@ -915,9 +951,9 @@ class Nifty50CompleteAnalyzer:
         if not top_buys.empty:
             html += """
                             <!-- BUY Section -->
-                            <h2 style="color: #15803d; border-bottom: 3px solid #15803d; padding-bottom: 10px; margin-top: 40px;">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#d1d5db" style="border-collapse: collapse; margin: 20px 0;">
-                                <tr bgcolor="#15803d">
+                            <h2 style="color: #7986cb; border-bottom: 3px solid #3f51b5; padding-bottom: 10px; margin-top: 40px;">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
+                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#283593" style="border-collapse: collapse; margin: 20px 0; background: #1a237e;">
+                                <tr bgcolor="#3f51b5">
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
@@ -931,36 +967,36 @@ class Nifty50CompleteAnalyzer:
             row_num = 0
             for idx, row in top_buys.iterrows():
                 row_num += 1
-                row_bg = "#ffffff" if row_num % 2 == 1 else "#f9fafb"
+                row_bg = "#1a237e" if row_num % 2 == 1 else "#283593"
                 
-                # Upside color - HIGHLY VISIBLE
+                # Upside color
                 if row['Upside'] > 0:
-                    upside_color = "#15803d"  # Dark green
+                    upside_color = "#66bb6a"
                 elif row['Upside'] < 0:
-                    upside_color = "#dc2626"  # Dark red
+                    upside_color = "#ef5350"
                 else:
-                    upside_color = "#000000"  # Black
+                    upside_color = "#e8eaf6"
                 
                 # Quality badge color
                 if row['Quality'] == 'Excellent':
-                    badge_color = "#15803d"
+                    badge_color = "#5c6bc0"
                 elif row['Quality'] == 'Good':
-                    badge_color = "#3b82f6"
+                    badge_color = "#7986cb"
                 elif row['Quality'] == 'Average':
-                    badge_color = "#f59e0b"
+                    badge_color = "#9fa8da"
                 else:
-                    badge_color = "#dc2626"
+                    badge_color = "#ef5350"
                 
                 html += f"""
                                 <tr bgcolor="{row_bg}">
-                                    <td style="color: #000000; font-weight: 600; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Name']}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #000000; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {upside_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 16px;">{row['Upside']:+.1f}%</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Target_1']:,.0f}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Stop_Loss']:,.0f}</td>
-                                    <td style="padding: 14px 12px; border: 1px solid #d1d5db;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
+                                    <td style="color: #9fa8da; font-weight: 600; padding: 14px 12px; border: 1px solid #283593;">{row['Name']}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Price']:,.0f}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
+                                    <td style="color: #e8eaf6; font-weight: bold; padding: 14px 12px; border: 1px solid #283593;">{row['Combined_Score']:.0f}</td>
+                                    <td style="color: {upside_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #283593; font-size: 16px;">{row['Upside']:+.1f}%</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Target_1']:,.0f}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Stop_Loss']:,.0f}</td>
+                                    <td style="padding: 14px 12px; border: 1px solid #283593;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
                                 </tr>
 """
             html += """
@@ -971,9 +1007,9 @@ class Nifty50CompleteAnalyzer:
         if not top_sells.empty:
             html += """
                             <!-- SELL Section -->
-                            <h2 style="color: #dc2626; border-bottom: 3px solid #dc2626; padding-bottom: 10px; margin-top: 40px;">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#d1d5db" style="border-collapse: collapse; margin: 20px 0;">
-                                <tr bgcolor="#dc2626">
+                            <h2 style="color: #ef5350; border-bottom: 3px solid #f44336; padding-bottom: 10px; margin-top: 40px;">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
+                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#283593" style="border-collapse: collapse; margin: 20px 0; background: #1a237e;">
+                                <tr bgcolor="#f44336">
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
                                     <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
@@ -986,35 +1022,35 @@ class Nifty50CompleteAnalyzer:
             row_num = 0
             for idx, row in top_sells.iterrows():
                 row_num += 1
-                row_bg = "#ffffff" if row_num % 2 == 1 else "#f9fafb"
+                row_bg = "#1a237e" if row_num % 2 == 1 else "#283593"
                 
-                # RSI color - HIGHLY VISIBLE
+                # RSI color
                 if row['RSI'] > 70:
-                    rsi_color = "#dc2626"  # Dark red - Overbought
+                    rsi_color = "#ef5350"
                 elif row['RSI'] < 30:
-                    rsi_color = "#15803d"  # Dark green - Oversold
+                    rsi_color = "#66bb6a"
                 else:
-                    rsi_color = "#f59e0b"  # Orange - Neutral
+                    rsi_color = "#ffa726"
                 
                 # Quality badge color
                 if row['Quality'] == 'Excellent':
-                    badge_color = "#15803d"
+                    badge_color = "#5c6bc0"
                 elif row['Quality'] == 'Good':
-                    badge_color = "#3b82f6"
+                    badge_color = "#7986cb"
                 elif row['Quality'] == 'Average':
-                    badge_color = "#f59e0b"
+                    badge_color = "#9fa8da"
                 else:
-                    badge_color = "#dc2626"
+                    badge_color = "#ef5350"
                 
                 html += f"""
                                 <tr bgcolor="{row_bg}">
-                                    <td style="color: #000000; font-weight: 600; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Name']}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #000000; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {rsi_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #d1d5db; font-size: 16px;">{row['RSI']:.0f}</td>
-                                    <td style="color: #000000; padding: 14px 12px; border: 1px solid #d1d5db;">{row['MACD']}</td>
-                                    <td style="padding: 14px 12px; border: 1px solid #d1d5db;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
+                                    <td style="color: #9fa8da; font-weight: 600; padding: 14px 12px; border: 1px solid #283593;">{row['Name']}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Price']:,.0f}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
+                                    <td style="color: #e8eaf6; font-weight: bold; padding: 14px 12px; border: 1px solid #283593;">{row['Combined_Score']:.0f}</td>
+                                    <td style="color: {rsi_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #283593; font-size: 16px;">{row['RSI']:.0f}</td>
+                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">{row['MACD']}</td>
+                                    <td style="padding: 14px 12px; border: 1px solid #283593;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
                                 </tr>
 """
             html += """
@@ -1025,11 +1061,11 @@ class Nifty50CompleteAnalyzer:
         next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
         html += f"""
                             <!-- Disclaimer -->
-                            <table width="100%" cellpadding="20" cellspacing="0" border="2" bordercolor="#f59e0b" bgcolor="#fef3c7" style="margin: 30px 0;">
+                            <table width="100%" cellpadding="20" cellspacing="0" border="2" bordercolor="#ffa726" bgcolor="#1a237e" style="margin: 30px 0;">
                                 <tr>
                                     <td>
-                                        <p style="color: #000000; margin: 0 0 10px 0;"><strong style="color: #dc2626;">⚠️ DISCLAIMER:</strong> This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
-                                        <ul style="color: #000000; margin: 10px 0; padding-left: 20px;">
+                                        <p style="color: #e8eaf6; margin: 0 0 10px 0;"><strong style="color: #ef5350;">⚠️ DISCLAIMER:</strong> This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
+                                        <ul style="color: #e8eaf6; margin: 10px 0; padding-left: 20px;">
                                             <li>Do your own research</li>
                                             <li>Consult a SEBI registered financial advisor</li>
                                             <li>Use proper risk management and stop losses</li>
@@ -1044,9 +1080,9 @@ class Nifty50CompleteAnalyzer:
                     
                     <!-- Footer -->
                     <tr>
-                        <td bgcolor="#1f2937" align="center" style="padding: 25px;">
-                            <p style="color: #ffffff; margin: 0 0 5px 0; font-size: 13px;"><strong>© 2025 NIFTY 50 Analyzer</strong></p>
-                            <p style="color: #d1d5db; margin: 0; font-size: 13px;">Automated Stock Analysis System | Next Update: {next_update} IST</p>
+                        <td bgcolor="#0a0e27" align="center" style="padding: 25px;">
+                            <p style="color: #9fa8da; margin: 0 0 5px 0; font-size: 13px;"><strong>© 2025 NIFTY 50 Analyzer - Royal Sapphire Edition</strong></p>
+                            <p style="color: #7986cb; margin: 0; font-size: 13px;">Premium Elite Trading Analysis | Next Update: {next_update} IST</p>
                         </td>
                     </tr>
                 </table>
@@ -1079,7 +1115,7 @@ class Nifty50CompleteAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From'] = from_email
             msg['To'] = to_email
-            msg['Subject'] = f"📊 NIFTY 50 Analysis - {time_of_day} Report ({now.strftime('%d %b %Y')})"
+            msg['Subject'] = f"💎 NIFTY 50 Analysis - {time_of_day} Report ({now.strftime('%d %b %Y')})"
             
             # Generate email body
             html_body = self.generate_email_html()
@@ -1105,7 +1141,7 @@ class Nifty50CompleteAnalyzer:
         ist_time = self.get_ist_time()
         
         print("=" * 70)
-        print("📊 NIFTY 50 STOCK ANALYZER")
+        print("💎 NIFTY 50 STOCK ANALYZER - ROYAL SAPPHIRE EDITION")
         print(f"Started: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         print()
