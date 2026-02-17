@@ -1115,7 +1115,7 @@ class Nifty50CompleteAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From'] = from_email
             msg['To'] = to_email
-            msg['Subject'] = f"💎 NIFTY 50 Analysis - {time_of_day} Report ({now.strftime('%d %b %Y')})"
+            msg['Subject'] = f"💎 NIFTY 50 Stock Analysis Report - {time_of_day} Report ({now.strftime('%d %b %Y')})"
             
             # Generate email body
             html_body = self.generate_email_html()
