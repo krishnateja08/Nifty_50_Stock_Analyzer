@@ -1,5 +1,5 @@
 """
-NIFTY 50 COMPLETE STOCK ANALYZER - AURORA GLASS THEME
+NIFTY 100 COMPLETE STOCK ANALYZER - AURORA GLASS THEME
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 Requirements:
@@ -73,7 +73,58 @@ class Nifty50CompleteAnalyzer:
             'BPCL.NS': 'BPCL',
             'HDFCLIFE.NS': 'HDFC Life',
             'LTIM.NS': 'LTIMindtree',
-            'ADANIENT.NS': 'Adani Enterprises'
+            'ADANIENT.NS': 'Adani Enterprises',
+            'SIEMENS.NS':       'Siemens India',
+            # ── NIFTY NEXT 50 (additional 50) ─────────────────────
+    'HAVELLS.NS':       'Havells India',
+    'PIDILITIND.NS':    'Pidilite Industries',
+    'DABUR.NS':         'Dabur India',
+    'MARICO.NS':        'Marico',
+    'GODREJCP.NS':      'Godrej Consumer Products',
+    'COLPAL.NS':        'Colgate-Palmolive India',
+    'BERGEPAINT.NS':    'Berger Paints',
+    'MUTHOOTFIN.NS':    'Muthoot Finance',
+    'CHOLAFIN.NS':      'Cholamandalam Investment',
+    'BAJAJHLDNG.NS':    'Bajaj Holdings',
+    'SBICARD.NS':       'SBI Cards',
+    'ICICIPRULI.NS':    'ICICI Prudential Life',
+    'ICICIGI.NS':       'ICICI Lombard General Insurance',
+    'HDFCAMC.NS':       'HDFC AMC',
+    'NAUKRI.NS':        'Info Edge (Naukri)',
+    'MCDOWELL-N.NS':    'United Spirits',
+    'TATAELXSI.NS':     'Tata Elxsi',
+    'COFORGE.NS':       'Coforge',
+    'PERSISTENT.NS':    'Persistent Systems',
+    'OFSS.NS':          'Oracle Financial Services',
+    'LTTS.NS':          'L&T Technology Services',
+    'PAGEIND.NS':       'Page Industries',
+    'VOLTAS.NS':        'Voltas',
+    'AMBUJACEM.NS':     'Ambuja Cements',
+    'ACC.NS':           'ACC',
+    'INDIGO.NS':        'IndiGo (InterGlobe Aviation)',
+    'DMART.NS':         'Avenue Supermarts (DMart)',
+    'VEDL.NS':          'Vedanta',
+    'SAIL.NS':          'Steel Authority of India',
+    'NMDC.NS':          'NMDC',
+    'RECLTD.NS':        'REC Limited',
+    'PFC.NS':           'Power Finance Corporation',
+    'IRCTC.NS':         'IRCTC',
+    'CONCOR.NS':        'Container Corporation of India',
+    'JINDALSTEL.NS':    'Jindal Steel & Power',
+    'MOTHERSON.NS':     'Samvardhana Motherson',
+    'BALKRISIND.NS':    'Balkrishna Industries',
+    'TORNTPHARM.NS':    'Torrent Pharmaceuticals',
+    'LUPIN.NS':         'Lupin',
+    'AUROPHARMA.NS':    'Aurobindo Pharma',
+    'ALKEM.NS':         'Alkem Laboratories',
+    'MAXHEALTH.NS':     'Max Healthcare',
+    'FORTIS.NS':        'Fortis Healthcare',
+    'ZOMATO.NS':        'Zomato',
+    'POLICYBZR.NS':     'PB Fintech (PolicyBazaar)',
+    'NYKAA.NS':         'FSN E-Commerce (Nykaa)',
+    'PAYTM.NS':         'One97 Communications (Paytm)',
+    'RVNL.NS':          'Rail Vikas Nigam',
+    'ADANIGREEN.NS':    'Adani Green Energy'
         }
 
         self.results = []
