@@ -1,5 +1,5 @@
 """
-NIFTY 50 COMPLETE STOCK ANALYZER - ROYAL SAPPHIRE THEME
+NIFTY 50 COMPLETE STOCK ANALYZER - AURORA GLASS THEME
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 Requirements:
@@ -61,7 +61,7 @@ class Nifty50CompleteAnalyzer:
             'CIPLA.NS': 'Cipla',
             'DRREDDY.NS': 'Dr Reddy',
             'GRASIM.NS': 'Grasim',
-            'DIVISLAB.NS': 'Divi\'s Lab',
+            'DIVISLAB.NS': "Divi's Lab",
             'HEROMOTOCO.NS': 'Hero MotoCorp',
             'EICHERMOT.NS': 'Eicher Motors',
             'BRITANNIA.NS': 'Britannia',
@@ -75,14 +75,14 @@ class Nifty50CompleteAnalyzer:
             'LTIM.NS': 'LTIMindtree',
             'ADANIENT.NS': 'Adani Enterprises'
         }
-        
+
         self.results = []
-    
+
     def get_ist_time(self):
         """Get current time in IST timezone"""
         ist = pytz.timezone('Asia/Kolkata')
         return datetime.now(ist)
-    
+
     def calculate_rsi(self, prices, period=14):
         """Calculate RSI"""
         delta = prices.diff()
@@ -91,7 +91,7 @@ class Nifty50CompleteAnalyzer:
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
         return rsi.iloc[-1]
-    
+
     def calculate_macd(self, prices):
         """Calculate MACD"""
         ema12 = prices.ewm(span=12, adjust=False).mean()
@@ -99,73 +99,73 @@ class Nifty50CompleteAnalyzer:
         macd = ema12 - ema26
         signal = macd.ewm(span=9, adjust=False).mean()
         return macd.iloc[-1], signal.iloc[-1]
-    
+
     def get_fundamental_score(self, info):
         """Calculate fundamental score (0-100)"""
         score = 0
-        
+
         # Valuation Score (25 points)
         pe = info.get('trailingPE', info.get('forwardPE', 0))
         pb = info.get('priceToBook', 0)
         peg = info.get('pegRatio', 0)
-        
+
         if pe and 0 < pe < 25:
             score += 10
         elif pe and 25 <= pe < 35:
             score += 5
-        
+
         if pb and 0 < pb < 3:
             score += 5
         elif pb and 3 <= pb < 5:
             score += 3
-        
+
         if peg and 0 < peg < 1:
             score += 10
         elif peg and 1 <= peg < 2:
             score += 5
-        
+
         # Profitability Score (25 points)
         roe = info.get('returnOnEquity', 0)
         roa = info.get('returnOnAssets', 0)
         profit_margin = info.get('profitMargins', 0)
-        
+
         if roe and roe > 0.15:
             score += 10
         elif roe and roe > 0.10:
             score += 5
-        
+
         if roa and roa > 0.05:
             score += 5
         elif roa and roa > 0.02:
             score += 3
-        
+
         if profit_margin and profit_margin > 0.10:
             score += 10
         elif profit_margin and profit_margin > 0.05:
             score += 5
-        
+
         # Growth Score (25 points)
         revenue_growth = info.get('revenueGrowth', 0)
         earnings_growth = info.get('earningsGrowth', 0)
-        
+
         if revenue_growth and revenue_growth > 0.15:
             score += 10
         elif revenue_growth and revenue_growth > 0.10:
             score += 7
         elif revenue_growth and revenue_growth > 0.05:
             score += 5
-        
+
         if earnings_growth and earnings_growth > 0.15:
             score += 10
         elif earnings_growth and earnings_growth > 0.10:
             score += 7
         elif earnings_growth and earnings_growth > 0.05:
             score += 5
-        
+
         # Financial Health Score (25 points)
         debt_to_equity = info.get('debtToEquity', 0)
         current_ratio = info.get('currentRatio', 0)
-        
+
         if debt_to_equity is not None:
             if debt_to_equity < 50:
                 score += 10
@@ -173,68 +173,68 @@ class Nifty50CompleteAnalyzer:
                 score += 5
         else:
             score += 5
-        
+
         if current_ratio and current_ratio > 1.5:
             score += 10
         elif current_ratio and current_ratio > 1.0:
             score += 5
-        
+
         # Free cash flow
         free_cashflow = info.get('freeCashflow', 0)
         if free_cashflow and free_cashflow > 0:
             score += 5
-        
+
         return min(score, 100)
-    
+
     def analyze_stock(self, symbol, name):
         """Analyze individual stock - Technical + Fundamental"""
         try:
             stock = yf.Ticker(symbol)
             df = stock.history(period='1y')
             info = stock.info
-            
+
             if df.empty or len(df) < 200:
                 return None
-            
+
             # ========== TECHNICAL ANALYSIS ==========
             current_price = df['Close'].iloc[-1]
-            
+
             # Moving Averages
             sma_20 = df['Close'].rolling(window=20).mean().iloc[-1]
             sma_50 = df['Close'].rolling(window=50).mean().iloc[-1]
             sma_200 = df['Close'].rolling(window=200).mean().iloc[-1]
-            
+
             # Indicators
             rsi = self.calculate_rsi(df['Close'])
             macd, signal = self.calculate_macd(df['Close'])
-            
+
             # Support/Resistance
             recent_60 = df.tail(60)
             resistance = recent_60['High'].quantile(0.90)
             support = recent_60['Low'].quantile(0.10)
-            
+
             # 52-week
             high_52w = df['High'].tail(252).max()
             low_52w = df['Low'].tail(252).min()
-            
+
             # Technical Score (-6 to +6)
             tech_score = 0
-            
+
             if current_price > sma_20:
                 tech_score += 1
             else:
                 tech_score -= 1
-            
+
             if current_price > sma_50:
                 tech_score += 1
             else:
                 tech_score -= 1
-            
+
             if current_price > sma_200:
                 tech_score += 2
             else:
                 tech_score -= 2
-            
+
             if rsi < 30:
                 tech_score += 2
                 rsi_signal = "Oversold"
@@ -243,56 +243,44 @@ class Nifty50CompleteAnalyzer:
                 rsi_signal = "Overbought"
             else:
                 rsi_signal = "Neutral"
-            
+
             if macd > signal:
                 tech_score += 1
                 macd_signal = "Bullish"
             else:
                 tech_score -= 1
                 macd_signal = "Bearish"
-            
+
             # ========== FUNDAMENTAL ANALYSIS ==========
-            
-            # Valuation
             pe_ratio = info.get('trailingPE', info.get('forwardPE', 0))
             pb_ratio = info.get('priceToBook', 0)
             peg_ratio = info.get('pegRatio', 0)
             market_cap = info.get('marketCap', 0)
             dividend_yield = info.get('dividendYield', 0)
-            
-            # Profitability
+
             roe = info.get('returnOnEquity', 0)
             roa = info.get('returnOnAssets', 0)
             profit_margin = info.get('profitMargins', 0)
             operating_margin = info.get('operatingMargins', 0)
             eps = info.get('trailingEps', 0)
-            
-            # Growth
+
             revenue_growth = info.get('revenueGrowth', 0)
             earnings_growth = info.get('earningsGrowth', 0)
-            
-            # Financial Health
+
             debt_to_equity = info.get('debtToEquity', 0)
             current_ratio = info.get('currentRatio', 0)
             quick_ratio = info.get('quickRatio', 0)
-            
-            # Other
+
             beta = info.get('beta', 1.0)
             analyst_recommendation = info.get('recommendationKey', 'hold')
             target_price = info.get('targetMeanPrice', current_price)
-            
-            # Fundamental Score (0-100)
+
             fund_score = self.get_fundamental_score(info)
-            
+
             # ========== COMBINED SCORING ==========
-            
-            # Normalize technical score to 0-100 scale
             tech_score_normalized = ((tech_score + 6) / 12) * 100
-            
-            # Combined score (50% technical + 50% fundamental)
             combined_score = (tech_score_normalized * 0.5) + (fund_score * 0.5)
-            
-            # Rating - ADJUSTED THRESHOLDS FOR MORE RECOMMENDATIONS
+
             if combined_score >= 75:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY"
                 recommendation = "STRONG BUY"
@@ -308,8 +296,7 @@ class Nifty50CompleteAnalyzer:
             else:
                 rating = "⭐ STRONG SELL"
                 recommendation = "STRONG SELL"
-            
-            # Stop Loss & Targets
+
             if recommendation in ["STRONG BUY", "BUY"]:
                 stop_loss = support * 0.97
                 sl_percentage = ((current_price - stop_loss) / current_price) * 100
@@ -322,13 +309,11 @@ class Nifty50CompleteAnalyzer:
                 target_1 = support
                 target_2 = support * 0.95
                 upside = ((current_price - target_1) / current_price) * 100
-            
-            # Risk-Reward
+
             risk = abs(current_price - stop_loss)
             reward = abs(target_1 - current_price)
             risk_reward = reward / risk if risk > 0 else 0
-            
-            # Quality Assessment
+
             if fund_score >= 80:
                 quality = "Excellent"
             elif fund_score >= 60:
@@ -337,14 +322,11 @@ class Nifty50CompleteAnalyzer:
                 quality = "Average"
             else:
                 quality = "Poor"
-            
+
             result = {
-                # Basic Info
                 'Symbol': symbol.replace('.NS', ''),
                 'Name': name,
                 'Price': round(current_price, 2),
-                
-                # Technical
                 'RSI': round(rsi, 2),
                 'RSI_Signal': rsi_signal,
                 'MACD': macd_signal,
@@ -357,8 +339,6 @@ class Nifty50CompleteAnalyzer:
                 '52W_Low': round(low_52w, 2),
                 'Tech_Score': tech_score,
                 'Tech_Score_Norm': round(tech_score_normalized, 1),
-                
-                # Fundamental
                 'PE_Ratio': round(pe_ratio, 2) if pe_ratio else 0,
                 'PB_Ratio': round(pb_ratio, 2) if pb_ratio else 0,
                 'PEG_Ratio': round(peg_ratio, 2) if peg_ratio else 0,
@@ -376,13 +356,9 @@ class Nifty50CompleteAnalyzer:
                 'Beta': round(beta, 2) if beta else 1.0,
                 'Fund_Score': round(fund_score, 1),
                 'Quality': quality,
-                
-                # Combined
                 'Combined_Score': round(combined_score, 1),
                 'Rating': rating,
                 'Recommendation': recommendation,
-                
-                # Trading
                 'Stop_Loss': round(stop_loss, 2),
                 'SL_Percentage': round(sl_percentage, 2),
                 'Target_1': round(target_1, 2),
@@ -391,792 +367,941 @@ class Nifty50CompleteAnalyzer:
                 'Upside': round(upside, 2),
                 'Risk_Reward': round(risk_reward, 2),
             }
-            
+
             return result
-            
+
         except Exception as e:
             return None
-    
+
     def analyze_all_stocks(self):
         """Analyze all Nifty 50 stocks"""
         print(f"🔍 Analyzing {len(self.nifty50_stocks)} NIFTY 50 stocks...")
-        
+
         for idx, (symbol, name) in enumerate(self.nifty50_stocks.items(), 1):
             result = self.analyze_stock(symbol, name)
             if result:
                 self.results.append(result)
             print(f"  [{idx}/{len(self.nifty50_stocks)}] {name}")
-        
+
         print(f"✅ Analysis complete: {len(self.results)} stocks analyzed\n")
-    
+
     def get_top_recommendations(self):
         """Get top 10 buy and sell recommendations"""
         df = pd.DataFrame(self.results)
-        
-        # Top 10 Buy (highest combined scores from BUY + STRONG BUY)
         top_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])].nlargest(10, 'Combined_Score')
-        
-        # Top 10 Sell (lowest combined scores from SELL + STRONG SELL)
         top_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])].nsmallest(10, 'Combined_Score')
-        
         return top_buys, top_sells
-    
+
+    # =========================================================
+    #   AURORA GLASS THEME — SHARED CSS
+    # =========================================================
+    def _aurora_css(self):
+        return """
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0d1f1e 0%, #0a1a2e 50%, #0f1e2a 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #b2dfdb;
+        }
+
+        /* ---- Ambient glow orbs ---- */
+        body::before {
+            content: '';
+            position: fixed; top: -120px; right: -120px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(32,178,170,.18) 0%, transparent 65%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed; bottom: -100px; left: -80px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(0,150,136,.14) 0%, transparent 65%);
+            border-radius: 50%; pointer-events: none; z-index: 0;
+        }
+
+        .wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        /* ---- HEADER ---- */
+        .header {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(77,208,196,.2);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 20px;
+            padding: 36px 40px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .header-left {}
+        .header-eyebrow {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #4dd0c4;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: .8;
+        }
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #e0f2f1;
+            line-height: 1.1;
+        }
+        .header-title span { color: #4dd0c4; }
+        .header-sub {
+            font-size: 14px;
+            color: #80cbc4;
+            margin-top: 6px;
+            font-weight: 300;
+        }
+        .header-badge {
+            background: rgba(32,178,170,.15);
+            border: 1px solid rgba(77,208,196,.35);
+            color: #4dd0c4;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            white-space: nowrap;
+        }
+        .header-badge::before { content: '● '; font-size: 9px; }
+
+        /* ---- STAT CARDS ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(77,208,196,.15);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 16px;
+            padding: 22px 18px;
+            text-align: center;
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(77,208,196,.6), transparent);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(77,208,196,.35);
+            box-shadow: 0 8px 28px rgba(32,178,170,.15);
+        }
+        .stat-card .num {
+            font-size: 42px;
+            font-weight: 700;
+            color: #4dd0c4;
+            line-height: 1;
+            text-shadow: 0 0 24px rgba(77,208,196,.4);
+        }
+        .stat-card .lbl {
+            font-size: 11px;
+            color: #80cbc4;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+            font-weight: 400;
+            opacity: .8;
+        }
+
+        /* ---- SECTION ---- */
+        .section { margin-bottom: 32px; }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px;
+        }
+        .section-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .section-dot.buy { background: #4dd0c4; color: #4dd0c4; }
+        .section-dot.sell { background: #ef9a9a; color: #ef9a9a; }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0f2f1;
+            letter-spacing: .5px;
+        }
+        .section-title.sell { color: #ef9a9a; }
+        .section-count {
+            margin-left: auto;
+            background: rgba(77,208,196,.12);
+            border: 1px solid rgba(77,208,196,.25);
+            color: #4dd0c4;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .section-count.sell {
+            background: rgba(239,154,154,.1);
+            border-color: rgba(239,154,154,.25);
+            color: #ef9a9a;
+        }
+
+        /* ---- TABLE ---- */
+        .table-wrap {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(77,208,196,.14);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: rgba(32,178,170,.14); }
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #4dd0c4;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(77,208,196,.07);
+            color: #b2dfdb;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background .15s ease; }
+        tbody tr:hover { background: rgba(77,208,196,.06); }
+
+        .stock-name { font-weight: 600; color: #e0f2f1; }
+        .price { font-weight: 500; }
+
+        /* ---- SCORE PILL ---- */
+        .score-pill {
+            display: inline-block;
+            background: rgba(32,178,170,.18);
+            border: 1px solid rgba(77,208,196,.28);
+            color: #4dd0c4;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ---- SIGNAL COLORS ---- */
+        .buy  { color: #4dd0c4; font-weight: 700; }
+        .sell { color: #ef9a9a; font-weight: 700; }
+        .hold { color: #ffd54f; font-weight: 600; }
+        .neutral { color: #90a4ae; }
+
+        /* ---- QUALITY BADGE ---- */
+        .badge {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-excellent { background: rgba(77,208,196,.2);  border: 1px solid rgba(77,208,196,.35);  color: #4dd0c4; }
+        .badge-good      { background: rgba(129,199,132,.15); border: 1px solid rgba(129,199,132,.3);  color: #81c784; }
+        .badge-average   { background: rgba(255,213,79,.12);  border: 1px solid rgba(255,213,79,.28);  color: #ffd54f; }
+        .badge-poor      { background: rgba(239,154,154,.14); border: 1px solid rgba(239,154,154,.28); color: #ef9a9a; }
+
+        /* ---- RSI / MACD badges ---- */
+        .rsi-oversold  { color: #4dd0c4; font-weight: 700; }
+        .rsi-overbought{ color: #ef9a9a; font-weight: 700; }
+        .rsi-neutral   { color: #ffd54f; font-weight: 600; }
+
+        /* ---- DISCLAIMER ---- */
+        .disclaimer {
+            background: rgba(255,213,79,.05);
+            border: 1px solid rgba(255,213,79,.2);
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-top: 32px;
+        }
+        .disclaimer h3 { color: #ef9a9a; font-size: 14px; margin-bottom: 10px; letter-spacing: 1px; }
+        .disclaimer p  { color: #80cbc4; font-size: 13px; line-height: 1.7; }
+        .disclaimer ul { margin-left: 20px; margin-top: 8px; }
+        .disclaimer li { color: #80cbc4; font-size: 13px; line-height: 1.9; }
+
+        /* ---- FOOTER ---- */
+        .footer {
+            text-align: center;
+            padding: 28px 0 10px;
+            color: #4dd0c4;
+            font-size: 12px;
+            opacity: .65;
+            letter-spacing: 1px;
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 900px) {
+            body { padding: 14px; }
+            .header { padding: 24px 20px; }
+            .header-title { font-size: 24px; }
+            th, td { padding: 11px 10px; font-size: 12px; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .header { flex-direction: column; align-items: flex-start; gap: 14px; }
+        }
+        """
+
+    # =========================================================
+    #   GITHUB PAGES HTML  —  AURORA GLASS
+    # =========================================================
     def generate_github_pages_html(self, output_file='index.html'):
-        """Generate beautiful HTML for GitHub Pages - ROYAL SAPPHIRE THEME"""
+        """Generate Aurora Glass HTML for GitHub Pages"""
+
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
-        
+
         now = self.get_ist_time()
         time_of_day = "Morning" if now.hour < 12 else "Evening"
-        
-        # Count recommendations
+        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
+
         strong_buy_count = len(df[df['Recommendation'] == 'STRONG BUY'])
-        buy_count = len(df[df['Recommendation'] == 'BUY'])
-        hold_count = len(df[df['Recommendation'] == 'HOLD'])
-        sell_count = len(df[df['Recommendation'] == 'SELL'])
-        strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
-        
+        buy_count        = len(df[df['Recommendation'] == 'BUY'])
+        hold_count       = len(df[df['Recommendation'] == 'HOLD'])
+        sell_count       = len(df[df['Recommendation'] == 'SELL'])
+        strong_sell_count= len(df[df['Recommendation'] == 'STRONG SELL'])
+
+        css = self._aurora_css()
+
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIFTY 50 Stock Analysis - Royal Sapphire</title>
-    <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        
-        body {{
-            font-family: 'Georgia', serif;
-            background: #0a0e27;
-            padding: 20px;
-            min-height: 100vh;
-        }}
-        
-        .container {{
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #1a237e;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(63,81,181,0.4);
-            overflow: hidden;
-            border: 3px solid #3f51b5;
-        }}
-        
-        .header {{
-            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
-            color: #ffffff;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-        }}
-        
-        .header::before {{
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
-            background-size: 20px 20px;
-            opacity: 0.3;
-        }}
-        
-        .header h1 {{
-            font-size: 42px;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            font-weight: 800;
-            position: relative;
-            z-index: 1;
-        }}
-        
-        .header p {{
-            font-size: 18px;
-            opacity: 0.95;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }}
-        
-        .last-updated {{
-            background: rgba(0,0,0,0.3);
-            padding: 10px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.3);
-            position: relative;
-            z-index: 1;
-        }}
-        
-        .summary-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 40px;
-            background: #0f1535;
-        }}
-        
-        .summary-card {{
-            background: linear-gradient(145deg, #283593, #1a237e);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(63,81,181,0.3);
-            text-align: center;
-            transition: transform 0.3s ease;
-            border: 2px solid #3f51b5;
-        }}
-        
-        .summary-card:hover {{
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(63,81,181,0.5);
-            border-color: #5c6bc0;
-        }}
-        
-        .summary-card .number {{
-            font-size: 48px;
-            font-weight: bold;
-            color: #9fa8da;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(159,168,218,0.5);
-        }}
-        
-        .summary-card .label {{
-            font-size: 14px;
-            color: #c5cae9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }}
-        
-        .content {{
-            padding: 40px;
-            background: #0f1535;
-        }}
-        
-        .section {{
-            margin-bottom: 50px;
-        }}
-        
-        .section-title {{
-            font-size: 32px;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 4px solid #3f51b5;
-            color: #7986cb;
-            text-shadow: 0 0 10px rgba(121,134,203,0.3);
-        }}
-        
-        .section-title.sell {{
-            border-bottom-color: #f44336;
-            color: #ef5350;
-        }}
-        
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            background: #1a237e;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }}
-        
-        thead {{
-            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
-            color: #ffffff;
-        }}
-        
-        thead.sell {{
-            background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
-        }}
-        
-        th {{
-            padding: 18px 15px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }}
-        
-        td {{
-            padding: 16px 15px;
-            border-bottom: 1px solid #283593;
-            color: #e8eaf6;
-        }}
-        
-        tr:hover {{
-            background-color: #283593;
-        }}
-        
-        .stock-name {{
-            font-weight: 600;
-            color: #9fa8da;
-        }}
-        
-        .rating {{
-            font-weight: bold;
-            font-size: 12px;
-        }}
-        
-        .upside-positive {{
-            color: #66bb6a;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        
-        .upside-negative {{
-            color: #ef5350;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        
-        .rsi-overbought {{
-            color: #ef5350;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        
-        .rsi-oversold {{
-            color: #66bb6a;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        
-        .rsi-neutral {{
-            color: #ffa726;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        
-        .quality-badge {{
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-        }}
-        
-        .quality-excellent {{ background: #5c6bc0; }}
-        .quality-good {{ background: #7986cb; }}
-        .quality-average {{ background: #9fa8da; }}
-        .quality-poor {{ background: #ef5350; }}
-        
-        .disclaimer {{
-            background: #1a237e;
-            border: 3px solid #ffa726;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 40px 0;
-        }}
-        
-        .disclaimer h3 {{
-            color: #ef5350;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }}
-        
-        .disclaimer p {{
-            color: #e8eaf6;
-        }}
-        
-        .disclaimer ul {{
-            margin-left: 25px;
-            margin-top: 15px;
-            line-height: 1.8;
-            color: #e8eaf6;
-        }}
-        
-        .footer {{
-            background: #0a0e27;
-            color: #9fa8da;
-            text-align: center;
-            padding: 30px;
-        }}
-        
-        .footer p {{
-            margin: 5px 0;
-        }}
-        
-        @media (max-width: 768px) {{
-            .header h1 {{ font-size: 28px; }}
-            .summary-grid {{ grid-template-columns: repeat(2, 1fr); }}
-            table {{ font-size: 12px; }}
-            th, td {{ padding: 10px 8px; }}
-        }}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIFTY 50 Analysis — Aurora Glass</title>
+<style>{css}
+/* Page-specific scroll behaviour */
+html {{ scroll-behavior: smooth; }}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>💎 NIFTY 50 Stock Analysis</h1>
-            <p>{time_of_day} Market Report - Royal Sapphire Edition</p>
-            <div class="last-updated">
-                Last Updated: {now.strftime('%d %b %Y, %I:%M %p')} IST
-            </div>
-        </div>
-        
-        <!-- Summary Cards -->
-        <div class="summary-grid">
-            <div class="summary-card">
-                <div class="number">{len(self.results)}</div>
-                <div class="label">Stocks Analyzed</div>
-            </div>
-            <div class="summary-card">
-                <div class="number">{strong_buy_count}</div>
-                <div class="label">Strong Buy</div>
-            </div>
-            <div class="summary-card">
-                <div class="number">{buy_count}</div>
-                <div class="label">Buy</div>
-            </div>
-            <div class="summary-card">
-                <div class="number">{hold_count}</div>
-                <div class="label">Hold</div>
-            </div>
-        </div>
-        
-        <!-- Content -->
-        <div class="content">
-"""
-        
-        # Top 10 Buy Recommendations
-        if not top_buys.empty:
-            html += """
-            <div class="section">
-                <h2 class="section-title">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>Rating</th>
-                            <th>Score</th>
-                            <th>Upside %</th>
-                            <th>Target</th>
-                            <th>Stop Loss</th>
-                            <th>Quality</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-"""
-            for idx, row in top_buys.iterrows():
-                upside_class = "upside-positive" if row['Upside'] > 0 else "upside-negative"
-                
-                quality_class = {
-                    'Excellent': 'quality-excellent',
-                    'Good': 'quality-good',
-                    'Average': 'quality-average',
-                    'Poor': 'quality-poor'
-                }.get(row['Quality'], 'quality-average')
-                
-                html += f"""
-                        <tr>
-                            <td class="stock-name">{row['Name']}</td>
-                            <td>₹{row['Price']:,.0f}</td>
-                            <td class="rating">{row['Rating']}</td>
-                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
-                            <td class="{upside_class}">{row['Upside']:+.1f}%</td>
-                            <td>₹{row['Target_1']:,.0f}</td>
-                            <td>₹{row['Stop_Loss']:,.0f}</td>
-                            <td><span class="quality-badge {quality_class}">{row['Quality']}</span></td>
-                        </tr>
-"""
-            html += """
-                    </tbody>
-                </table>
-            </div>
-"""
-        
-        # Top 10 Sell Recommendations
-        if not top_sells.empty:
-            html += """
-            <div class="section">
-                <h2 class="section-title sell">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
-                <table>
-                    <thead class="sell">
-                        <tr>
-                            <th>Stock</th>
-                            <th>Price</th>
-                            <th>Rating</th>
-                            <th>Score</th>
-                            <th>RSI</th>
-                            <th>MACD</th>
-                            <th>Quality</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-"""
-            for idx, row in top_sells.iterrows():
-                if row['RSI'] > 70:
-                    rsi_class = "rsi-overbought"
-                elif row['RSI'] < 30:
-                    rsi_class = "rsi-oversold"
-                else:
-                    rsi_class = "rsi-neutral"
-                
-                quality_class = {
-                    'Excellent': 'quality-excellent',
-                    'Good': 'quality-good',
-                    'Average': 'quality-average',
-                    'Poor': 'quality-poor'
-                }.get(row['Quality'], 'quality-average')
-                
-                html += f"""
-                        <tr>
-                            <td class="stock-name">{row['Name']}</td>
-                            <td>₹{row['Price']:,.0f}</td>
-                            <td class="rating">{row['Rating']}</td>
-                            <td><strong>{row['Combined_Score']:.0f}</strong></td>
-                            <td class="{rsi_class}">{row['RSI']:.0f}</td>
-                            <td>{row['MACD']}</td>
-                            <td><span class="quality-badge {quality_class}">{row['Quality']}</span></td>
-                        </tr>
-"""
-            html += """
-                    </tbody>
-                </table>
-            </div>
-"""
-        
-        # Disclaimer
-        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
-        html += f"""
-            <div class="disclaimer">
-                <h3>⚠️ DISCLAIMER</h3>
-                <p>This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice.</p>
-                <ul>
-                    <li>Do your own research</li>
-                    <li>Consult a SEBI registered financial advisor</li>
-                    <li>Use proper risk management and stop losses</li>
-                    <li>Never invest more than you can afford to lose</li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <p><strong>© 2025 NIFTY 50 Analyzer - Royal Sapphire Edition</strong></p>
-            <p>Premium Elite Trading Analysis | Next Update: {next_update} IST</p>
-        </div>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-eyebrow">NIFTY 50 · Market Intelligence</div>
+      <div class="header-title">💎 Stock <span>Analysis</span> Report</div>
+      <div class="header-sub">
+        {time_of_day} Update &nbsp;·&nbsp;
+        {now.strftime('%d %B %Y, %I:%M %p')} IST &nbsp;·&nbsp;
+        Aurora Glass Edition
+      </div>
     </div>
+    <div class="header-badge">Live Market Data</div>
+  </header>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="num">{len(self.results)}</div>
+      <div class="lbl">Stocks Analyzed</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{strong_buy_count}</div>
+      <div class="lbl">Strong Buy</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{buy_count}</div>
+      <div class="lbl">Buy</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{hold_count}</div>
+      <div class="lbl">Hold</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{sell_count}</div>
+      <div class="lbl">Sell</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{strong_sell_count}</div>
+      <div class="lbl">Strong Sell</div>
+    </div>
+  </div>
+"""
+
+        # ---- TOP 10 BUY ----
+        if not top_buys.empty:
+            html += f"""
+  <!-- BUY SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot buy"></div>
+      <div class="section-title">Top 10 Buy Recommendations</div>
+      <div class="section-count">{len(top_buys)} stocks</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Score</th>
+            <th>Upside %</th>
+            <th>Target 1</th>
+            <th>Stop Loss</th>
+            <th>R:R Ratio</th>
+            <th>Quality</th>
+          </tr>
+        </thead>
+        <tbody>
+"""
+            for rank, (_, row) in enumerate(top_buys.iterrows(), 1):
+                upside_cls = "buy" if row['Upside'] >= 0 else "sell"
+                q = row['Quality'].lower()
+                badge_cls = f"badge-{q}"
+                html += f"""
+          <tr>
+            <td class="neutral">{rank}</td>
+            <td class="stock-name">{row['Name']}</td>
+            <td class="price">₹{row['Price']:,.2f}</td>
+            <td class="buy" style="font-size:12px">{row['Rating']}</td>
+            <td><span class="score-pill">{row['Combined_Score']:.0f}</span></td>
+            <td class="{upside_cls}">{row['Upside']:+.1f}%</td>
+            <td>₹{row['Target_1']:,.2f}</td>
+            <td>₹{row['Stop_Loss']:,.2f}</td>
+            <td class="neutral">{row['Risk_Reward']:.2f}x</td>
+            <td><span class="badge {badge_cls}">{row['Quality']}</span></td>
+          </tr>
+"""
+            html += """
+        </tbody>
+      </table>
+    </div>
+  </div>
+"""
+
+        # ---- TOP 10 SELL ----
+        if not top_sells.empty:
+            html += f"""
+  <!-- SELL SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot sell"></div>
+      <div class="section-title sell">Top 10 Sell Recommendations</div>
+      <div class="section-count sell">{len(top_sells)} stocks</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Score</th>
+            <th>RSI</th>
+            <th>RSI Signal</th>
+            <th>MACD</th>
+            <th>Quality</th>
+          </tr>
+        </thead>
+        <tbody>
+"""
+            for rank, (_, row) in enumerate(top_sells.iterrows(), 1):
+                rsi_val = row['RSI']
+                if rsi_val > 70:
+                    rsi_cls = "rsi-overbought"
+                elif rsi_val < 30:
+                    rsi_cls = "rsi-oversold"
+                else:
+                    rsi_cls = "rsi-neutral"
+                macd_cls = "buy" if row['MACD'] == "Bullish" else "sell"
+                q = row['Quality'].lower()
+                badge_cls = f"badge-{q}"
+                html += f"""
+          <tr>
+            <td class="neutral">{rank}</td>
+            <td class="stock-name">{row['Name']}</td>
+            <td class="price">₹{row['Price']:,.2f}</td>
+            <td class="sell" style="font-size:12px">{row['Rating']}</td>
+            <td><span class="score-pill">{row['Combined_Score']:.0f}</span></td>
+            <td class="{rsi_cls}">{row['RSI']:.1f}</td>
+            <td class="{rsi_cls}">{row['RSI_Signal']}</td>
+            <td class="{macd_cls}">{row['MACD']}</td>
+            <td><span class="badge {badge_cls}">{row['Quality']}</span></td>
+          </tr>
+"""
+            html += """
+        </tbody>
+      </table>
+    </div>
+  </div>
+"""
+
+        # ---- FULL TABLE ----
+        all_df = pd.DataFrame(self.results).sort_values('Combined_Score', ascending=False)
+        html += """
+  <!-- ALL STOCKS SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot buy"></div>
+      <div class="section-title">All NIFTY 50 Stocks — Complete Analysis</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Score</th>
+            <th>PE</th>
+            <th>PB</th>
+            <th>ROE %</th>
+            <th>RSI</th>
+            <th>MACD</th>
+            <th>Rating</th>
+            <th>Quality</th>
+          </tr>
+        </thead>
+        <tbody>
+"""
+        for rank, (_, row) in enumerate(all_df.iterrows(), 1):
+            rec = row['Recommendation']
+            if rec in ["STRONG BUY", "BUY"]:
+                rec_cls = "buy"
+            elif rec in ["STRONG SELL", "SELL"]:
+                rec_cls = "sell"
+            else:
+                rec_cls = "hold"
+            rsi_val = row['RSI']
+            if rsi_val > 70:
+                rsi_cls = "rsi-overbought"
+            elif rsi_val < 30:
+                rsi_cls = "rsi-oversold"
+            else:
+                rsi_cls = "rsi-neutral"
+            q = row['Quality'].lower()
+            html += f"""
+          <tr>
+            <td class="neutral">{rank}</td>
+            <td class="stock-name">{row['Name']}</td>
+            <td class="price">₹{row['Price']:,.2f}</td>
+            <td><span class="score-pill">{row['Combined_Score']:.0f}</span></td>
+            <td class="neutral">{row['PE_Ratio']:.1f}</td>
+            <td class="neutral">{row['PB_Ratio']:.1f}</td>
+            <td class="neutral">{row['ROE']:.1f}%</td>
+            <td class="{rsi_cls}">{row['RSI']:.1f}</td>
+            <td class="{'buy' if row['MACD']=='Bullish' else 'sell'}">{row['MACD']}</td>
+            <td class="{rec_cls}" style="font-size:12px">{row['Rating']}</td>
+            <td><span class="badge badge-{q}">{row['Quality']}</span></td>
+          </tr>
+"""
+        html += """
+        </tbody>
+      </table>
+    </div>
+  </div>
+"""
+
+        html += f"""
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <h3>⚠ DISCLAIMER</h3>
+    <p>This analysis is for <strong>educational purposes only</strong> and does <strong>NOT</strong> constitute financial advice.</p>
+    <ul>
+      <li>Always conduct your own research before investing.</li>
+      <li>Consult a SEBI-registered financial advisor for personalised guidance.</li>
+      <li>Use proper risk management and honour stop-loss levels.</li>
+      <li>Never invest more than you can afford to lose.</li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    © 2025 NIFTY 50 Analyzer · Aurora Glass Edition &nbsp;|&nbsp; Next Update: {next_update} IST
+  </div>
+
+</div><!-- /wrapper -->
 </body>
 </html>
 """
-        
-        # Write to file
+
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(html)
-        
-        print(f"✅ GitHub Pages HTML generated: {output_file}\n")
+
+        print(f"✅ Aurora Glass HTML generated: {output_file}\n")
         return output_file
-    
+
+    # =========================================================
+    #   EMAIL HTML  —  AURORA GLASS  (inline styles for email)
+    # =========================================================
     def generate_email_html(self):
-        """Generate beautiful HTML email - ROYAL SAPPHIRE THEME"""
+        """Generate Aurora Glass HTML email (table-based, inline styles)"""
+
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
-        
-        # Get IST time
+
         now = self.get_ist_time()
         time_of_day = "Morning" if now.hour < 12 else "Evening"
-        
-        # Count recommendations
-        strong_buy_count = len(df[df['Recommendation'] == 'STRONG BUY'])
-        buy_count = len(df[df['Recommendation'] == 'BUY'])
-        hold_count = len(df[df['Recommendation'] == 'HOLD'])
-        sell_count = len(df[df['Recommendation'] == 'SELL'])
+        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
+
+        strong_buy_count  = len(df[df['Recommendation'] == 'STRONG BUY'])
+        buy_count         = len(df[df['Recommendation'] == 'BUY'])
+        hold_count        = len(df[df['Recommendation'] == 'HOLD'])
+        sell_count        = len(df[df['Recommendation'] == 'SELL'])
         strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
-        
+
+        # Inline style helpers
+        bg_outer   = "#0d1f1e"
+        bg_card    = "#0f2020"
+        bg_glass   = "rgba(255,255,255,0.05)"
+        teal       = "#4dd0c4"
+        teal_dim   = "#80cbc4"
+        teal_bg    = "rgba(32,178,170,0.14)"
+        teal_border= "rgba(77,208,196,0.2)"
+        text_main  = "#e0f2f1"
+        text_body  = "#b2dfdb"
+        green      = "#4dd0c4"
+        red        = "#ef9a9a"
+        yellow     = "#ffd54f"
+        row_border = "rgba(77,208,196,0.07)"
+        divider    = "rgba(77,208,196,0.14)"
+
+        def quality_color(q):
+            return {"Excellent": teal, "Good": "#81c784", "Average": yellow, "Poor": red}.get(q, text_body)
+
         html = f"""<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-</head>
-<body bgcolor="#0a0e27" style="margin:0; padding:0; font-family: Georgia, serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0e27">
-        <tr>
-            <td align="center" style="padding: 20px;">
-                <table width="900" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a237e" style="border-radius: 20px; border: 3px solid #3f51b5;">
-                    <!-- Header -->
-                    <tr>
-                        <td bgcolor="#3f51b5" align="center" style="padding: 30px; background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 32px;">💎 NIFTY 50 Stock Analysis</h1>
-                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">{time_of_day} Update - Royal Sapphire Edition - {now.strftime('%d %b %Y, %I:%M %p')} IST</p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td bgcolor="#0f1535" style="padding: 30px;">
-                            
-                            <!-- Summary Box -->
-                            <table width="100%" cellpadding="15" cellspacing="0" border="0" bgcolor="#283593" style="border-radius: 10px; margin-bottom: 30px; border: 2px solid #3f51b5;">
-                                <tr>
-                                    <td>
-                                        <h2 style="color: #9fa8da; margin: 0 0 15px 0; font-size: 20px;">📈 Market Summary</h2>
-                                        <table width="100%" cellpadding="10" cellspacing="10" border="0">
-                                            <tr>
-                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
-                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{len(self.results)}</strong>
-                                                    <span style="color: #c5cae9; font-size: 13px;">STOCKS ANALYZED</span>
-                                                </td>
-                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
-                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{strong_buy_count}</strong>
-                                                    <span style="color: #c5cae9; font-size: 13px;">STRONG BUY</span>
-                                                </td>
-                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
-                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{buy_count}</strong>
-                                                    <span style="color: #c5cae9; font-size: 13px;">BUY</span>
-                                                </td>
-                                                <td width="25%" bgcolor="#1a237e" align="center" style="border-radius: 8px; border: 2px solid #3f51b5;">
-                                                    <strong style="color: #9fa8da; font-size: 32px; display: block;">{hold_count}</strong>
-                                                    <span style="color: #c5cae9; font-size: 13px;">HOLD</span>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:{bg_outer};font-family:'Segoe UI',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{bg_outer}">
+<tr><td align="center" style="padding:24px 16px;">
+
+  <!-- OUTER CARD -->
+  <table width="680" cellpadding="0" cellspacing="0" border="0"
+         style="background:{bg_card};border:1px solid {teal_border};border-radius:20px;overflow:hidden;">
+
+    <!-- HEADER -->
+    <tr>
+      <td style="background:linear-gradient(135deg,rgba(13,31,30,.9),rgba(10,26,46,.9));
+                 border-bottom:1px solid {teal_border};padding:32px 36px;">
+        <p style="font-size:11px;letter-spacing:3px;color:{teal};text-transform:uppercase;
+                  margin:0 0 8px">NIFTY 50 · MARKET INTELLIGENCE</p>
+        <p style="font-size:26px;font-weight:700;color:{text_main};margin:0 0 6px">
+          💎 Stock Analysis Report</p>
+        <p style="font-size:13px;color:{teal_dim};margin:0;font-weight:300">
+          {time_of_day} Update &nbsp;·&nbsp; {now.strftime('%d %B %Y, %I:%M %p')} IST
+          &nbsp;·&nbsp; Aurora Glass Edition</p>
+      </td>
+    </tr>
+
+    <!-- STAT ROW -->
+    <tr>
+      <td style="padding:24px 36px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
 """
-        
-        # Top 10 Buy Recommendations
-        if not top_buys.empty:
-            html += """
-                            <!-- BUY Section -->
-                            <h2 style="color: #7986cb; border-bottom: 3px solid #3f51b5; padding-bottom: 10px; margin-top: 40px;">🟢 TOP 10 BUY RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#283593" style="border-collapse: collapse; margin: 20px 0; background: #1a237e;">
-                                <tr bgcolor="#3f51b5">
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">UPSIDE %</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">TARGET</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOP LOSS</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
-                                </tr>
-"""
-            row_num = 0
-            for idx, row in top_buys.iterrows():
-                row_num += 1
-                row_bg = "#1a237e" if row_num % 2 == 1 else "#283593"
-                
-                # Upside color
-                if row['Upside'] > 0:
-                    upside_color = "#66bb6a"
-                elif row['Upside'] < 0:
-                    upside_color = "#ef5350"
-                else:
-                    upside_color = "#e8eaf6"
-                
-                # Quality badge color
-                if row['Quality'] == 'Excellent':
-                    badge_color = "#5c6bc0"
-                elif row['Quality'] == 'Good':
-                    badge_color = "#7986cb"
-                elif row['Quality'] == 'Average':
-                    badge_color = "#9fa8da"
-                else:
-                    badge_color = "#ef5350"
-                
-                html += f"""
-                                <tr bgcolor="{row_bg}">
-                                    <td style="color: #9fa8da; font-weight: 600; padding: 14px 12px; border: 1px solid #283593;">{row['Name']}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #e8eaf6; font-weight: bold; padding: 14px 12px; border: 1px solid #283593;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {upside_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #283593; font-size: 16px;">{row['Upside']:+.1f}%</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Target_1']:,.0f}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Stop_Loss']:,.0f}</td>
-                                    <td style="padding: 14px 12px; border: 1px solid #283593;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
-                                </tr>
-"""
-            html += """
-                            </table>
-"""
-        
-        # Top 10 Sell Recommendations
-        if not top_sells.empty:
-            html += """
-                            <!-- SELL Section -->
-                            <h2 style="color: #ef5350; border-bottom: 3px solid #f44336; padding-bottom: 10px; margin-top: 40px;">🔴 TOP 10 SELL RECOMMENDATIONS</h2>
-                            <table width="100%" cellpadding="12" cellspacing="0" border="1" bordercolor="#283593" style="border-collapse: collapse; margin: 20px 0; background: #1a237e;">
-                                <tr bgcolor="#f44336">
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">STOCK</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">PRICE</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RATING</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">SCORE</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">RSI</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">MACD</th>
-                                    <th style="color: #ffffff; text-align: left; padding: 16px 12px; font-size: 13px;">QUALITY</th>
-                                </tr>
-"""
-            row_num = 0
-            for idx, row in top_sells.iterrows():
-                row_num += 1
-                row_bg = "#1a237e" if row_num % 2 == 1 else "#283593"
-                
-                # RSI color
-                if row['RSI'] > 70:
-                    rsi_color = "#ef5350"
-                elif row['RSI'] < 30:
-                    rsi_color = "#66bb6a"
-                else:
-                    rsi_color = "#ffa726"
-                
-                # Quality badge color
-                if row['Quality'] == 'Excellent':
-                    badge_color = "#5c6bc0"
-                elif row['Quality'] == 'Good':
-                    badge_color = "#7986cb"
-                elif row['Quality'] == 'Average':
-                    badge_color = "#9fa8da"
-                else:
-                    badge_color = "#ef5350"
-                
-                html += f"""
-                                <tr bgcolor="{row_bg}">
-                                    <td style="color: #9fa8da; font-weight: 600; padding: 14px 12px; border: 1px solid #283593;">{row['Name']}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">₹{row['Price']:,.0f}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593; font-size: 12px; font-weight: bold;">{row['Rating']}</td>
-                                    <td style="color: #e8eaf6; font-weight: bold; padding: 14px 12px; border: 1px solid #283593;">{row['Combined_Score']:.0f}</td>
-                                    <td style="color: {rsi_color}; font-weight: bold; padding: 14px 12px; border: 1px solid #283593; font-size: 16px;">{row['RSI']:.0f}</td>
-                                    <td style="color: #e8eaf6; padding: 14px 12px; border: 1px solid #283593;">{row['MACD']}</td>
-                                    <td style="padding: 14px 12px; border: 1px solid #283593;"><span style="background-color: {badge_color}; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold;">{row['Quality']}</span></td>
-                                </tr>
-"""
-            html += """
-                            </table>
-"""
-        
-        # Disclaimer and Footer
-        next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
-        html += f"""
-                            <!-- Disclaimer -->
-                            <table width="100%" cellpadding="20" cellspacing="0" border="2" bordercolor="#ffa726" bgcolor="#1a237e" style="margin: 30px 0;">
-                                <tr>
-                                    <td>
-                                        <p style="color: #e8eaf6; margin: 0 0 10px 0;"><strong style="color: #ef5350;">⚠️ DISCLAIMER:</strong> This analysis is for <strong>EDUCATIONAL PURPOSES ONLY</strong>. This is NOT financial advice. Always:</p>
-                                        <ul style="color: #e8eaf6; margin: 10px 0; padding-left: 20px;">
-                                            <li>Do your own research</li>
-                                            <li>Consult a SEBI registered financial advisor</li>
-                                            <li>Use proper risk management and stop losses</li>
-                                            <li>Never invest more than you can afford to lose</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td bgcolor="#0a0e27" align="center" style="padding: 25px;">
-                            <p style="color: #9fa8da; margin: 0 0 5px 0; font-size: 13px;"><strong>© 2025 NIFTY 50 Analyzer - Royal Sapphire Edition</strong></p>
-                            <p style="color: #7986cb; margin: 0; font-size: 13px;">Premium Elite Trading Analysis | Next Update: {next_update} IST</p>
-                        </td>
-                    </tr>
-                </table>
+        stats = [
+            (len(self.results), "Analyzed"),
+            (strong_buy_count,  "Strong Buy"),
+            (buy_count,         "Buy"),
+            (hold_count,        "Hold"),
+            (sell_count,        "Sell"),
+            (strong_sell_count, "Strong Sell"),
+        ]
+        for num, lbl in stats:
+            html += f"""
+            <td align="center" style="padding:0 4px;">
+              <table width="100%" cellpadding="12" cellspacing="0" border="0"
+                     style="background:{teal_bg};border:1px solid {teal_border};border-radius:12px;">
+                <tr>
+                  <td align="center">
+                    <p style="font-size:30px;font-weight:700;color:{teal};margin:0;
+                               text-shadow:0 0 16px rgba(77,208,196,.3)">{num}</p>
+                    <p style="font-size:10px;color:{teal_dim};margin:4px 0 0;
+                               text-transform:uppercase;letter-spacing:1px">{lbl}</p>
+                  </td>
+                </tr>
+              </table>
             </td>
-        </tr>
-    </table>
+"""
+        html += """
+          </tr>
+        </table>
+      </td>
+    </tr>
+"""
+
+        # ---- BUY TABLE ----
+        if not top_buys.empty:
+            html += f"""
+    <!-- BUY SECTION -->
+    <tr>
+      <td style="padding:4px 36px 20px;">
+        <p style="font-size:13px;font-weight:600;color:{teal};
+                  letter-spacing:1px;margin:0 0 12px;text-transform:uppercase">
+          ● Top 10 Buy Recommendations</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+               style="border:1px solid {divider};border-radius:12px;overflow:hidden;">
+          <tr style="background:{teal_bg}">
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">STOCK</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">PRICE</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">SCORE</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">UPSIDE</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">TARGET</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">STOP LOSS</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{teal};letter-spacing:1px;font-weight:600">QUALITY</th>
+          </tr>
+"""
+            for i, (_, row) in enumerate(top_buys.iterrows()):
+                row_bg = "rgba(255,255,255,0.02)" if i % 2 == 0 else "rgba(32,178,170,0.04)"
+                upside_color = green if row['Upside'] >= 0 else red
+                q_color = quality_color(row['Quality'])
+                html += f"""
+          <tr style="background:{row_bg};border-top:1px solid {row_border}">
+            <td style="padding:12px 10px;color:{text_main};font-weight:600;font-size:13px">{row['Name']}</td>
+            <td style="padding:12px 10px;color:{text_body};font-size:13px">₹{row['Price']:,.2f}</td>
+            <td style="padding:12px 10px">
+              <span style="background:rgba(77,208,196,.18);border:1px solid rgba(77,208,196,.3);
+                           color:{teal};padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600">
+                {row['Combined_Score']:.0f}
+              </span>
+            </td>
+            <td style="padding:12px 10px;color:{upside_color};font-weight:700;font-size:14px">
+              {row['Upside']:+.1f}%</td>
+            <td style="padding:12px 10px;color:{text_body};font-size:13px">₹{row['Target_1']:,.2f}</td>
+            <td style="padding:12px 10px;color:{text_body};font-size:13px">₹{row['Stop_Loss']:,.2f}</td>
+            <td style="padding:12px 10px">
+              <span style="color:{q_color};font-size:11px;font-weight:600">{row['Quality']}</span>
+            </td>
+          </tr>
+"""
+            html += """
+        </table>
+      </td>
+    </tr>
+"""
+
+        # ---- SELL TABLE ----
+        if not top_sells.empty:
+            html += f"""
+    <!-- SELL SECTION -->
+    <tr>
+      <td style="padding:4px 36px 20px;">
+        <p style="font-size:13px;font-weight:600;color:{red};
+                  letter-spacing:1px;margin:0 0 12px;text-transform:uppercase">
+          ● Top 10 Sell Recommendations</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+               style="border:1px solid rgba(239,154,154,.18);border-radius:12px;overflow:hidden;">
+          <tr style="background:rgba(239,154,154,.1)">
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">STOCK</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">PRICE</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">SCORE</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">RSI</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">RSI SIGNAL</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">MACD</th>
+            <th style="padding:12px 10px;text-align:left;font-size:10px;
+                        color:{red};letter-spacing:1px;font-weight:600">QUALITY</th>
+          </tr>
+"""
+            for i, (_, row) in enumerate(top_sells.iterrows()):
+                row_bg = "rgba(255,255,255,0.02)" if i % 2 == 0 else "rgba(239,154,154,0.04)"
+                rsi_val = row['RSI']
+                if rsi_val > 70:
+                    rsi_color = red
+                elif rsi_val < 30:
+                    rsi_color = green
+                else:
+                    rsi_color = yellow
+                macd_color = green if row['MACD'] == "Bullish" else red
+                q_color = quality_color(row['Quality'])
+                html += f"""
+          <tr style="background:{row_bg};border-top:1px solid rgba(239,154,154,0.08)">
+            <td style="padding:12px 10px;color:{text_main};font-weight:600;font-size:13px">{row['Name']}</td>
+            <td style="padding:12px 10px;color:{text_body};font-size:13px">₹{row['Price']:,.2f}</td>
+            <td style="padding:12px 10px">
+              <span style="background:rgba(239,154,154,.15);border:1px solid rgba(239,154,154,.3);
+                           color:{red};padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600">
+                {row['Combined_Score']:.0f}
+              </span>
+            </td>
+            <td style="padding:12px 10px;color:{rsi_color};font-weight:700;font-size:14px">
+              {row['RSI']:.1f}</td>
+            <td style="padding:12px 10px;color:{rsi_color};font-size:13px;font-weight:600">
+              {row['RSI_Signal']}</td>
+            <td style="padding:12px 10px;color:{macd_color};font-size:13px;font-weight:600">
+              {row['MACD']}</td>
+            <td style="padding:12px 10px">
+              <span style="color:{q_color};font-size:11px;font-weight:600">{row['Quality']}</span>
+            </td>
+          </tr>
+"""
+            html += """
+        </table>
+      </td>
+    </tr>
+"""
+
+        html += f"""
+    <!-- DISCLAIMER -->
+    <tr>
+      <td style="padding:4px 36px 28px;">
+        <table width="100%" cellpadding="16" cellspacing="0" border="0"
+               style="background:rgba(255,213,79,.05);border:1px solid rgba(255,213,79,.2);border-radius:12px;">
+          <tr>
+            <td>
+              <p style="color:{red};font-size:12px;font-weight:700;
+                         letter-spacing:1px;margin:0 0 8px">⚠ DISCLAIMER</p>
+              <p style="color:{text_body};font-size:12px;line-height:1.7;margin:0">
+                This analysis is for <strong>educational purposes only</strong> and does
+                <strong>NOT</strong> constitute financial advice. Always do your own research,
+                consult a SEBI-registered advisor, use stop-loss levels, and never invest
+                more than you can afford to lose.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td align="center"
+          style="padding:16px 36px 24px;border-top:1px solid {divider}">
+        <p style="color:{teal};font-size:11px;margin:0;opacity:.7;letter-spacing:1px">
+          © 2025 NIFTY 50 Analyzer · Aurora Glass Edition
+          &nbsp;|&nbsp; Next Update: {next_update} IST
+        </p>
+      </td>
+    </tr>
+
+  </table><!-- /OUTER CARD -->
+
+</td></tr>
+</table><!-- /body table -->
+
 </body>
 </html>
 """
-        
         return html
-    
+
+    # =========================================================
+    #   SEND EMAIL
+    # =========================================================
     def send_email(self, to_email):
-        """Send email with analysis report"""
+        """Send Aurora Glass email report"""
         try:
-            # Get credentials from environment variables
             from_email = os.environ.get('GMAIL_USER')
-            password = os.environ.get('GMAIL_APP_PASSWORD')
-            
+            password   = os.environ.get('GMAIL_APP_PASSWORD')
+
             if not from_email or not password:
                 print("❌ Gmail credentials not found in environment variables")
                 print("   Set GMAIL_USER and GMAIL_APP_PASSWORD")
                 return False
-            
-            # Get IST time
+
             now = self.get_ist_time()
             time_of_day = "Morning" if now.hour < 12 else "Evening"
-            
-            # Create message
+
             msg = MIMEMultipart('alternative')
-            msg['From'] = from_email
-            msg['To'] = to_email
-            msg['Subject'] = f"💎 NIFTY 50 Stock Analysis Report - {time_of_day} Report ({now.strftime('%d %b %Y')})"
-            
-            # Generate email body
+            msg['From']    = from_email
+            msg['To']      = to_email
+            msg['Subject'] = (
+                f"💎 NIFTY 50 Stock Analysis — {time_of_day} Report "
+                f"({now.strftime('%d %b %Y')})"
+            )
+
             html_body = self.generate_email_html()
             msg.attach(MIMEText(html_body, 'html'))
-            
-            # Send email
+
             print(f"📧 Sending email to {to_email}...")
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(from_email, password)
             server.send_message(msg)
             server.quit()
-            
-            print(f"✅ Email sent successfully!\n")
+
+            print("✅ Email sent successfully!\n")
             return True
-            
+
         except Exception as e:
             print(f"❌ Error sending email: {e}\n")
             return False
-    
-    def generate_complete_report(self, send_email_flag=True, recipient_email=None, generate_github_pages=True):
+
+    # =========================================================
+    #   MAIN RUNNER
+    # =========================================================
+    def generate_complete_report(self, send_email_flag=True,
+                                 recipient_email=None,
+                                 generate_github_pages=True):
         """Generate complete analysis report"""
         ist_time = self.get_ist_time()
-        
+
         print("=" * 70)
-        print("💎 NIFTY 50 STOCK ANALYZER - ROYAL SAPPHIRE EDITION")
-        print(f"Started: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
+        print("💎 NIFTY 50 STOCK ANALYZER — AURORA GLASS EDITION")
+        print(f"   Started: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         print()
-        
-        # Analyze all stocks
+
         self.analyze_all_stocks()
-        
-        # Generate GitHub Pages HTML
+
         if generate_github_pages:
             self.generate_github_pages_html('index.html')
-        
-        # Send email if requested
+
         if send_email_flag and recipient_email:
             self.send_email(recipient_email)
-        
+
         print("=" * 70)
-        print("✅ ANALYSIS COMPLETE!")
+        print("✅ ANALYSIS COMPLETE — Aurora Glass Report Ready!")
         print("=" * 70)
 
 
+# =========================================================
+#   ENTRY POINT
+# =========================================================
 def main():
-    """Main execution"""
     analyzer = Nifty50CompleteAnalyzer()
-    
-    # Get recipient email from environment variable
+
     recipient = os.environ.get('RECIPIENT_EMAIL')
-    
     if not recipient:
-        print("⚠️  RECIPIENT_EMAIL environment variable not set")
-        print("   Please set it to receive email reports")
+        print("⚠️  RECIPIENT_EMAIL environment variable not set.")
+        print("   Reports will still be generated locally.\n")
         recipient = None
-    
-    # Generate report, GitHub Pages HTML, and send email
+
     analyzer.generate_complete_report(
-        send_email_flag=True, 
+        send_email_flag=True,
         recipient_email=recipient,
         generate_github_pages=True
     )
