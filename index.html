@@ -89,6 +89,15 @@
         }
         .header-badge::before { content: '● '; font-size: 9px; }
 
+        /* ---- LIVE CLOCK ---- */
+        #live-clock {
+            font-size: 14px;
+            color: #4dd0c4;
+            font-weight: 500;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
         /* ---- STAT CARDS ---- */
         .stats-grid {
             display: grid;
@@ -274,7 +283,6 @@
             .header { flex-direction: column; align-items: flex-start; gap: 14px; }
         }
         
-/* Page-specific scroll behaviour */
 html { scroll-behavior: smooth; }
 </style>
 </head>
@@ -287,10 +295,10 @@ html { scroll-behavior: smooth; }
       <div class="header-eyebrow">NIFTY 50 · Market Intelligence</div>
       <div class="header-title">💎 Stock <span>Analysis</span> Report</div>
       <div class="header-sub">
-        Evening Update &nbsp;·&nbsp;
-        23 February 2026, 05:14 PM IST &nbsp;·&nbsp;
-        Aurora Glass Edition
+        Report Generated on 24 February 2026, 06:00 AM IST
       </div>
+      <!-- Live IST Clock -->
+      <div id="live-clock">🕐 Current IST Time: Loading...</div>
     </div>
     <div class="header-badge">Live Market Data</div>
   </header>
@@ -2034,9 +2042,34 @@ html { scroll-behavior: smooth; }
 
   <!-- FOOTER -->
   <div class="footer">
-    © 2025 NIFTY 50 Analyzer · Aurora Glass Edition &nbsp;|&nbsp; Next Update: 9:30 AM (Next Day) IST
+    © 2025 NIFTY 50 Analyzer &nbsp;|&nbsp; Next Update: 4:30 PM IST
   </div>
 
 </div><!-- /wrapper -->
+
+<!-- LIVE IST CLOCK SCRIPT -->
+<script>
+  function updateISTClock() {
+    const now = new Date();
+    const options = {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    };
+    const istTime = now.toLocaleString('en-IN', options);
+    const el = document.getElementById('live-clock');
+    if (el) {
+      el.textContent = '🕐 Current IST Time: ' + istTime;
+    }
+  }
+  updateISTClock();
+  setInterval(updateISTClock, 1000);
+</script>
+
 </body>
 </html>

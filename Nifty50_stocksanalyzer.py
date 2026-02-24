@@ -76,55 +76,55 @@ class Nifty50CompleteAnalyzer:
             'ADANIENT.NS': 'Adani Enterprises',
             'SIEMENS.NS':       'Siemens India',
             # ── NIFTY NEXT 50 (additional 50) ─────────────────────
-    'HAVELLS.NS':       'Havells India',
-    'PIDILITIND.NS':    'Pidilite Industries',
-    'DABUR.NS':         'Dabur India',
-    'MARICO.NS':        'Marico',
-    'GODREJCP.NS':      'Godrej Consumer Products',
-    'COLPAL.NS':        'Colgate-Palmolive India',
-    'BERGEPAINT.NS':    'Berger Paints',
-    'MUTHOOTFIN.NS':    'Muthoot Finance',
-    'CHOLAFIN.NS':      'Cholamandalam Investment',
-    'BAJAJHLDNG.NS':    'Bajaj Holdings',
-    'SBICARD.NS':       'SBI Cards',
-    'ICICIPRULI.NS':    'ICICI Prudential Life',
-    'ICICIGI.NS':       'ICICI Lombard General Insurance',
-    'HDFCAMC.NS':       'HDFC AMC',
-    'NAUKRI.NS':        'Info Edge (Naukri)',
-    'MCDOWELL-N.NS':    'United Spirits',
-    'TATAELXSI.NS':     'Tata Elxsi',
-    'COFORGE.NS':       'Coforge',
-    'PERSISTENT.NS':    'Persistent Systems',
-    'OFSS.NS':          'Oracle Financial Services',
-    'LTTS.NS':          'L&T Technology Services',
-    'PAGEIND.NS':       'Page Industries',
-    'VOLTAS.NS':        'Voltas',
-    'AMBUJACEM.NS':     'Ambuja Cements',
-    'ACC.NS':           'ACC',
-    'INDIGO.NS':        'IndiGo (InterGlobe Aviation)',
-    'DMART.NS':         'Avenue Supermarts (DMart)',
-    'VEDL.NS':          'Vedanta',
-    'SAIL.NS':          'Steel Authority of India',
-    'NMDC.NS':          'NMDC',
-    'RECLTD.NS':        'REC Limited',
-    'PFC.NS':           'Power Finance Corporation',
-    'IRCTC.NS':         'IRCTC',
-    'CONCOR.NS':        'Container Corporation of India',
-    'JINDALSTEL.NS':    'Jindal Steel & Power',
-    'MOTHERSON.NS':     'Samvardhana Motherson',
-    'BALKRISIND.NS':    'Balkrishna Industries',
-    'TORNTPHARM.NS':    'Torrent Pharmaceuticals',
-    'LUPIN.NS':         'Lupin',
-    'AUROPHARMA.NS':    'Aurobindo Pharma',
-    'ALKEM.NS':         'Alkem Laboratories',
-    'MAXHEALTH.NS':     'Max Healthcare',
-    'FORTIS.NS':        'Fortis Healthcare',
-    'ZOMATO.NS':        'Zomato',
-    'POLICYBZR.NS':     'PB Fintech (PolicyBazaar)',
-    'NYKAA.NS':         'FSN E-Commerce (Nykaa)',
-    'PAYTM.NS':         'One97 Communications (Paytm)',
-    'RVNL.NS':          'Rail Vikas Nigam',
-    'ADANIGREEN.NS':    'Adani Green Energy'
+            'HAVELLS.NS':       'Havells India',
+            'PIDILITIND.NS':    'Pidilite Industries',
+            'DABUR.NS':         'Dabur India',
+            'MARICO.NS':        'Marico',
+            'GODREJCP.NS':      'Godrej Consumer Products',
+            'COLPAL.NS':        'Colgate-Palmolive India',
+            'BERGEPAINT.NS':    'Berger Paints',
+            'MUTHOOTFIN.NS':    'Muthoot Finance',
+            'CHOLAFIN.NS':      'Cholamandalam Investment',
+            'BAJAJHLDNG.NS':    'Bajaj Holdings',
+            'SBICARD.NS':       'SBI Cards',
+            'ICICIPRULI.NS':    'ICICI Prudential Life',
+            'ICICIGI.NS':       'ICICI Lombard General Insurance',
+            'HDFCAMC.NS':       'HDFC AMC',
+            'NAUKRI.NS':        'Info Edge (Naukri)',
+            'MCDOWELL-N.NS':    'United Spirits',
+            'TATAELXSI.NS':     'Tata Elxsi',
+            'COFORGE.NS':       'Coforge',
+            'PERSISTENT.NS':    'Persistent Systems',
+            'OFSS.NS':          'Oracle Financial Services',
+            'LTTS.NS':          'L&T Technology Services',
+            'PAGEIND.NS':       'Page Industries',
+            'VOLTAS.NS':        'Voltas',
+            'AMBUJACEM.NS':     'Ambuja Cements',
+            'ACC.NS':           'ACC',
+            'INDIGO.NS':        'IndiGo (InterGlobe Aviation)',
+            'DMART.NS':         'Avenue Supermarts (DMart)',
+            'VEDL.NS':          'Vedanta',
+            'SAIL.NS':          'Steel Authority of India',
+            'NMDC.NS':          'NMDC',
+            'RECLTD.NS':        'REC Limited',
+            'PFC.NS':           'Power Finance Corporation',
+            'IRCTC.NS':         'IRCTC',
+            'CONCOR.NS':        'Container Corporation of India',
+            'JINDALSTEL.NS':    'Jindal Steel & Power',
+            'MOTHERSON.NS':     'Samvardhana Motherson',
+            'BALKRISIND.NS':    'Balkrishna Industries',
+            'TORNTPHARM.NS':    'Torrent Pharmaceuticals',
+            'LUPIN.NS':         'Lupin',
+            'AUROPHARMA.NS':    'Aurobindo Pharma',
+            'ALKEM.NS':         'Alkem Laboratories',
+            'MAXHEALTH.NS':     'Max Healthcare',
+            'FORTIS.NS':        'Fortis Healthcare',
+            'ZOMATO.NS':        'Zomato',
+            'POLICYBZR.NS':     'PB Fintech (PolicyBazaar)',
+            'NYKAA.NS':         'FSN E-Commerce (Nykaa)',
+            'PAYTM.NS':         'One97 Communications (Paytm)',
+            'RVNL.NS':          'Rail Vikas Nigam',
+            'ADANIGREEN.NS':    'Adani Green Energy'
         }
 
         self.results = []
@@ -532,6 +532,15 @@ class Nifty50CompleteAnalyzer:
         }
         .header-badge::before { content: '● '; font-size: 9px; }
 
+        /* ---- LIVE CLOCK ---- */
+        #live-clock {
+            font-size: 14px;
+            color: #4dd0c4;
+            font-weight: 500;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
         /* ---- STAT CARDS ---- */
         .stats-grid {
             display: grid;
@@ -728,7 +737,6 @@ class Nifty50CompleteAnalyzer:
         top_buys, top_sells = self.get_top_recommendations()
 
         now = self.get_ist_time()
-        time_of_day = "Morning" if now.hour < 12 else "Evening"
         next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
 
         strong_buy_count = len(df[df['Recommendation'] == 'STRONG BUY'])
@@ -736,6 +744,9 @@ class Nifty50CompleteAnalyzer:
         hold_count       = len(df[df['Recommendation'] == 'HOLD'])
         sell_count       = len(df[df['Recommendation'] == 'SELL'])
         strong_sell_count= len(df[df['Recommendation'] == 'STRONG SELL'])
+
+        # Static generation timestamp (used only as fallback text)
+        generated_on = now.strftime('%d %B %Y, %I:%M %p IST')
 
         css = self._aurora_css()
 
@@ -746,7 +757,6 @@ class Nifty50CompleteAnalyzer:
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NIFTY 50 Analysis — Aurora Glass</title>
 <style>{css}
-/* Page-specific scroll behaviour */
 html {{ scroll-behavior: smooth; }}
 </style>
 </head>
@@ -759,10 +769,10 @@ html {{ scroll-behavior: smooth; }}
       <div class="header-eyebrow">NIFTY 50 · Market Intelligence</div>
       <div class="header-title">💎 Stock <span>Analysis</span> Report</div>
       <div class="header-sub">
-        {time_of_day} Update &nbsp;·&nbsp;
-        {now.strftime('%d %B %Y, %I:%M %p')} IST &nbsp;·&nbsp;
-        Aurora Glass Edition
+        Report Generated on {generated_on}
       </div>
+      <!-- Live IST Clock -->
+      <div id="live-clock">🕐 Current IST Time: Loading...</div>
     </div>
     <div class="header-badge">Live Market Data</div>
   </header>
@@ -988,10 +998,35 @@ html {{ scroll-behavior: smooth; }}
 
   <!-- FOOTER -->
   <div class="footer">
-    © 2025 NIFTY 50 Analyzer · Aurora Glass Edition &nbsp;|&nbsp; Next Update: {next_update} IST
+    © 2025 NIFTY 50 Analyzer &nbsp;|&nbsp; Next Update: {next_update} IST
   </div>
 
 </div><!-- /wrapper -->
+
+<!-- LIVE IST CLOCK SCRIPT -->
+<script>
+  function updateISTClock() {{
+    const now = new Date();
+    const options = {{
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    }};
+    const istTime = now.toLocaleString('en-IN', options);
+    const el = document.getElementById('live-clock');
+    if (el) {{
+      el.textContent = '🕐 Current IST Time: ' + istTime;
+    }}
+  }}
+  updateISTClock();
+  setInterval(updateISTClock, 1000);
+</script>
+
 </body>
 </html>
 """
@@ -1012,7 +1047,6 @@ html {{ scroll-behavior: smooth; }}
         top_buys, top_sells = self.get_top_recommendations()
 
         now = self.get_ist_time()
-        time_of_day = "Morning" if now.hour < 12 else "Evening"
         next_update = "4:30 PM" if now.hour < 12 else "9:30 AM (Next Day)"
 
         strong_buy_count  = len(df[df['Recommendation'] == 'STRONG BUY'])
@@ -1024,7 +1058,6 @@ html {{ scroll-behavior: smooth; }}
         # Inline style helpers
         bg_outer   = "#0d1f1e"
         bg_card    = "#0f2020"
-        bg_glass   = "rgba(255,255,255,0.05)"
         teal       = "#4dd0c4"
         teal_dim   = "#80cbc4"
         teal_bg    = "rgba(32,178,170,0.14)"
@@ -1036,6 +1069,8 @@ html {{ scroll-behavior: smooth; }}
         yellow     = "#ffd54f"
         row_border = "rgba(77,208,196,0.07)"
         divider    = "rgba(77,208,196,0.14)"
+
+        generated_on = now.strftime('%d %B %Y, %I:%M %p IST')
 
         def quality_color(q):
             return {"Excellent": teal, "Good": "#81c784", "Average": yellow, "Poor": red}.get(q, text_body)
@@ -1061,8 +1096,7 @@ html {{ scroll-behavior: smooth; }}
         <p style="font-size:26px;font-weight:700;color:{text_main};margin:0 0 6px">
           💎 Stock Analysis Report</p>
         <p style="font-size:13px;color:{teal_dim};margin:0;font-weight:300">
-          {time_of_day} Update &nbsp;·&nbsp; {now.strftime('%d %B %Y, %I:%M %p')} IST
-          &nbsp;·&nbsp; Aurora Glass Edition</p>
+          Report Generated on {generated_on}</p>
       </td>
     </tr>
 
@@ -1253,7 +1287,7 @@ html {{ scroll-behavior: smooth; }}
       <td align="center"
           style="padding:16px 36px 24px;border-top:1px solid {divider}">
         <p style="color:{teal};font-size:11px;margin:0;opacity:.7;letter-spacing:1px">
-          © 2025 NIFTY 50 Analyzer · Aurora Glass Edition
+          © 2025 NIFTY 50 Analyzer
           &nbsp;|&nbsp; Next Update: {next_update} IST
         </p>
       </td>
@@ -1284,14 +1318,13 @@ html {{ scroll-behavior: smooth; }}
                 return False
 
             now = self.get_ist_time()
-            time_of_day = "Morning" if now.hour < 12 else "Evening"
+            generated_on = now.strftime('%d %b %Y, %I:%M %p IST')
 
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
             msg['Subject'] = (
-                f"💎 NIFTY 50 Stock Analysis — {time_of_day} Report "
-                f"({now.strftime('%d %b %Y')})"
+                f"💎 NIFTY 50 Stock Analysis — Report Generated on {generated_on}"
             )
 
             html_body = self.generate_email_html()
@@ -1321,8 +1354,8 @@ html {{ scroll-behavior: smooth; }}
         ist_time = self.get_ist_time()
 
         print("=" * 70)
-        print("💎 NIFTY 50 STOCK ANALYZER — AURORA GLASS EDITION")
-        print(f"   Started: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
+        print("💎 NIFTY 50 STOCK ANALYZER")
+        print(f"   Report Generated on: {ist_time.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         print()
 
@@ -1335,7 +1368,7 @@ html {{ scroll-behavior: smooth; }}
             self.send_email(recipient_email)
 
         print("=" * 70)
-        print("✅ ANALYSIS COMPLETE — Aurora Glass Report Ready!")
+        print("✅ ANALYSIS COMPLETE — Report Ready!")
         print("=" * 70)
 
 
