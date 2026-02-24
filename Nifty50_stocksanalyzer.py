@@ -534,11 +534,16 @@ class Nifty50CompleteAnalyzer:
 
         /* ---- LIVE CLOCK ---- */
         #live-clock {
-            font-size: 14px;
+            font-size: 13px;
             color: #4dd0c4;
             font-weight: 500;
-            margin-top: 8px;
             letter-spacing: 0.5px;
+            background: rgba(32,178,170,.1);
+            border: 1px solid rgba(77,208,196,.25);
+            border-radius: 30px;
+            padding: 8px 18px;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
         }
 
         /* ---- STAT CARDS ---- */
@@ -771,10 +776,12 @@ html {{ scroll-behavior: smooth; }}
       <div class="header-sub">
         Report Generated on {generated_on}
       </div>
-      <!-- Live IST Clock -->
-      <div id="live-clock">🕐 Current IST Time: Loading...</div>
     </div>
-    <div class="header-badge">Live Market Data</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+      <div class="header-badge">Live Market Data</div>
+      <!-- Live IST Clock -->
+      <div id="live-clock">🕐 Loading...</div>
+    </div>
   </header>
 
   <!-- STAT CARDS -->
