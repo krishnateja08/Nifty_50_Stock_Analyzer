@@ -2,2081 +2,1829 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIFTY 50 Analysis — Aurora Glass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NIFTY 100 Market Influencers — Morning Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg:#050f0e; --bg2:#071412; --card:#0a1c1a; --card2:#0d2220;
+    --accent:#4dd0c4; --accent2:#2dd4bf;
+    --green:#22c55e; --red:#ef4444; --blue:#60a5fa;
+    --gold:#f59e0b; --teal:#4dd0c4; --purple:#a78bfa;
+    --text:#b2dfdb; --text2:#e0f2f1;
+    --sym:#80cbc4; --t2c:#4dd0c4; --muted:#4a7a78;
+    --border:#0d3330; --border2:#134540;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:13px; line-height:1.4;
+    background-image:
+      radial-gradient(ellipse at 0% 0%,   rgba(77,208,196,0.07) 0%,transparent 50%),
+      radial-gradient(ellipse at 100% 100%,rgba(45,212,191,0.04) 0%,transparent 40%);
+  }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0d1f1e 0%, #0a1a2e 50%, #0f1e2a 100%);
-            min-height: 100vh;
-            padding: 24px;
-            color: #b2dfdb;
-        }
+  /* ── HEADER ── */
+  header { background:linear-gradient(180deg,#071412,var(--bg2)); border-bottom:2px solid var(--accent); }
+  .h-top {
+    width:100%; display:flex; align-items:center;
+    justify-content:space-between; padding:12px 16px;
+    gap:12px; flex-wrap:wrap;
+  }
+  .brand { display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand-icon {
+    width:36px; height:36px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--gold));
+    border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:17px;
+  }
+  .brand-t { font-size:clamp(12px,1.8vw,17px); font-weight:800; color:var(--text2); white-space:nowrap; }
+  .brand-s { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+  .h-meta { display:flex; flex-wrap:wrap; gap:0; align-items:center; }
+  .hm { padding:6px 14px; border-left:1px solid var(--border2); text-align:right; }
+  .hm-l { font-size:8px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+  .hm-v { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; margin-top:1px; }
 
-        /* ---- Ambient glow orbs ---- */
-        body::before {
-            content: '';
-            position: fixed; top: -120px; right: -120px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(32,178,170,.18) 0%, transparent 65%);
-            border-radius: 50%; pointer-events: none; z-index: 0;
-        }
-        body::after {
-            content: '';
-            position: fixed; bottom: -100px; left: -80px;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(0,150,136,.14) 0%, transparent 65%);
-            border-radius: 50%; pointer-events: none; z-index: 0;
-        }
+  /* ── INDEX STRIP ── */
+  .idx-strip {
+    display:flex; align-items:center;
+    background:rgba(0,0,0,0.35); border:1px solid var(--border2);
+    border-radius:8px; padding:4px 0; margin:0 8px;
+  }
+  .idx-item { display:flex; align-items:center; gap:8px; padding:6px 16px; }
+  .idx-name  { font-size:9px; font-weight:800; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+  .idx-price { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:var(--text2); }
+  .idx-chg   { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); }
+  .idx-chg.up { color:var(--green); }
+  .idx-chg.dn { color:var(--red); }
+  .idx-sep   { width:1px; height:30px; background:var(--border2); }
 
-        .wrapper {
-            max-width: 1300px;
-            margin: 0 auto;
-            position: relative; z-index: 1;
-        }
+  /* ── LIVE CLOCK ── */
+  .live-clock-wrap {
+    display:flex; flex-direction:column; align-items:center;
+    padding:6px 16px; border-left:1px solid var(--border2); min-width:130px;
+  }
+  .lc-label { font-size:8px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+  .lc-time  { font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--green); letter-spacing:2px; margin-top:2px; }
+  .lc-date  { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); margin-top:1px; }
+  .lc-last  { font-size:8px; color:var(--accent2); margin-top:3px; letter-spacing:0.3px; white-space:nowrap; }
 
-        /* ---- HEADER ---- */
-        .header {
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(77,208,196,.2);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 20px;
-            padding: 36px 40px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .header-left {}
-        .header-eyebrow {
-            font-size: 11px;
-            letter-spacing: 3px;
-            color: #4dd0c4;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            opacity: .8;
-        }
-        .header-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: #e0f2f1;
-            line-height: 1.1;
-        }
-        .header-title span { color: #4dd0c4; }
-        .header-sub {
-            font-size: 14px;
-            color: #80cbc4;
-            margin-top: 6px;
-            font-weight: 300;
-        }
-        .header-badge {
-            background: rgba(32,178,170,.15);
-            border: 1px solid rgba(77,208,196,.35);
-            color: #4dd0c4;
-            padding: 10px 22px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            backdrop-filter: blur(8px);
-            white-space: nowrap;
-        }
-        .header-badge::before { content: '● '; font-size: 9px; }
+  /* ── TICKER TAPE ── */
+  .ticker { background:#020808; border-bottom:1px solid var(--border); }
+  .ticker-inner { display:flex; padding:0 16px; overflow-x:auto; scrollbar-width:none; }
+  .ticker-inner::-webkit-scrollbar { display:none; }
+  .ti { display:flex; gap:5px; align-items:center; padding:5px 10px; border-right:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:10px; white-space:nowrap; }
+  .ti-s { color:var(--accent2); font-weight:700; }
+  .ti-p { color:var(--text2); }
+  .ti-u { color:var(--green); }
+  .ti-d { color:var(--red); }
 
-        /* ---- LIVE CLOCK ---- */
-        #live-clock {
-            font-size: 13px;
-            color: #4dd0c4;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            background: rgba(32,178,170,.1);
-            border: 1px solid rgba(77,208,196,.25);
-            border-radius: 30px;
-            padding: 8px 18px;
-            white-space: nowrap;
-            backdrop-filter: blur(8px);
-        }
+  /* ── KPI BAND ── */
+  .kpi-band { background:var(--card); border-bottom:1px solid var(--border2); }
+  .kpi-inner { display:grid; grid-template-columns:repeat(5,1fr); width:100%; }
+  .kc { padding:12px 10px; border-right:1px solid var(--border); text-align:center; }
+  .kc:last-child { border-right:none; }
+  .kn { font-size:clamp(20px,4vw,30px); font-weight:800; line-height:1; }
+  .kl { font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+  .kbar { height:2px; border-radius:1px; margin:3px auto 0; width:32px; }
 
-        /* ---- STAT CARDS ---- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,.06);
-            border: 1px solid rgba(77,208,196,.15);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-radius: 16px;
-            padding: 22px 18px;
-            text-align: center;
-            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
-            position: relative; overflow: hidden;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(77,208,196,.6), transparent);
-        }
-        .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(77,208,196,.35);
-            box-shadow: 0 8px 28px rgba(32,178,170,.15);
-        }
-        .stat-card .num {
-            font-size: 42px;
-            font-weight: 700;
-            color: #4dd0c4;
-            line-height: 1;
-            text-shadow: 0 0 24px rgba(77,208,196,.4);
-        }
-        .stat-card .lbl {
-            font-size: 11px;
-            color: #80cbc4;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 8px;
-            font-weight: 400;
-            opacity: .8;
-        }
+  /* ── MAIN ── */
+  .main { width:100%; padding:12px 16px; }
 
-        /* ---- SECTION ---- */
-        .section { margin-bottom: 32px; }
-        .section-header {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 16px;
-        }
-        .section-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            box-shadow: 0 0 8px currentColor;
-        }
-        .section-dot.buy { background: #4dd0c4; color: #4dd0c4; }
-        .section-dot.sell { background: #ef9a9a; color: #ef9a9a; }
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #e0f2f1;
-            letter-spacing: .5px;
-        }
-        .section-title.sell { color: #ef9a9a; }
-        .section-count {
-            margin-left: auto;
-            background: rgba(77,208,196,.12);
-            border: 1px solid rgba(77,208,196,.25);
-            color: #4dd0c4;
-            font-size: 11px;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-        .section-count.sell {
-            background: rgba(239,154,154,.1);
-            border-color: rgba(239,154,154,.25);
-            color: #ef9a9a;
-        }
+  /* ── SECTION HEADER ── */
+  .sh { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .sh-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .shi-buy  { background:rgba(34,197,94,0.15); }
+  .shi-sell { background:rgba(239,68,68,0.15); }
+  .sh-title { font-size:15px; font-weight:800; color:var(--text2); }
+  .sh-divider { flex:1; height:1px; background:var(--border); min-width:10px; }
+  .sh-count { font-size:9px; color:var(--muted); white-space:nowrap; }
 
-        /* ---- TABLE ---- */
-        .table-wrap {
-            background: rgba(255,255,255,.04);
-            border: 1px solid rgba(77,208,196,.14);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        table { width: 100%; border-collapse: collapse; }
-        thead tr { background: rgba(32,178,170,.14); }
-        th {
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 600;
-            color: #4dd0c4;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        td {
-            padding: 13px 16px;
-            border-bottom: 1px solid rgba(77,208,196,.07);
-            color: #b2dfdb;
-            font-size: 13px;
-            vertical-align: middle;
-        }
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr { transition: background .15s ease; }
-        tbody tr:hover { background: rgba(77,208,196,.06); }
+  /* ── TABLE ── */
+  .tbl-wrap {
+    width:100%; overflow-x:auto;
+    border:1px solid var(--border2); border-radius:8px;
+    margin-bottom:20px; background:var(--card);
+    box-shadow:0 4px 24px rgba(0,0,0,0.3);
+    -webkit-overflow-scrolling:touch;
+  }
+  table { width:100%; border-collapse:collapse; min-width:1200px; }
+  th {
+    font-size:8px; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--teal);
+    padding:8px 9px; background:var(--card2);
+    border-bottom:1px solid var(--border2); text-align:left; white-space:nowrap;
+  }
+  td { padding:8px 9px; border-bottom:1px solid var(--border); vertical-align:middle; white-space:nowrap; }
+  tr:hover td { background:rgba(77,208,196,0.05); }
+  tr:nth-child(even) td { background:rgba(0,0,0,0.15); }
+  tr:last-child td { border-bottom:none; }
 
-        .stock-name { font-weight: 600; color: #e0f2f1; }
-        .price { font-weight: 500; }
+  /* ── CELL COMPONENTS ── */
+  .sn  { font-size:13px; font-weight:700; color:var(--text2); }
+  .ss  { font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:600; color:var(--sym); letter-spacing:1px; margin-top:2px; }
+  .sec { font-size:8px; color:var(--muted); margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; }
+  .pv  { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--gold); }
+  .rt  { display:inline-block; font-size:8px; font-weight:700; padding:3px 7px; border-radius:3px; white-space:nowrap; letter-spacing:0.5px; }
+  .rt-sb { background:rgba(34,197,94,0.15);  color:#4ade80; border:1px solid rgba(34,197,94,0.3); }
+  .rt-b  { background:rgba(77,208,196,0.15); color:#4dd0c4; border:1px solid rgba(77,208,196,0.3); }
+  .rt-s  { background:rgba(239,68,68,0.15);  color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+  .rt-ss { background:rgba(239,68,68,0.22);  color:#fca5a5; border:1px solid rgba(239,68,68,0.4); }
+  .scn { font-size:20px; font-weight:800; }
+  .scb { height:3px; border-radius:2px; margin-top:3px; width:36px; }
+  .up { color:#4ade80; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+  .dn { color:#f87171; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+  .t1 { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--text2); }
+  .t2 { font-size:9px; color:var(--t2c); margin-top:1px; }
+  .sl1 { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:#f87171; }
+  .sl2 { font-size:9px; color:var(--muted); margin-top:1px; }
+  .rv  { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+  .rsb { font-size:8px; color:var(--muted); }
+  .rrv { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+  .qb    { font-size:8px; font-weight:700; padding:2px 6px; border-radius:3px; }
+  .qb-ex { background:rgba(34,197,94,0.15);  color:#4ade80; }
+  .qb-gd { background:rgba(77,208,196,0.15); color:#4dd0c4; }
+  .qb-av { background:rgba(245,158,11,0.15); color:#fbbf24; }
+  .qb-po { background:rgba(239,68,68,0.15);  color:#f87171; }
+  .ts { font-size:7px; font-weight:700; padding:2px 5px; border-radius:3px; letter-spacing:0.5px; display:inline-block; margin-bottom:2px; }
+  .ts-real    { background:rgba(34,197,94,0.15);  color:#4ade80; }
+  .ts-partial { background:rgba(245,158,11,0.15); color:#fbbf24; }
+  .ts-ath     { background:rgba(77,208,196,0.15); color:#4dd0c4; }
+  .sb { font-size:7px; font-weight:700; padding:2px 5px; border-radius:3px; display:inline-block; margin-top:2px; }
+  .sb-atr  { background:rgba(34,197,94,0.15);  color:#4ade80; }
+  .sb-beta { background:rgba(245,158,11,0.15); color:#fbbf24; }
+  .ab { font-size:8px; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
+  .ab-sb { background:rgba(34,197,94,0.15);  color:#4ade80; }
+  .ab-b  { background:rgba(77,208,196,0.15); color:#4dd0c4; }
+  .ab-h  { background:rgba(74,122,120,0.2);  color:#80cbc4; }
+  .ab-s  { background:rgba(239,68,68,0.15);  color:#f87171; }
+  .adx-strong { color:#4ade80; font-weight:700; }
+  .adx-mid    { color:#fbbf24; font-weight:600; }
+  .adx-weak   { color:#4a7a78; }
+  .vol-high { color:#4ade80; font-weight:700; }
+  .vol-norm { color:var(--text); }
+  .vol-low  { color:#4a7a78; }
+  .earn { font-size:9px; color:var(--teal); font-family:'JetBrains Mono',monospace; }
+  .sdist-close { color:#4ade80;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }
+  .sdist-mid   { color:#fbbf24;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }
+  .sdist-far   { color:#f87171;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }
 
-        /* ---- SCORE PILL ---- */
-        .score-pill {
-            display: inline-block;
-            background: rgba(32,178,170,.18);
-            border: 1px solid rgba(77,208,196,.28);
-            color: #4dd0c4;
-            padding: 4px 11px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
+  /* ── DISCLAIMER ── */
+  .disc {
+    background:var(--card); border:1px solid var(--border2);
+    border-left:3px solid var(--accent); padding:12px 16px;
+    margin:16px 0; font-size:11px; color:var(--muted); line-height:1.7;
+  }
+  .disc strong { color:#f87171; }
 
-        /* ---- SIGNAL COLORS ---- */
-        .buy  { color: #4dd0c4; font-weight: 700; }
-        .sell { color: #ef9a9a; font-weight: 700; }
-        .hold { color: #ffd54f; font-weight: 600; }
-        .neutral { color: #90a4ae; }
+  /* ── FOOTER ── */
+  footer {
+    background:linear-gradient(90deg,var(--bg2),#071412,var(--bg2));
+    border-top:2px solid var(--accent); text-align:center;
+    padding:14px; font-size:10px; color:var(--muted); letter-spacing:1px;
+  }
+  footer strong { color:var(--accent2); }
 
-        /* ---- QUALITY BADGE ---- */
-        .badge {
-            display: inline-block;
-            padding: 4px 11px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .badge-excellent { background: rgba(77,208,196,.2);  border: 1px solid rgba(77,208,196,.35);  color: #4dd0c4; }
-        .badge-good      { background: rgba(129,199,132,.15); border: 1px solid rgba(129,199,132,.3);  color: #81c784; }
-        .badge-average   { background: rgba(255,213,79,.12);  border: 1px solid rgba(255,213,79,.28);  color: #ffd54f; }
-        .badge-poor      { background: rgba(239,154,154,.14); border: 1px solid rgba(239,154,154,.28); color: #ef9a9a; }
-
-        /* ---- RSI / MACD badges ---- */
-        .rsi-oversold  { color: #4dd0c4; font-weight: 700; }
-        .rsi-overbought{ color: #ef9a9a; font-weight: 700; }
-        .rsi-neutral   { color: #ffd54f; font-weight: 600; }
-
-        /* ---- DISCLAIMER ---- */
-        .disclaimer {
-            background: rgba(255,213,79,.05);
-            border: 1px solid rgba(255,213,79,.2);
-            border-radius: 14px;
-            padding: 22px 26px;
-            margin-top: 32px;
-        }
-        .disclaimer h3 { color: #ef9a9a; font-size: 14px; margin-bottom: 10px; letter-spacing: 1px; }
-        .disclaimer p  { color: #80cbc4; font-size: 13px; line-height: 1.7; }
-        .disclaimer ul { margin-left: 20px; margin-top: 8px; }
-        .disclaimer li { color: #80cbc4; font-size: 13px; line-height: 1.9; }
-
-        /* ---- FOOTER ---- */
-        .footer {
-            text-align: center;
-            padding: 28px 0 10px;
-            color: #4dd0c4;
-            font-size: 12px;
-            opacity: .65;
-            letter-spacing: 1px;
-        }
-
-        /* ---- RESPONSIVE ---- */
-        @media (max-width: 900px) {
-            body { padding: 14px; }
-            .header { padding: 24px 20px; }
-            .header-title { font-size: 24px; }
-            th, td { padding: 11px 10px; font-size: 12px; }
-        }
-        @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .header { flex-direction: column; align-items: flex-start; gap: 14px; }
-        }
-        
-html { scroll-behavior: smooth; }
+  /* ── MOBILE ── */
+  @media(max-width:900px) {
+    .kpi-inner { grid-template-columns:repeat(3,1fr); }
+    .hm:nth-child(n+4) { display:none; }
+    .idx-strip { display:none; }
+  }
+  @media(max-width:600px) {
+    .kpi-inner { grid-template-columns:repeat(2,1fr); }
+    .brand-t { font-size:12px; }
+    .hm:nth-child(n+3) { display:none; }
+    .main { padding:8px; }
+    .h-top { padding:10px 10px; }
+    th { font-size:7px; padding:6px 7px; letter-spacing:0.5px; }
+    td { padding:7px 7px; }
+    .sn { font-size:12px; }
+    .kn { font-size:18px; }
+    .kl { font-size:7px; }
+    .live-clock-wrap { display:none; }
+  }
 </style>
 </head>
 <body>
-<div class="wrapper">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="header-eyebrow">NIFTY 50 · Market Intelligence</div>
-      <div class="header-title">💎 Stock <span>Analysis</span> Report</div>
-      <div class="header-sub">
-        Report Generated on 26 February 2026, 05:13 PM IST
+<!-- HEADER -->
+<header>
+  <div class="h-top">
+    <div class="brand">
+      <div class="brand-icon">💎</div>
+      <div>
+        <div class="brand-t">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
+        <div class="brand-s">12M S/R · ATR Stops · Tech &amp; Fundamental v2</div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
-      <div class="header-badge">Live Market Data</div>
-      <!-- Live IST Clock -->
-      <div id="live-clock">🕐 Loading...</div>
+
+    <!-- ── INDEX STRIP ── -->
+    <div class="idx-strip">
+      <div class="idx-item">
+        <span class="idx-name">SENSEX</span>
+        <span class="idx-price">82,248.61</span>
+        <span class="idx-chg dn">▼ -0.03%</span>
+      </div>
+      <div class="idx-sep"></div>
+      <div class="idx-item">
+        <span class="idx-name">NIFTY</span>
+        <span class="idx-price">25,496.55</span>
+        <span class="idx-chg up">▲ +0.06%</span>
+      </div>
+      <div class="idx-sep"></div>
+      <div class="idx-item">
+        <span class="idx-name">BANK NIFTY</span>
+        <span class="idx-price">61,187.70</span>
+        <span class="idx-chg up">▲ +0.24%</span>
+      </div>
     </div>
-  </header>
 
-  <!-- STAT CARDS -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="num">97</div>
-      <div class="lbl">Stocks Analyzed</div>
-    </div>
-    <div class="stat-card">
-      <div class="num">0</div>
-      <div class="lbl">Strong Buy</div>
-    </div>
-    <div class="stat-card">
-      <div class="num">38</div>
-      <div class="lbl">Buy</div>
-    </div>
-    <div class="stat-card">
-      <div class="num">23</div>
-      <div class="lbl">Hold</div>
-    </div>
-    <div class="stat-card">
-      <div class="num">21</div>
-      <div class="lbl">Sell</div>
-    </div>
-    <div class="stat-card">
-      <div class="num">15</div>
-      <div class="lbl">Strong Sell</div>
-    </div>
-  </div>
-
-  <!-- BUY SECTION -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-dot buy"></div>
-      <div class="section-title">Top 10 Buy Recommendations</div>
-      <div class="section-count">10 stocks</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Stock</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Score</th>
-            <th>Upside %</th>
-            <th>Target 1</th>
-            <th>Stop Loss</th>
-            <th>R:R Ratio</th>
-            <th>Quality</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td class="neutral">1</td>
-            <td class="stock-name">Siemens India</td>
-            <td class="price">₹3,336.90</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">71</span></td>
-            <td class="buy">+1.1%</td>
-            <td>₹3,373.82</td>
-            <td>₹2,814.65</td>
-            <td class="neutral">0.07x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">2</td>
-            <td class="stock-name">Dr Reddy</td>
-            <td class="price">₹1,319.30</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">70</span></td>
-            <td class="sell">-2.0%</td>
-            <td>₹1,292.91</td>
-            <td>₹1,149.02</td>
-            <td class="neutral">0.15x</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">3</td>
-            <td class="stock-name">Hero MotoCorp</td>
-            <td class="price">₹5,787.00</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">69</span></td>
-            <td class="buy">+2.5%</td>
-            <td>₹5,929.82</td>
-            <td>₹5,205.74</td>
-            <td class="neutral">0.25x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">4</td>
-            <td class="stock-name">Axis Bank</td>
-            <td class="price">₹1,395.50</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="sell">-1.2%</td>
-            <td>₹1,379.11</td>
-            <td>₹1,187.84</td>
-            <td class="neutral">0.08x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">5</td>
-            <td class="stock-name">Coal India</td>
-            <td class="price">₹433.50</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="buy">+0.5%</td>
-            <td>₹435.70</td>
-            <td>₹362.20</td>
-            <td class="neutral">0.03x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">6</td>
-            <td class="stock-name">ICICI Prudential Life</td>
-            <td class="price">₹674.55</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="buy">+2.1%</td>
-            <td>₹688.86</td>
-            <td>₹602.18</td>
-            <td class="neutral">0.20x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">7</td>
-            <td class="stock-name">NMDC</td>
-            <td class="price">₹82.56</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="buy">+1.2%</td>
-            <td>₹83.53</td>
-            <td>₹71.16</td>
-            <td class="neutral">0.09x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">8</td>
-            <td class="stock-name">Aurobindo Pharma</td>
-            <td class="price">₹1,220.70</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="buy">+1.3%</td>
-            <td>₹1,236.23</td>
-            <td>₹1,092.74</td>
-            <td class="neutral">0.12x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">9</td>
-            <td class="stock-name">Nestle India</td>
-            <td class="price">₹1,318.00</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="buy">+0.5%</td>
-            <td>₹1,324.00</td>
-            <td>₹1,182.24</td>
-            <td class="neutral">0.04x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">10</td>
-            <td class="stock-name">ONGC</td>
-            <td class="price">₹280.10</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="sell">-2.1%</td>
-            <td>₹274.12</td>
-            <td>₹219.53</td>
-            <td class="neutral">0.10x</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-        </tbody>
-      </table>
+    <div class="h-meta">
+      <div class="hm"><div class="hm-l">Date</div><div class="hm-v" style="color:var(--gold)">27 Feb 2026</div></div>
+      <div class="live-clock-wrap">
+        <div class="lc-label">TIME</div>
+        <div class="lc-time" id="liveClock">--:-- --</div>
+        <div class="lc-date" id="liveDate">27 Feb 2026</div>
+        <div class="lc-last">Report: 27 Feb 2026 05:24 AM IST</div>
+      </div>
+      <div class="hm"><div class="hm-l">Session</div><div class="hm-v" style="color:var(--green)">▲ MORNING</div></div>
+      <div class="hm"><div class="hm-l">Next Update</div><div class="hm-v" style="color:var(--accent2)">4:30 PM</div></div>
     </div>
   </div>
 
-  <!-- SELL SECTION -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-dot sell"></div>
-      <div class="section-title sell">Top 10 Sell Recommendations</div>
-      <div class="section-count sell">10 stocks</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Stock</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Score</th>
-            <th>RSI</th>
-            <th>RSI Signal</th>
-            <th>MACD</th>
-            <th>Quality</th>
-          </tr>
-        </thead>
-        <tbody>
+  <!-- TICKER TAPE -->
+  <div class="ticker"><div class="ticker-inner">
+<div class="ti"><span class="ti-s">RELIANCE</span><span class="ti-p">₹1,406.80</span><span class="ti-d">-1.7%</span></div><div class="ti"><span class="ti-s">TCS</span><span class="ti-p">₹2,647.70</span><span class="ti-d">-6.7%</span></div><div class="ti"><span class="ti-s">HDFCBANK</span><span class="ti-p">₹898.60</span><span class="ti-d">-2.9%</span></div><div class="ti"><span class="ti-s">INFY</span><span class="ti-p">₹1,289.10</span><span class="ti-d">-10.3%</span></div><div class="ti"><span class="ti-s">ICICIBANK</span><span class="ti-p">₹1,404.90</span><span class="ti-u">+0.5%</span></div><div class="ti"><span class="ti-s">HINDUNILVR</span><span class="ti-p">₹2,383.30</span><span class="ti-u">+0.7%</span></div><div class="ti"><span class="ti-s">BHARTIARTL</span><span class="ti-p">₹1,929.60</span><span class="ti-d">-3.2%</span></div><div class="ti"><span class="ti-s">ITC</span><span class="ti-p">₹318.30</span><span class="ti-d">-0.4%</span></div>  </div></div>
+</header>
 
-          <tr>
-            <td class="neutral">1</td>
-            <td class="stock-name">Container Corporation of India</td>
-            <td class="price">₹499.85</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">19</span></td>
-            <td class="rsi-neutral">43.6</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">2</td>
-            <td class="stock-name">Berger Paints</td>
-            <td class="price">₹459.25</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">20</span></td>
-            <td class="rsi-neutral">36.3</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="buy">Bullish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">3</td>
-            <td class="stock-name">Ambuja Cements</td>
-            <td class="price">₹512.15</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">20</span></td>
-            <td class="rsi-neutral">37.6</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">4</td>
-            <td class="stock-name">REC Limited</td>
-            <td class="price">₹354.10</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="rsi-neutral">34.2</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">5</td>
-            <td class="stock-name">Asian Paints</td>
-            <td class="price">₹2,394.90</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="rsi-neutral">48.9</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="buy">Bullish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">6</td>
-            <td class="stock-name">Tata Elxsi</td>
-            <td class="price">₹4,507.50</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="rsi-oversold">26.2</td>
-            <td class="rsi-oversold">Oversold</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">7</td>
-            <td class="stock-name">Reliance Industries</td>
-            <td class="price">₹1,406.80</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">23</span></td>
-            <td class="rsi-neutral">39.7</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">8</td>
-            <td class="stock-name">Info Edge (Naukri)</td>
-            <td class="price">₹1,051.00</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="rsi-neutral">36.2</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">9</td>
-            <td class="stock-name">One97 Communications (Paytm)</td>
-            <td class="price">₹1,122.80</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="rsi-neutral">38.3</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="buy">Bullish</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">10</td>
-            <td class="stock-name">ACC</td>
-            <td class="price">₹1,613.10</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="rsi-neutral">34.6</td>
-            <td class="rsi-neutral">Neutral</td>
-            <td class="sell">Bearish</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-        </tbody>
-      </table>
-    </div>
+<!-- KPI BAND -->
+<div class="kpi-band">
+  <div class="kpi-inner">
+    <div class="kc"><div class="kn" style="color:var(--accent2)">97</div><div class="kl">Analyzed</div><div class="kbar" style="background:var(--accent)"></div></div>
+    <div class="kc"><div class="kn" style="color:var(--green)">1</div><div class="kl">Strong Buy</div><div class="kbar" style="background:var(--green)"></div></div>
+    <div class="kc"><div class="kn" style="color:var(--teal)">47</div><div class="kl">Buy</div><div class="kbar" style="background:var(--teal)"></div></div>
+    <div class="kc"><div class="kn" style="color:var(--red)">30</div><div class="kl">Sell</div><div class="kbar" style="background:var(--red)"></div></div>
+    <div class="kc"><div class="kn" style="color:var(--blue)">19</div><div class="kl">Hold</div><div class="kbar" style="background:var(--blue)"></div></div>
   </div>
-
-  <!-- ALL STOCKS SECTION -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-dot buy"></div>
-      <div class="section-title">All NIFTY 50 Stocks — Complete Analysis</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Stock</th>
-            <th>Price</th>
-            <th>Score</th>
-            <th>PE</th>
-            <th>PB</th>
-            <th>ROE %</th>
-            <th>RSI</th>
-            <th>MACD</th>
-            <th>Rating</th>
-            <th>Quality</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td class="neutral">1</td>
-            <td class="stock-name">Siemens India</td>
-            <td class="price">₹3,336.90</td>
-            <td><span class="score-pill">71</span></td>
-            <td class="neutral">70.1</td>
-            <td class="neutral">9.0</td>
-            <td class="neutral">11.8%</td>
-            <td class="rsi-neutral">62.5</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">2</td>
-            <td class="stock-name">Dr Reddy</td>
-            <td class="price">₹1,319.30</td>
-            <td><span class="score-pill">70</span></td>
-            <td class="neutral">19.4</td>
-            <td class="neutral">3.0</td>
-            <td class="neutral">16.1%</td>
-            <td class="rsi-overbought">74.7</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">3</td>
-            <td class="stock-name">Hero MotoCorp</td>
-            <td class="price">₹5,787.00</td>
-            <td><span class="score-pill">69</span></td>
-            <td class="neutral">21.3</td>
-            <td class="neutral">5.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">57.3</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">4</td>
-            <td class="stock-name">Coal India</td>
-            <td class="price">₹433.50</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="neutral">8.9</td>
-            <td class="neutral">2.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">54.6</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">5</td>
-            <td class="stock-name">Aurobindo Pharma</td>
-            <td class="price">₹1,220.70</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="neutral">20.3</td>
-            <td class="neutral">2.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">54.8</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">6</td>
-            <td class="stock-name">ICICI Prudential Life</td>
-            <td class="price">₹674.55</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="neutral">71.6</td>
-            <td class="neutral">7.3</td>
-            <td class="neutral">10.9%</td>
-            <td class="rsi-neutral">67.7</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">7</td>
-            <td class="stock-name">Axis Bank</td>
-            <td class="price">₹1,395.50</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="neutral">16.6</td>
-            <td class="neutral">2.1</td>
-            <td class="neutral">13.6%</td>
-            <td class="rsi-neutral">66.7</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">8</td>
-            <td class="stock-name">NMDC</td>
-            <td class="price">₹82.56</td>
-            <td><span class="score-pill">68</span></td>
-            <td class="neutral">10.5</td>
-            <td class="neutral">2.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">53.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">9</td>
-            <td class="stock-name">Nestle India</td>
-            <td class="price">₹1,318.00</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="neutral">77.8</td>
-            <td class="neutral">57.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">55.0</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">10</td>
-            <td class="stock-name">ICICI Lombard General Insurance</td>
-            <td class="price">₹1,946.50</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="neutral">35.6</td>
-            <td class="neutral">5.6</td>
-            <td class="neutral">17.3%</td>
-            <td class="rsi-neutral">66.1</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">11</td>
-            <td class="stock-name">Bajaj Auto</td>
-            <td class="price">₹10,110.00</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="neutral">31.8</td>
-            <td class="neutral">8.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">68.6</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">12</td>
-            <td class="stock-name">ONGC</td>
-            <td class="price">₹280.10</td>
-            <td><span class="score-pill">66</span></td>
-            <td class="neutral">9.3</td>
-            <td class="neutral">1.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">68.3</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">13</td>
-            <td class="stock-name">Power Grid</td>
-            <td class="price">₹303.25</td>
-            <td><span class="score-pill">64</span></td>
-            <td class="neutral">19.5</td>
-            <td class="neutral">2.9</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">64.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">14</td>
-            <td class="stock-name">Power Finance Corporation</td>
-            <td class="price">₹420.60</td>
-            <td><span class="score-pill">64</span></td>
-            <td class="neutral">5.5</td>
-            <td class="neutral">1.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">53.6</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">15</td>
-            <td class="stock-name">Steel Authority of India</td>
-            <td class="price">₹165.51</td>
-            <td><span class="score-pill">64</span></td>
-            <td class="neutral">24.5</td>
-            <td class="neutral">1.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">58.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">16</td>
-            <td class="stock-name">Adani Ports</td>
-            <td class="price">₹1,550.60</td>
-            <td><span class="score-pill">64</span></td>
-            <td class="neutral">26.8</td>
-            <td class="neutral">5.0</td>
-            <td class="neutral">19.4%</td>
-            <td class="rsi-neutral">50.0</td>
-            <td class="sell">Bearish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">17</td>
-            <td class="stock-name">Cholamandalam Investment</td>
-            <td class="price">₹1,748.10</td>
-            <td><span class="score-pill">63</span></td>
-            <td class="neutral">30.5</td>
-            <td class="neutral">5.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">51.0</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">18</td>
-            <td class="stock-name">Pidilite Industries</td>
-            <td class="price">₹1,516.90</td>
-            <td><span class="score-pill">63</span></td>
-            <td class="neutral">67.5</td>
-            <td class="neutral">16.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">59.5</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">19</td>
-            <td class="stock-name">Lupin</td>
-            <td class="price">₹2,323.20</td>
-            <td><span class="score-pill">62</span></td>
-            <td class="neutral">22.9</td>
-            <td class="neutral">5.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">82.0</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">20</td>
-            <td class="stock-name">Alkem Laboratories</td>
-            <td class="price">₹5,752.00</td>
-            <td><span class="score-pill">62</span></td>
-            <td class="neutral">29.0</td>
-            <td class="neutral">5.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">54.4</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">21</td>
-            <td class="stock-name">ICICI Bank</td>
-            <td class="price">₹1,404.90</td>
-            <td><span class="score-pill">62</span></td>
-            <td class="neutral">19.2</td>
-            <td class="neutral">2.9</td>
-            <td class="neutral">16.8%</td>
-            <td class="rsi-neutral">49.5</td>
-            <td class="sell">Bearish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">22</td>
-            <td class="stock-name">Britannia</td>
-            <td class="price">₹6,137.00</td>
-            <td><span class="score-pill">61</span></td>
-            <td class="neutral">61.1</td>
-            <td class="neutral">39.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">63.9</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">23</td>
-            <td class="stock-name">Dabur India</td>
-            <td class="price">₹524.45</td>
-            <td><span class="score-pill">61</span></td>
-            <td class="neutral">50.6</td>
-            <td class="neutral">8.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">62.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">24</td>
-            <td class="stock-name">Kotak Mahindra Bank</td>
-            <td class="price">₹424.55</td>
-            <td><span class="score-pill">60</span></td>
-            <td class="neutral">22.4</td>
-            <td class="neutral">2.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">52.0</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">25</td>
-            <td class="stock-name">NTPC</td>
-            <td class="price">₹381.90</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">21.1</td>
-            <td class="neutral">1.9</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">66.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">26</td>
-            <td class="stock-name">Titan Company</td>
-            <td class="price">₹4,342.60</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">81.0</td>
-            <td class="neutral">30.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">68.8</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">27</td>
-            <td class="stock-name">SBI Life</td>
-            <td class="price">₹2,082.80</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">84.4</td>
-            <td class="neutral">11.0</td>
-            <td class="neutral">13.9%</td>
-            <td class="rsi-neutral">69.8</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">28</td>
-            <td class="stock-name">Torrent Pharmaceuticals</td>
-            <td class="price">₹4,399.80</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">65.5</td>
-            <td class="neutral">17.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">89.7</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">29</td>
-            <td class="stock-name">Eicher Motors</td>
-            <td class="price">₹8,190.00</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">41.9</td>
-            <td class="neutral">10.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">81.3</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">30</td>
-            <td class="stock-name">HDFC AMC</td>
-            <td class="price">₹2,753.80</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">41.1</td>
-            <td class="neutral">15.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">53.6</td>
-            <td class="sell">Bearish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">31</td>
-            <td class="stock-name">BPCL</td>
-            <td class="price">₹386.00</td>
-            <td><span class="score-pill">58</span></td>
-            <td class="neutral">6.7</td>
-            <td class="neutral">1.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">49.7</td>
-            <td class="sell">Bearish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">32</td>
-            <td class="stock-name">Bajaj Finserv</td>
-            <td class="price">₹2,041.30</td>
-            <td><span class="score-pill">57</span></td>
-            <td class="neutral">34.1</td>
-            <td class="neutral">4.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">55.3</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">33</td>
-            <td class="stock-name">Sun Pharma</td>
-            <td class="price">₹1,785.70</td>
-            <td><span class="score-pill">56</span></td>
-            <td class="neutral">39.2</td>
-            <td class="neutral">5.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">80.5</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">34</td>
-            <td class="stock-name">Marico</td>
-            <td class="price">₹805.75</td>
-            <td><span class="score-pill">56</span></td>
-            <td class="neutral">61.0</td>
-            <td class="neutral">25.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">73.1</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">35</td>
-            <td class="stock-name">JSW Steel</td>
-            <td class="price">₹1,280.60</td>
-            <td><span class="score-pill">56</span></td>
-            <td class="neutral">42.0</td>
-            <td class="neutral">3.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">66.6</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">36</td>
-            <td class="stock-name">Bajaj Finance</td>
-            <td class="price">₹1,012.95</td>
-            <td><span class="score-pill">56</span></td>
-            <td class="neutral">34.9</td>
-            <td class="neutral">6.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">61.2</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">37</td>
-            <td class="stock-name">Tata Steel</td>
-            <td class="price">₹215.52</td>
-            <td><span class="score-pill">55</span></td>
-            <td class="neutral">0.3</td>
-            <td class="neutral">2.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">71.8</td>
-            <td class="buy">Bullish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">38</td>
-            <td class="stock-name">UltraTech Cement</td>
-            <td class="price">₹12,937.00</td>
-            <td><span class="score-pill">55</span></td>
-            <td class="neutral">49.6</td>
-            <td class="neutral">5.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">57.3</td>
-            <td class="sell">Bearish</td>
-            <td class="buy" style="font-size:12px">⭐⭐⭐⭐ BUY</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">39</td>
-            <td class="stock-name">Muthoot Finance</td>
-            <td class="price">₹3,435.90</td>
-            <td><span class="score-pill">55</span></td>
-            <td class="neutral">15.8</td>
-            <td class="neutral">3.9</td>
-            <td class="neutral">26.7%</td>
-            <td class="rsi-neutral">38.6</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">40</td>
-            <td class="stock-name">L&T</td>
-            <td class="price">₹4,286.50</td>
-            <td><span class="score-pill">54</span></td>
-            <td class="neutral">33.5</td>
-            <td class="neutral">5.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">66.2</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">41</td>
-            <td class="stock-name">Shriram Finance</td>
-            <td class="price">₹1,104.60</td>
-            <td><span class="score-pill">54</span></td>
-            <td class="neutral">22.8</td>
-            <td class="neutral">3.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">71.8</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">42</td>
-            <td class="stock-name">Maruti Suzuki</td>
-            <td class="price">₹15,213.00</td>
-            <td><span class="score-pill">54</span></td>
-            <td class="neutral">32.0</td>
-            <td class="neutral">4.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">55.9</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">43</td>
-            <td class="stock-name">Tata Consumer</td>
-            <td class="price">₹1,159.50</td>
-            <td><span class="score-pill">54</span></td>
-            <td class="neutral">77.9</td>
-            <td class="neutral">5.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">50.1</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">44</td>
-            <td class="stock-name">Hindalco</td>
-            <td class="price">₹941.30</td>
-            <td><span class="score-pill">54</span></td>
-            <td class="neutral">13.0</td>
-            <td class="neutral">1.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">49.7</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">45</td>
-            <td class="stock-name">State Bank of India</td>
-            <td class="price">₹1,209.50</td>
-            <td><span class="score-pill">53</span></td>
-            <td class="neutral">13.2</td>
-            <td class="neutral">1.9</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">81.3</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">46</td>
-            <td class="stock-name">Apollo Hospital</td>
-            <td class="price">₹7,775.00</td>
-            <td><span class="score-pill">52</span></td>
-            <td class="neutral">62.0</td>
-            <td class="neutral">12.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">90.0</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">47</td>
-            <td class="stock-name">Fortis Healthcare</td>
-            <td class="price">₹963.65</td>
-            <td><span class="score-pill">52</span></td>
-            <td class="neutral">75.6</td>
-            <td class="neutral">7.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">81.7</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">48</td>
-            <td class="stock-name">Samvardhana Motherson</td>
-            <td class="price">₹135.31</td>
-            <td><span class="score-pill">52</span></td>
-            <td class="neutral">41.8</td>
-            <td class="neutral">3.9</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">79.5</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">49</td>
-            <td class="stock-name">Balkrishna Industries</td>
-            <td class="price">₹2,462.40</td>
-            <td><span class="score-pill">52</span></td>
-            <td class="neutral">36.2</td>
-            <td class="neutral">4.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">16.8</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">50</td>
-            <td class="stock-name">Divi's Lab</td>
-            <td class="price">₹6,474.00</td>
-            <td><span class="score-pill">51</span></td>
-            <td class="neutral">69.3</td>
-            <td class="neutral">11.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">72.2</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">51</td>
-            <td class="stock-name">Voltas</td>
-            <td class="price">₹1,544.50</td>
-            <td><span class="score-pill">51</span></td>
-            <td class="neutral">102.5</td>
-            <td class="neutral">8.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">68.4</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">52</td>
-            <td class="stock-name">Vedanta</td>
-            <td class="price">₹737.45</td>
-            <td><span class="score-pill">50</span></td>
-            <td class="neutral">20.5</td>
-            <td class="neutral">7.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">71.6</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">53</td>
-            <td class="stock-name">Godrej Consumer Products</td>
-            <td class="price">₹1,239.20</td>
-            <td><span class="score-pill">50</span></td>
-            <td class="neutral">69.5</td>
-            <td class="neutral">10.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">70.2</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">54</td>
-            <td class="stock-name">IndusInd Bank</td>
-            <td class="price">₹964.60</td>
-            <td><span class="score-pill">50</span></td>
-            <td class="neutral">19.1</td>
-            <td class="neutral">1.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">75.2</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">55</td>
-            <td class="stock-name">FSN E-Commerce (Nykaa)</td>
-            <td class="price">₹267.53</td>
-            <td><span class="score-pill">50</span></td>
-            <td class="neutral">557.4</td>
-            <td class="neutral">55.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">40.0</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">56</td>
-            <td class="stock-name">Jindal Steel & Power</td>
-            <td class="price">₹1,261.00</td>
-            <td><span class="score-pill">48</span></td>
-            <td class="neutral">64.7</td>
-            <td class="neutral">2.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">74.7</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">57</td>
-            <td class="stock-name">Adani Enterprises</td>
-            <td class="price">₹2,216.40</td>
-            <td><span class="score-pill">48</span></td>
-            <td class="neutral">20.0</td>
-            <td class="neutral">5.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">48.9</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">58</td>
-            <td class="stock-name">Persistent Systems</td>
-            <td class="price">₹4,781.50</td>
-            <td><span class="score-pill">48</span></td>
-            <td class="neutral">43.2</td>
-            <td class="neutral">9.6</td>
-            <td class="neutral">25.0%</td>
-            <td class="rsi-oversold">18.6</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">59</td>
-            <td class="stock-name">Colgate-Palmolive India</td>
-            <td class="price">₹2,295.30</td>
-            <td><span class="score-pill">48</span></td>
-            <td class="neutral">47.0</td>
-            <td class="neutral">39.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">72.0</td>
-            <td class="buy">Bullish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">60</td>
-            <td class="stock-name">Wipro</td>
-            <td class="price">₹201.08</td>
-            <td><span class="score-pill">48</span></td>
-            <td class="neutral">15.9</td>
-            <td class="neutral">2.4</td>
-            <td class="neutral">15.2%</td>
-            <td class="rsi-oversold">13.7</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">61</td>
-            <td class="stock-name">HCL Tech</td>
-            <td class="price">₹1,373.50</td>
-            <td><span class="score-pill">45</span></td>
-            <td class="neutral">22.6</td>
-            <td class="neutral">5.0</td>
-            <td class="neutral">23.2%</td>
-            <td class="rsi-oversold">20.2</td>
-            <td class="sell">Bearish</td>
-            <td class="hold" style="font-size:12px">⭐⭐⭐ HOLD</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">62</td>
-            <td class="stock-name">Hindustan Unilever</td>
-            <td class="price">₹2,383.30</td>
-            <td><span class="score-pill">44</span></td>
-            <td class="neutral">55.4</td>
-            <td class="neutral">11.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">44.6</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">63</td>
-            <td class="stock-name">LTIMindtree</td>
-            <td class="price">₹4,504.00</td>
-            <td><span class="score-pill">44</span></td>
-            <td class="neutral">28.1</td>
-            <td class="neutral">5.6</td>
-            <td class="neutral">21.0%</td>
-            <td class="rsi-oversold">14.1</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">64</td>
-            <td class="stock-name">Havells India</td>
-            <td class="price">₹1,413.70</td>
-            <td><span class="score-pill">43</span></td>
-            <td class="neutral">59.7</td>
-            <td class="neutral">10.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">68.1</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">65</td>
-            <td class="stock-name">Infosys</td>
-            <td class="price">₹1,289.10</td>
-            <td><span class="score-pill">42</span></td>
-            <td class="neutral">18.4</td>
-            <td class="neutral">6.2</td>
-            <td class="neutral">32.7%</td>
-            <td class="rsi-oversold">13.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">66</td>
-            <td class="stock-name">TCS</td>
-            <td class="price">₹2,647.70</td>
-            <td><span class="score-pill">42</span></td>
-            <td class="neutral">20.1</td>
-            <td class="neutral">8.4</td>
-            <td class="neutral">42.6%</td>
-            <td class="rsi-oversold">25.3</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">67</td>
-            <td class="stock-name">Oracle Financial Services</td>
-            <td class="price">₹6,856.50</td>
-            <td><span class="score-pill">41</span></td>
-            <td class="neutral">24.5</td>
-            <td class="neutral">8.6</td>
-            <td class="neutral">33.5%</td>
-            <td class="rsi-neutral">38.9</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-good">Good</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">68</td>
-            <td class="stock-name">Grasim</td>
-            <td class="price">₹2,863.50</td>
-            <td><span class="score-pill">40</span></td>
-            <td class="neutral">42.9</td>
-            <td class="neutral">1.9</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">53.2</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">69</td>
-            <td class="stock-name">Bajaj Holdings</td>
-            <td class="price">₹10,951.00</td>
-            <td><span class="score-pill">40</span></td>
-            <td class="neutral">13.9</td>
-            <td class="neutral">1.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">48.8</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">70</td>
-            <td class="stock-name">M&M</td>
-            <td class="price">₹3,484.60</td>
-            <td><span class="score-pill">40</span></td>
-            <td class="neutral">24.9</td>
-            <td class="neutral">4.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">41.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">71</td>
-            <td class="stock-name">Max Healthcare</td>
-            <td class="price">₹1,109.90</td>
-            <td><span class="score-pill">39</span></td>
-            <td class="neutral">76.1</td>
-            <td class="neutral">10.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-overbought">71.0</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">72</td>
-            <td class="stock-name">PB Fintech (PolicyBazaar)</td>
-            <td class="price">₹1,524.80</td>
-            <td><span class="score-pill">38</span></td>
-            <td class="neutral">122.4</td>
-            <td class="neutral">10.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">53.2</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">73</td>
-            <td class="stock-name">Adani Green Energy</td>
-            <td class="price">₹965.95</td>
-            <td><span class="score-pill">38</span></td>
-            <td class="neutral">112.6</td>
-            <td class="neutral">8.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">48.7</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">74</td>
-            <td class="stock-name">Cipla</td>
-            <td class="price">₹1,358.10</td>
-            <td><span class="score-pill">37</span></td>
-            <td class="neutral">24.1</td>
-            <td class="neutral">3.3</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">58.5</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">75</td>
-            <td class="stock-name">SBI Cards</td>
-            <td class="price">₹775.40</td>
-            <td><span class="score-pill">37</span></td>
-            <td class="neutral">35.2</td>
-            <td class="neutral">5.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">58.9</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">76</td>
-            <td class="stock-name">HDFC Life</td>
-            <td class="price">₹734.00</td>
-            <td><span class="score-pill">33</span></td>
-            <td class="neutral">83.9</td>
-            <td class="neutral">9.0</td>
-            <td class="neutral">11.3%</td>
-            <td class="rsi-neutral">68.4</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">77</td>
-            <td class="stock-name">HDFC Bank</td>
-            <td class="price">₹898.60</td>
-            <td><span class="score-pill">33</span></td>
-            <td class="neutral">20.0</td>
-            <td class="neutral">2.5</td>
-            <td class="neutral">14.0%</td>
-            <td class="rsi-neutral">30.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">78</td>
-            <td class="stock-name">Bharti Airtel</td>
-            <td class="price">₹1,929.60</td>
-            <td><span class="score-pill">32</span></td>
-            <td class="neutral">38.2</td>
-            <td class="neutral">9.4</td>
-            <td class="neutral">23.1%</td>
-            <td class="rsi-oversold">27.3</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">79</td>
-            <td class="stock-name">IndiGo (InterGlobe Aviation)</td>
-            <td class="price">₹4,933.50</td>
-            <td><span class="score-pill">32</span></td>
-            <td class="neutral">59.4</td>
-            <td class="neutral">22.1</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">52.1</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">80</td>
-            <td class="stock-name">ITC</td>
-            <td class="price">₹318.30</td>
-            <td><span class="score-pill">30</span></td>
-            <td class="neutral">19.6</td>
-            <td class="neutral">5.6</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">42.0</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">81</td>
-            <td class="stock-name">Tech Mahindra</td>
-            <td class="price">₹1,361.80</td>
-            <td><span class="score-pill">30</span></td>
-            <td class="neutral">26.1</td>
-            <td class="neutral">4.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">14.4</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">82</td>
-            <td class="stock-name">Coforge</td>
-            <td class="price">₹1,200.40</td>
-            <td><span class="score-pill">30</span></td>
-            <td class="neutral">35.9</td>
-            <td class="neutral">5.8</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">8.7</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐⭐ SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">83</td>
-            <td class="stock-name">L&T Technology Services</td>
-            <td class="price">₹3,317.40</td>
-            <td><span class="score-pill">28</span></td>
-            <td class="neutral">28.0</td>
-            <td class="neutral">5.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">24.9</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">84</td>
-            <td class="stock-name">IRCTC</td>
-            <td class="price">₹594.95</td>
-            <td><span class="score-pill">27</span></td>
-            <td class="neutral">33.4</td>
-            <td class="neutral">11.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">41.3</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">85</td>
-            <td class="stock-name">Avenue Supermarts (DMart)</td>
-            <td class="price">₹3,865.60</td>
-            <td><span class="score-pill">26</span></td>
-            <td class="neutral">88.0</td>
-            <td class="neutral">11.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">47.4</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">86</td>
-            <td class="stock-name">Rail Vikas Nigam</td>
-            <td class="price">₹318.30</td>
-            <td><span class="score-pill">26</span></td>
-            <td class="neutral">58.0</td>
-            <td class="neutral">7.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">56.5</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">87</td>
-            <td class="stock-name">Page Industries</td>
-            <td class="price">₹32,255.00</td>
-            <td><span class="score-pill">25</span></td>
-            <td class="neutral">48.1</td>
-            <td class="neutral">25.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">17.1</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">88</td>
-            <td class="stock-name">ACC</td>
-            <td class="price">₹1,613.10</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="neutral">11.5</td>
-            <td class="neutral">1.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">34.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-average">Average</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">89</td>
-            <td class="stock-name">One97 Communications (Paytm)</td>
-            <td class="price">₹1,122.80</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="neutral">54.7</td>
-            <td class="neutral">4.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">38.3</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">90</td>
-            <td class="stock-name">Info Edge (Naukri)</td>
-            <td class="price">₹1,051.00</td>
-            <td><span class="score-pill">24</span></td>
-            <td class="neutral">50.6</td>
-            <td class="neutral">1.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">36.2</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">91</td>
-            <td class="stock-name">Reliance Industries</td>
-            <td class="price">₹1,406.80</td>
-            <td><span class="score-pill">23</span></td>
-            <td class="neutral">22.9</td>
-            <td class="neutral">2.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">39.7</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">92</td>
-            <td class="stock-name">Asian Paints</td>
-            <td class="price">₹2,394.90</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="neutral">59.7</td>
-            <td class="neutral">11.7</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">48.9</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">93</td>
-            <td class="stock-name">Tata Elxsi</td>
-            <td class="price">₹4,507.50</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="neutral">48.3</td>
-            <td class="neutral">10.4</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-oversold">26.2</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">94</td>
-            <td class="stock-name">REC Limited</td>
-            <td class="price">₹354.10</td>
-            <td><span class="score-pill">22</span></td>
-            <td class="neutral">5.4</td>
-            <td class="neutral">1.1</td>
-            <td class="neutral">21.5%</td>
-            <td class="rsi-neutral">34.2</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">95</td>
-            <td class="stock-name">Ambuja Cements</td>
-            <td class="price">₹512.15</td>
-            <td><span class="score-pill">20</span></td>
-            <td class="neutral">34.2</td>
-            <td class="neutral">2.2</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">37.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">96</td>
-            <td class="stock-name">Berger Paints</td>
-            <td class="price">₹459.25</td>
-            <td><span class="score-pill">20</span></td>
-            <td class="neutral">50.9</td>
-            <td class="neutral">8.5</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">36.3</td>
-            <td class="buy">Bullish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-          <tr>
-            <td class="neutral">97</td>
-            <td class="stock-name">Container Corporation of India</td>
-            <td class="price">₹499.85</td>
-            <td><span class="score-pill">19</span></td>
-            <td class="neutral">29.8</td>
-            <td class="neutral">3.0</td>
-            <td class="neutral">0.0%</td>
-            <td class="rsi-neutral">43.6</td>
-            <td class="sell">Bearish</td>
-            <td class="sell" style="font-size:12px">⭐ STRONG SELL</td>
-            <td><span class="badge badge-poor">Poor</span></td>
-          </tr>
-
-        </tbody>
-      </table>
-    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="sh">
+    <div class="sh-icon shi-buy">▲</div>
+    <span class="sh-title">Top 20 Buy Recommendations</span>
+    <div class="sh-divider"></div>
+    <span class="sh-count">12M S/R · ATR Stop · Sector · Vol · ADX · Earnings</span>
   </div>
-
-  <!-- DISCLAIMER -->
-  <div class="disclaimer">
-    <h3>⚠ DISCLAIMER</h3>
-    <p>This analysis is for <strong>educational purposes only</strong> and does <strong>NOT</strong> constitute financial advice.</p>
-    <ul>
-      <li>Always conduct your own research before investing.</li>
-      <li>Consult a SEBI-registered financial advisor for personalised guidance.</li>
-      <li>Use proper risk management and honour stop-loss levels.</li>
-      <li>Never invest more than you can afford to lose.</li>
-    </ul>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>#</th><th>Stock / Sector</th><th>Price</th><th>Rating</th>
+      <th>Score</th><th>Upside</th><th>Target (S/R)</th><th>Stop Loss</th>
+      <th>ATR</th><th>Sup Dist</th><th>RSI</th><th>ADX</th><th>Vol/Avg</th>
+      <th>R:R</th><th>52W Hi%</th><th>Beta</th><th>P/E</th><th>Div%</th>
+      <th>Analyst</th><th>Earnings</th><th>Quality</th>
+    </tr></thead><tbody>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">1</td>
+        <td>
+          <div class="sn">Siemens India</div>
+          <div class="ss">SIEMENS</div>
+          <div class="sec">Industrials</div>
+        </td>
+        <td><div class="pv">₹3,336.90</div></td>
+        <td><span class="rt rt-sb">⭐⭐⭐⭐⭐ STRONG BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4ade80">75</div>
+          <div class="scb" style="background:#22c55e"></div>
+        </td>
+        <td class="up">+15.0%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹3,836.90</div>
+          <div class="t2">T2: ₹4,336.90</div>
+        </td>
+        <td>
+          <div class="sl1">₹3,170.05</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹98.99</div>
+          <div style="font-size:8px;color:var(--muted)">3.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">5.0%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">62</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">55</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-low">0.4×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#4ade80">3.0×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-2.1%</td>
+        <td style="color:#4ade80;font-size:11px">0.31</td>
+        <td style="color:#f87171;font-size:11px">70.1</td>
+        <td style="color:#4ade80;font-size:11px">39.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">06 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">2</td>
+        <td>
+          <div class="sn">Dr Reddy</div>
+          <div class="ss">DRREDDY</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹1,319.30</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">74</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.1%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,372.84</div>
+          <div class="t2">T2: ₹1,427.75</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,253.34</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹26.77</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">6.6%</span></td>
+        <td>
+          <div class="rv" style="color:#f87171">75</div>
+          <div class="rsb">Overbought</div>
+        </td>
+        <td><div class="rv adx-strong">43</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">1.1×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-3.8%</td>
+        <td style="color:#4ade80;font-size:11px">0.29</td>
+        <td style="color:#4ade80;font-size:11px">19.4</td>
+        <td style="color:#4ade80;font-size:11px">61.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">21 Jan 2026</div></td>
+        <td><span class="qb qb-gd">Good</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">3</td>
+        <td>
+          <div class="sn">Hero MotoCorp</div>
+          <div class="ss">HEROMOTOCO</div>
+          <div class="sec">Consumer Cyclical</div>
+        </td>
+        <td><div class="pv">₹5,787.00</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">74</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+5.2%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹6,091.04</div>
+          <div class="t2">T2: ₹6,334.68</div>
+        </td>
+        <td>
+          <div class="sl1">₹5,497.65</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹152.02</div>
+          <div style="font-size:8px;color:var(--muted)">2.6% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.2%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">57</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">54</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">1.0×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.1×</td>
+        <td style="color:#d4a85a;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-7.6%</td>
+        <td style="color:#4ade80;font-size:11px">0.61</td>
+        <td style="color:#4ade80;font-size:11px">21.3</td>
+        <td style="color:#4ade80;font-size:11px">305.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">05 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">4</td>
+        <td>
+          <div class="sn">Axis Bank</div>
+          <div class="ss">AXISBANK</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹1,395.50</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">72</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.0%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,450.82</div>
+          <div class="t2">T2: ₹1,508.85</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,325.72</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹27.66</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">5.7%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">67</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-mid">28</div><div class="rsb">Moderate</div></td>
+        <td><div class="rv vol-norm">1.5×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-1.6%</td>
+        <td style="color:#4ade80;font-size:11px">0.33</td>
+        <td style="color:#4ade80;font-size:11px">16.6</td>
+        <td style="color:#4ade80;font-size:11px">7.00%</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">26 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">5</td>
+        <td>
+          <div class="sn">Coal India</div>
+          <div class="ss">COALINDIA</div>
+          <div class="sec">Energy</div>
+        </td>
+        <td><div class="pv">₹433.50</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">72</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+5.1%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹455.53</div>
+          <div class="t2">T2: ₹483.50</div>
+        </td>
+        <td>
+          <div class="sl1">₹403.16</div>
+          <div class="sl2">-7.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹10.21</div>
+          <div style="font-size:8px;color:var(--muted)">2.4% · 1.2×</div>
+        </td>
+        <td><span class="sdist-mid">6.3%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">55</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">35</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">1.2×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.7×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-4.8%</td>
+        <td style="color:#4ade80;font-size:11px">1.00</td>
+        <td style="color:#4ade80;font-size:11px">8.9</td>
+        <td style="color:#4ade80;font-size:11px">502.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">12 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">6</td>
+        <td>
+          <div class="sn">ICICI Prudential Life</div>
+          <div class="ss">ICICIPRULI</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹674.55</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">72</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+3.8%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹700.47</div>
+          <div class="t2">T2: ₹728.49</div>
+        </td>
+        <td>
+          <div class="sl1">₹640.82</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹12.96</div>
+          <div style="font-size:8px;color:var(--muted)">1.9% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.4%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">68</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">52</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">0.9×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-4.6%</td>
+        <td style="color:#4ade80;font-size:11px">0.42</td>
+        <td style="color:#f87171;font-size:11px">71.6</td>
+        <td style="color:#4ade80;font-size:11px">13.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">13 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">7</td>
+        <td>
+          <div class="sn">NMDC</div>
+          <div class="ss">NMDC</div>
+          <div class="sec">Basic Materials</div>
+        </td>
+        <td><div class="pv">₹82.56</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">72</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+5.6%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹87.22</div>
+          <div class="t2">T2: ₹90.71</div>
+        </td>
+        <td>
+          <div class="sl1">₹78.43</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹2.33</div>
+          <div style="font-size:8px;color:var(--muted)">2.8% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">6.7%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">53</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-mid">30</div><div class="rsb">Moderate</div></td>
+        <td><div class="rv vol-norm">1.0×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.1×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-1.9%</td>
+        <td style="color:#4ade80;font-size:11px">0.64</td>
+        <td style="color:#4ade80;font-size:11px">10.5</td>
+        <td style="color:#4ade80;font-size:11px">428.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">03 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">8</td>
+        <td>
+          <div class="sn">Aurobindo Pharma</div>
+          <div class="ss">AUROPHARMA</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹1,220.70</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">72</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+6.7%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,302.46</div>
+          <div class="t2">T2: ₹1,354.56</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,159.66</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹40.88</div>
+          <div style="font-size:8px;color:var(--muted)">3.4% · 1.0×</div>
+        </td>
+        <td><span class="sdist-close">2.5%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">55</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">34</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">0.9×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.3×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-4.2%</td>
+        <td style="color:#4ade80;font-size:11px">0.05</td>
+        <td style="color:#4ade80;font-size:11px">20.3</td>
+        <td style="color:#4ade80;font-size:11px">33.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">09 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">9</td>
+        <td>
+          <div class="sn">ONGC</div>
+          <div class="ss">ONGC</div>
+          <div class="sec">Energy</div>
+        </td>
+        <td><div class="pv">₹280.10</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">70</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+17.9%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹330.10</div>
+          <div class="t2">T2: ₹343.30</div>
+        </td>
+        <td>
+          <div class="sl1">₹266.10</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹6.88</div>
+          <div style="font-size:8px;color:var(--muted)">2.5% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.3%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">68</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">39</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">0.7×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#4ade80">3.6×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-0.3%</td>
+        <td style="color:#4ade80;font-size:11px">0.23</td>
+        <td style="color:#4ade80;font-size:11px">9.3</td>
+        <td style="color:#4ade80;font-size:11px">667.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">12 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">10</td>
+        <td>
+          <div class="sn">Bajaj Auto</div>
+          <div class="ss">BAJAJ-AUTO</div>
+          <div class="sec">Consumer Cyclical</div>
+        </td>
+        <td><div class="pv">₹10,110.00</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">70</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.0%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹10,518.86</div>
+          <div class="t2">T2: ₹10,939.61</div>
+        </td>
+        <td>
+          <div class="sl1">₹9,604.50</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹204.43</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.4%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">69</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-mid">28</div><div class="rsb">Moderate</div></td>
+        <td><div class="rv vol-low">0.7×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-0.8%</td>
+        <td style="color:#4ade80;font-size:11px">0.65</td>
+        <td style="color:#fbbf24;font-size:11px">31.8</td>
+        <td style="color:#4ade80;font-size:11px">208.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">11</td>
+        <td>
+          <div class="sn">Power Grid</div>
+          <div class="ss">POWERGRID</div>
+          <div class="sec">Utilities</div>
+        </td>
+        <td><div class="pv">₹303.25</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">68</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.4%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹316.47</div>
+          <div class="t2">T2: ₹329.13</div>
+        </td>
+        <td>
+          <div class="sl1">₹288.09</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹6.61</div>
+          <div style="font-size:8px;color:var(--muted)">2.2% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">3.8%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">64</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">54</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">0.8×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.9×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-2.7%</td>
+        <td style="color:#4ade80;font-size:11px">0.17</td>
+        <td style="color:#4ade80;font-size:11px">19.5</td>
+        <td style="color:#4ade80;font-size:11px">399.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">12</td>
+        <td>
+          <div class="sn">Steel Authority of India</div>
+          <div class="ss">SAIL</div>
+          <div class="sec">Basic Materials</div>
+        </td>
+        <td><div class="pv">₹165.51</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">68</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+6.4%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹176.17</div>
+          <div class="t2">T2: ₹183.22</div>
+        </td>
+        <td>
+          <div class="sl1">₹153.92</div>
+          <div class="sl2">-7.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹5.33</div>
+          <div style="font-size:8px;color:var(--muted)">3.2% · 1.2×</div>
+        </td>
+        <td><span class="sdist-far">13.7%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">58</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">65</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">0.8×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.9×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-1.0%</td>
+        <td style="color:#4ade80;font-size:11px">0.92</td>
+        <td style="color:#4ade80;font-size:11px">24.5</td>
+        <td style="color:#4ade80;font-size:11px">97.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">13</td>
+        <td>
+          <div class="sn">Power Finance Corporation</div>
+          <div class="ss">PFC</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹420.60</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">68</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+11.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹470.60</div>
+          <div class="t2">T2: ₹520.60</div>
+        </td>
+        <td>
+          <div class="sl1">₹399.57</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹11.25</div>
+          <div style="font-size:8px;color:var(--muted)">2.7% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.2%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">54</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">34</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-low">0.5×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#4ade80">2.4×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-2.0%</td>
+        <td style="color:#4ade80;font-size:11px">0.60</td>
+        <td style="color:#4ade80;font-size:11px">5.5</td>
+        <td style="color:#4ade80;font-size:11px">378.00%</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">05 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">14</td>
+        <td>
+          <div class="sn">Adani Ports</div>
+          <div class="ss">ADANIPORTS</div>
+          <div class="sec">Industrials</div>
+        </td>
+        <td><div class="pv">₹1,550.60</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">68</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+5.2%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,631.78</div>
+          <div class="t2">T2: ₹1,697.05</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,473.07</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹40.59</div>
+          <div style="font-size:8px;color:var(--muted)">2.6% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">5.2%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">50</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">47</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-low">0.5×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.1×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-2.1%</td>
+        <td style="color:#4ade80;font-size:11px">0.19</td>
+        <td style="color:#fbbf24;font-size:11px">26.8</td>
+        <td style="color:#4ade80;font-size:11px">46.00%</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">30 Apr 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">15</td>
+        <td>
+          <div class="sn">Cholamandalam Investment</div>
+          <div class="ss">CHOLAFIN</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹1,748.10</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">68</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+5.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,851.66</div>
+          <div class="t2">T2: ₹1,925.73</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,660.69</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹51.78</div>
+          <div style="font-size:8px;color:var(--muted)">3.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">5.8%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">51</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">63</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-high">5.5×</div><div class="rsb">High Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.2×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-4.5%</td>
+        <td style="color:#4ade80;font-size:11px">0.34</td>
+        <td style="color:#fbbf24;font-size:11px">30.5</td>
+        <td style="color:#4ade80;font-size:11px">11.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">16</td>
+        <td>
+          <div class="sn">Pidilite Industries</div>
+          <div class="ss">PIDILITIND</div>
+          <div class="sec">Basic Materials</div>
+        </td>
+        <td><div class="pv">₹1,516.90</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">67</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+3.5%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,569.72</div>
+          <div class="t2">T2: ₹1,632.51</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,441.06</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹26.41</div>
+          <div style="font-size:8px;color:var(--muted)">1.7% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">4.5%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">59</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">32</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">1.0×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.7×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-3.7%</td>
+        <td style="color:#4ade80;font-size:11px">0.23</td>
+        <td style="color:#f87171;font-size:11px">67.5</td>
+        <td style="color:#4ade80;font-size:11px">67.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">03 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">17</td>
+        <td>
+          <div class="sn">Lupin</div>
+          <div class="ss">LUPIN</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹2,323.20</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">67</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+21.5%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹2,823.20</div>
+          <div class="t2">T2: ₹2,936.13</div>
+        </td>
+        <td>
+          <div class="sl1">₹2,207.04</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹44.32</div>
+          <div style="font-size:8px;color:var(--muted)">1.9% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">7.0%</span></td>
+        <td>
+          <div class="rv" style="color:#f87171">82</div>
+          <div class="rsb">Overbought</div>
+        </td>
+        <td><div class="rv adx-strong">72</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-norm">1.1×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#4ade80">4.3×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-0.4%</td>
+        <td style="color:#4ade80;font-size:11px">0.30</td>
+        <td style="color:#4ade80;font-size:11px">22.9</td>
+        <td style="color:#4ade80;font-size:11px">52.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">12 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">18</td>
+        <td>
+          <div class="sn">Alkem Laboratories</div>
+          <div class="ss">ALKEM</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹5,752.00</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">66</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹6,032.90</div>
+          <div class="t2">T2: ₹6,274.22</div>
+        </td>
+        <td>
+          <div class="sl1">₹5,464.40</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹140.45</div>
+          <div style="font-size:8px;color:var(--muted)">2.4% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">3.9%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">54</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-strong">62</div><div class="rsb">Strong</div></td>
+        <td><div class="rv vol-low">0.6×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">1.0×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-2.3%</td>
+        <td style="color:#4ade80;font-size:11px">0.30</td>
+        <td style="color:#fbbf24;font-size:11px">29.0</td>
+        <td style="color:#4ade80;font-size:11px">91.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">13 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">19</td>
+        <td>
+          <div class="sn">Nestle India</div>
+          <div class="ss">NESTLEIND</div>
+          <div class="sec">Consumer Defensive</div>
+        </td>
+        <td><div class="pv">₹1,318.00</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">66</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+3.7%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,366.72</div>
+          <div class="t2">T2: ₹1,421.39</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,252.10</div>
+          <div class="sl2">-5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹24.36</div>
+          <div style="font-size:8px;color:var(--muted)">1.9% · 1.0×</div>
+        </td>
+        <td><span class="sdist-mid">4.9%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">55</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-mid">21</div><div class="rsb">Moderate</div></td>
+        <td><div class="rv vol-low">0.4×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.7×</td>
+        <td style="color:#f87171;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-1.3%</td>
+        <td style="color:#4ade80;font-size:11px">0.27</td>
+        <td style="color:#f87171;font-size:11px">77.8</td>
+        <td style="color:#4ade80;font-size:11px">145.00%</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">20</td>
+        <td>
+          <div class="sn">ICICI Lombard General Insurance</div>
+          <div class="ss">ICICIGI</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹1,946.50</div></td>
+        <td><span class="rt rt-b">⭐⭐⭐⭐ BUY</span></td>
+        <td>
+          <div class="scn" style="color:#4dd0c4">66</div>
+          <div class="scb" style="background:#14b8a6"></div>
+        </td>
+        <td class="up">+4.1%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹2,025.74</div>
+          <div class="t2">T2: ₹2,106.77</div>
+        </td>
+        <td>
+          <div class="sl1">₹1,883.03</div>
+          <div class="sl2">-3.3%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹39.62</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><span class="sdist-close">1.2%</span></td>
+        <td>
+          <div class="rv" style="color:#60a5fa">66</div>
+          <div class="rsb">Neutral</div>
+        </td>
+        <td><div class="rv adx-mid">25</div><div class="rsb">Moderate</div></td>
+        <td><div class="rv vol-low">0.6×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#4dd0c4">1.2×</td>
+        <td style="color:#d4a85a;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">-5.7%</td>
+        <td style="color:#4ade80;font-size:11px">0.46</td>
+        <td style="color:#fbbf24;font-size:11px">35.6</td>
+        <td style="color:#4ade80;font-size:11px">67.00%</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">13 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+    </tbody></table></div>
+  <div class="sh">
+    <div class="sh-icon shi-sell">▼</div>
+    <span class="sh-title">Top 20 Sell Recommendations</span>
+    <div class="sh-divider"></div>
+    <span class="sh-count">12M S/R · ATR Stop · Sector · Vol · ADX · Earnings</span>
   </div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    © 2025 NIFTY 50 Analyzer &nbsp;|&nbsp; Next Update: 9:30 AM (Next Day) IST
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>#</th><th>Stock / Sector</th><th>Price</th><th>Rating</th>
+      <th>Score</th><th>RSI</th><th>MACD</th><th>ADX</th>
+      <th>Downside</th><th>Target (S/R)</th><th>Stop Loss</th>
+      <th>ATR</th><th>Vol/Avg</th><th>R:R</th>
+      <th>Beta</th><th>P/E</th><th>Analyst</th><th>Earnings</th><th>Quality</th>
+    </tr></thead><tbody>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">1</td>
+        <td>
+          <div class="sn">Container Corporation of India</div>
+          <div class="ss">CONCOR</div>
+          <div class="sec">Industrials</div>
+        </td>
+        <td><div class="pv">₹499.85</div></td>
+        <td><span class="rt rt-ss">⭐ STRONG SELL</span></td>
+        <td><div class="scn" style="color:#f87171">23</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">44</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">51</div><div class="rsb">Strong</div></td>
+        <td class="dn">+6.0%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹469.60</div>
+          <div class="t2">T2: ₹449.85</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹524.84</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹10.19</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.4×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.2×</td>
+        <td style="color:#4ade80;font-size:11px">0.10</td>
+        <td style="color:#fbbf24;font-size:11px">29.8</td>
+        <td><span class="ab ab-h">None</span></td>
+        <td><div class="earn">29 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">2</td>
+        <td>
+          <div class="sn">Ambuja Cements</div>
+          <div class="ss">AMBUJACEM</div>
+          <div class="sec">Basic Materials</div>
+        </td>
+        <td><div class="pv">₹512.15</div></td>
+        <td><span class="rt rt-ss">⭐ STRONG SELL</span></td>
+        <td><div class="scn" style="color:#f87171">24</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">38</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">48</div><div class="rsb">Strong</div></td>
+        <td class="dn">+3.7%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹493.35</div>
+          <div class="t2">T2: ₹478.60</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹537.76</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹11.69</div>
+          <div style="font-size:8px;color:var(--muted)">2.3% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.6×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.7×</td>
+        <td style="color:#4ade80;font-size:11px">-0.18</td>
+        <td style="color:#fbbf24;font-size:11px">34.2</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">30 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">3</td>
+        <td>
+          <div class="sn">REC Limited</div>
+          <div class="ss">RECLTD</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹354.10</div></td>
+        <td><span class="rt rt-ss">⭐ STRONG SELL</span></td>
+        <td><div class="scn" style="color:#f87171">26</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">34</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">47</div><div class="rsb">Strong</div></td>
+        <td class="dn">+4.0%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹339.98</div>
+          <div class="t2">T2: ₹326.97</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹369.11</div>
+          <div class="sl2">+4.2%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹9.15</div>
+          <div style="font-size:8px;color:var(--muted)">2.6% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.3×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.9×</td>
+        <td style="color:#4ade80;font-size:11px">0.25</td>
+        <td style="color:#4ade80;font-size:11px">5.4</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">29 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">4</td>
+        <td>
+          <div class="sn">Avenue Supermarts (DMart)</div>
+          <div class="ss">DMART</div>
+          <div class="sec">Consumer Defensive</div>
+        </td>
+        <td><div class="pv">₹3,865.60</div></td>
+        <td><span class="rt rt-ss">⭐ STRONG SELL</span></td>
+        <td><div class="scn" style="color:#f87171">26</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">47</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-weak">20</div><div class="rsb">Weak</div></td>
+        <td class="dn">+2.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹3,751.80</div>
+          <div class="t2">T2: ₹3,607.57</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹4,000.51</div>
+          <div class="sl2">+3.5%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹81.91</div>
+          <div style="font-size:8px;color:var(--muted)">2.1% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.2×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">0.22</td>
+        <td style="color:#f87171;font-size:11px">88.0</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">10 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">5</td>
+        <td>
+          <div class="sn">Info Edge (Naukri)</div>
+          <div class="ss">NAUKRI</div>
+          <div class="sec">Communication Services</div>
+        </td>
+        <td><div class="pv">₹1,051.00</div></td>
+        <td><span class="rt rt-ss">⭐ STRONG SELL</span></td>
+        <td><div class="scn" style="color:#f87171">28</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">36</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">50</div><div class="rsb">Strong</div></td>
+        <td class="dn">+4.3%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹1,006.10</div>
+          <div class="t2">T2: ₹965.86</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹1,103.55</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹40.51</div>
+          <div style="font-size:8px;color:var(--muted)">3.9% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.5×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">0.47</td>
+        <td style="color:#f87171;font-size:11px">50.6</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">13 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">6</td>
+        <td>
+          <div class="sn">IRCTC</div>
+          <div class="ss">IRCTC</div>
+          <div class="sec">Consumer Cyclical</div>
+        </td>
+        <td><div class="pv">₹594.95</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">31</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">41</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">42</div><div class="rsb">Strong</div></td>
+        <td class="dn">+8.4%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹544.95</div>
+          <div class="t2">T2: ₹494.95</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹624.70</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹16.52</div>
+          <div style="font-size:8px;color:var(--muted)">2.8% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.5×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.7×</td>
+        <td style="color:#4ade80;font-size:11px">0.00</td>
+        <td style="color:#fbbf24;font-size:11px">33.4</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">12 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">7</td>
+        <td>
+          <div class="sn">L&T Technology Services</div>
+          <div class="ss">LTTS</div>
+          <div class="sec">Technology</div>
+        </td>
+        <td><div class="pv">₹3,317.40</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">33</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#4ade80">25</div><div class="rsb">Oversold</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">82</div><div class="rsb">Strong</div></td>
+        <td class="dn">+5.3%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹3,140.00</div>
+          <div class="t2">T2: ₹2,817.40</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹3,483.27</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹122.02</div>
+          <div style="font-size:8px;color:var(--muted)">3.7% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">0.8×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.1×</td>
+        <td style="color:#4ade80;font-size:11px">-0.17</td>
+        <td style="color:#fbbf24;font-size:11px">28.0</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">15 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">8</td>
+        <td>
+          <div class="sn">Bharti Airtel</div>
+          <div class="ss">BHARTIARTL</div>
+          <div class="sec">Communication Services</div>
+        </td>
+        <td><div class="pv">₹1,929.60</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">37</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#4ade80">27</div><div class="rsb">Oversold</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">56</div><div class="rsb">Strong</div></td>
+        <td class="dn">+3.5%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,862.06</div>
+          <div class="t2">T2: ₹1,791.85</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹2,004.36</div>
+          <div class="sl2">+3.9%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹38.36</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-high">1.6×</div><div class="rsb">High Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.9×</td>
+        <td style="color:#4ade80;font-size:11px">-0.02</td>
+        <td style="color:#fbbf24;font-size:11px">38.2</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">05 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">9</td>
+        <td>
+          <div class="sn">HDFC Bank</div>
+          <div class="ss">HDFCBANK</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹898.60</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">37</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">31</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">41</div><div class="rsb">Strong</div></td>
+        <td class="dn">+5.1%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹853.06</div>
+          <div class="t2">T2: ₹823.89</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹925.15</div>
+          <div class="sl2">+3.0%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹15.59</div>
+          <div style="font-size:8px;color:var(--muted)">1.7% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.5×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.7×</td>
+        <td style="color:#4ade80;font-size:11px">0.40</td>
+        <td style="color:#4ade80;font-size:11px">20.0</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">17 Jan 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">10</td>
+        <td>
+          <div class="sn">HDFC Life</div>
+          <div class="ss">HDFCLIFE</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹734.00</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">38</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">68</div><div class="rsb">Neutral</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">47</div><div class="rsb">Strong</div></td>
+        <td class="dn">+3.6%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹707.28</div>
+          <div class="t2">T2: ₹687.88</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹761.36</div>
+          <div class="sl2">+3.7%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹13.63</div>
+          <div style="font-size:8px;color:var(--muted)">1.9% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">0.8×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">1.0×</td>
+        <td style="color:#4ade80;font-size:11px">0.50</td>
+        <td style="color:#f87171;font-size:11px">83.9</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">15 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">11</td>
+        <td>
+          <div class="sn">Cipla</div>
+          <div class="ss">CIPLA</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹1,358.10</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">42</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">59</div><div class="rsb">Neutral</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">54</div><div class="rsb">Strong</div></td>
+        <td class="dn">+2.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,318.34</div>
+          <div class="t2">T2: ₹1,281.70</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹1,406.49</div>
+          <div class="sl2">+3.6%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹25.19</div>
+          <div style="font-size:8px;color:var(--muted)">1.9% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.3×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">-0.05</td>
+        <td style="color:#4ade80;font-size:11px">24.1</td>
+        <td><span class="ab ab-h">Hold</span></td>
+        <td><div class="earn">23 Jan 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">12</td>
+        <td>
+          <div class="sn">Adani Green Energy</div>
+          <div class="ss">ADANIGREEN</div>
+          <div class="sec">Utilities</div>
+        </td>
+        <td><div class="pv">₹965.95</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">42</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">49</div><div class="rsb">Neutral</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">49</div><div class="rsb">Strong</div></td>
+        <td class="dn">+4.9%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹918.68</div>
+          <div class="t2">T2: ₹856.77</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹1,014.25</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹33.39</div>
+          <div style="font-size:8px;color:var(--muted)">3.5% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.3×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">1.0×</td>
+        <td style="color:#4ade80;font-size:11px">0.72</td>
+        <td style="color:#f87171;font-size:11px">112.6</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">27 Apr 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">13</td>
+        <td>
+          <div class="sn">PB Fintech (PolicyBazaar)</div>
+          <div class="ss">POLICYBZR</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹1,524.80</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">42</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">53</div><div class="rsb">Neutral</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">54</div><div class="rsb">Strong</div></td>
+        <td class="dn">+4.2%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,460.00</div>
+          <div class="t2">T2: ₹1,412.30</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹1,601.04</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹57.16</div>
+          <div style="font-size:8px;color:var(--muted)">3.8% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-low">0.3×</div><div class="rsb">Low Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">0.31</td>
+        <td style="color:#f87171;font-size:11px">122.4</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">02 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">14</td>
+        <td>
+          <div class="sn">Max Healthcare</div>
+          <div class="ss">MAXHEALTH</div>
+          <div class="sec">Healthcare</div>
+        </td>
+        <td><div class="pv">₹1,109.90</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">44</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#f87171">71</div><div class="rsb">Overbought</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">35</div><div class="rsb">Strong</div></td>
+        <td class="dn">+4.3%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹1,062.65</div>
+          <div class="t2">T2: ₹1,028.45</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹1,165.40</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹24.57</div>
+          <div style="font-size:8px;color:var(--muted)">2.2% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.1×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">-0.05</td>
+        <td style="color:#f87171;font-size:11px">76.1</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">05 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">15</td>
+        <td>
+          <div class="sn">M&M</div>
+          <div class="ss">M&M</div>
+          <div class="sec">Consumer Cyclical</div>
+        </td>
+        <td><div class="pv">₹3,484.60</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">44</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">42</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">34</div><div class="rsb">Strong</div></td>
+        <td class="dn">+2.6%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹3,393.65</div>
+          <div class="t2">T2: ₹3,282.80</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹3,601.72</div>
+          <div class="sl2">+3.4%</div>
+          <span class="sb sb-atr">📐 ATR Stop</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹80.32</div>
+          <div style="font-size:8px;color:var(--muted)">2.3% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">0.8×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#f87171">0.8×</td>
+        <td style="color:#4ade80;font-size:11px">0.32</td>
+        <td style="color:#4ade80;font-size:11px">24.9</td>
+        <td><span class="ab ab-h">Strong_Buy</span></td>
+        <td><div class="earn">11 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">16</td>
+        <td>
+          <div class="sn">Bajaj Holdings</div>
+          <div class="ss">BAJAJHLDNG</div>
+          <div class="sec">Financial Services</div>
+        </td>
+        <td><div class="pv">₹10,951.00</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">44</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">49</div><div class="rsb">Neutral</div></td>
+        <td style="color:#4ade80;font-weight:600;font-size:11px">Bullish</td>
+        <td><div class="rv adx-strong">45</div><div class="rsb">Strong</div></td>
+        <td class="dn">+5.4%</td>
+        <td>
+          <span class="ts ts-partial">⚡ Partial S/R</span>
+          <div class="t1">₹10,363.96</div>
+          <div class="t2">T2: ₹9,949.40</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹11,498.55</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹288.56</div>
+          <div style="font-size:8px;color:var(--muted)">2.6% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-high">1.6×</div><div class="rsb">High Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.1×</td>
+        <td style="color:#4ade80;font-size:11px">-0.19</td>
+        <td style="color:#4ade80;font-size:11px">13.9</td>
+        <td><span class="ab ab-h">None</span></td>
+        <td><div class="earn">04 Feb 2026</div></td>
+        <td><span class="qb qb-av">Average</span></td>
+      </tr>
+      <tr>
+        <td style="color:#4a7a78;font-size:11px">17</td>
+        <td>
+          <div class="sn">Grasim</div>
+          <div class="ss">GRASIM</div>
+          <div class="sec">Basic Materials</div>
+        </td>
+        <td><div class="pv">₹2,863.50</div></td>
+        <td><span class="rt rt-s">⭐⭐ SELL</span></td>
+        <td><div class="scn" style="color:#f87171">44</div><div class="scb" style="background:#ef4444"></div></td>
+        <td><div class="rv" style="color:#fbbf24">53</div><div class="rsb">Neutral</div></td>
+        <td style="color:#f87171;font-weight:600;font-size:11px">Bearish</td>
+        <td><div class="rv adx-strong">50</div><div class="rsb">Strong</div></td>
+        <td class="dn">+5.2%</td>
+        <td>
+          <span class="ts ts-real">📍 Real S/R</span>
+          <div class="t1">₹2,714.76</div>
+          <div class="t2">T2: ₹2,617.08</div>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹3,006.68</div>
+          <div class="sl2">+5.0%</div>
+          <span class="sb sb-beta">🔒 Beta Cap</span>
+        </td>
+        <td>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹56.26</div>
+          <div style="font-size:8px;color:var(--muted)">2.0% · 1.0×</div>
+        </td>
+        <td><div class="rv vol-norm">1.1×</div><div class="rsb">Avg Vol</div></td>
+        <td class="rrv" style="color:#fbbf24">1.0×</td>
+        <td style="color:#4ade80;font-size:11px">0.15</td>
+        <td style="color:#f87171;font-size:11px">42.9</td>
+        <td><span class="ab ab-b">Buy</span></td>
+        <td><div class="earn">10 Feb 2026</div></td>
+        <td><span class="qb qb-po">Poor</span></td>
+      </tr>
+    </tbody></table></div>
+  <div class="disc">
+    <strong>⚠ DISCLAIMER:</strong> For <strong>EDUCATIONAL PURPOSES ONLY</strong>. Not financial advice.
+    Stop losses are ATR-based near real 12-month S/R zones. Targets derived from swing highs/lows,
+    52-week extremes and round-number levels. Earnings dates are estimates.
+    Always conduct your own research, consult a SEBI-registered financial advisor,
+    and never invest more than you can afford to lose.
   </div>
+</div>
 
-</div><!-- /wrapper -->
+<footer>
+  <strong>NIFTY 100 Market Influencers: NSE &amp; BSE</strong>
+  · 12M S/R · ATR Stops · Sector · ADX · Vol · Earnings v2
+  · Next Update: <strong>4:30 PM IST</strong> · 27 Feb 2026
+</footer>
 
-<!-- LIVE IST CLOCK SCRIPT -->
 <script>
-  function updateISTClock() {
-    const now = new Date();
-    const options = {
-      timeZone: 'Asia/Kolkata',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    };
-    const istTime = now.toLocaleString('en-IN', options);
-    const el = document.getElementById('live-clock');
-    if (el) {
-      el.textContent = '🕐 Current IST Time: ' + istTime;
-    }
-  }
-  updateISTClock();
-  setInterval(updateISTClock, 1000);
+function updateClock() {
+  var now  = new Date();
+  var ist  = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
+  var h    = ist.getHours(), m = ist.getMinutes();
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  var pad = function(n) { return String(n).padStart(2, '0'); };
+  document.getElementById('liveClock').textContent = pad(h) + ':' + pad(m) + ' ' + ampm + ' IST';
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('liveDate').textContent =
+    pad(ist.getDate()) + ' ' + months[ist.getMonth()] + ' ' + ist.getFullYear();
+}
+updateClock();
+setInterval(updateClock, 1000);
 </script>
 
-</body>
-</html>
+</body></html>
