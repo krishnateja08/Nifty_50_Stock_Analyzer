@@ -737,8 +737,8 @@ header {{
   color: var(--text2); letter-spacing: -0.5px;
 }}
 .brand-sub {{
-  font-size: 10px; color: #8aabcc;
-  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; font-weight: 600;
+  font-size: 10px; color: #88bbdd;
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; font-weight: 700;
 }}
 
 /* INDEX STRIP */
@@ -754,7 +754,7 @@ header {{
   border-right: 1px solid var(--border); gap: 2px;
 }}
 .idx-item:last-child {{ border-right: none; }}
-.idx-name  {{ font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #a0bcd8; text-transform: uppercase; }}
+.idx-name  {{ font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #88bbdd; text-transform: uppercase; }}
 .idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text2); }}
 .idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; }}
 .idx-chg.up {{ color: var(--green); }}
@@ -769,8 +769,8 @@ header {{
   font-size: 18px; font-weight: 600; color: var(--green);
   text-shadow: 0 0 12px rgba(0,230,118,0.4);
 }}
-.clock-meta {{ font-size: 10px; color: #a0bcd8; letter-spacing: 1px; font-weight: 600; }}
-.clock-next {{ font-size: 9px; color: #8aabcc; margin-top: 2px; font-weight: 500; }}
+.clock-meta {{ font-size: 11px; color: #aaccee; letter-spacing: 1px; font-weight: 700; }}
+.clock-next {{ font-size: 10px; color: #88aacc; margin-top: 2px; font-weight: 600; }}
 
 /* TICKER TAPE */
 .ticker {{
@@ -809,7 +809,7 @@ header {{
 }}
 .kpi-item:last-child {{ border-right: none; }}
 .kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }}
-.kpi-label {{ font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #a0bcd8; margin-top: 4px; }}
+.kpi-label {{ font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #88bbdd; margin-top: 4px; }}
 .kpi-bar   {{ height: 2px; width: 40px; border-radius: 1px; margin-top: 6px; }}
 
 /* MAIN */
@@ -821,165 +821,166 @@ header {{
 }}
 .section-pill {{
   display: flex; align-items: center; gap: 8px;
-  padding: 6px 16px; border-radius: 100px;
-  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 8px 20px; border-radius: 100px;
+  font-size: 13px; font-weight: 800; letter-spacing: 0.5px;
 }}
-.pill-buy  {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }}
-.pill-sell {{ background: rgba(255,61,87,0.12);  color: var(--red);   border: 1px solid rgba(255,61,87,0.25); }}
-.section-line {{ flex: 1; height: 1px; background: var(--border); }}
-.section-note {{ font-size: 10px; color: #8aabcc; letter-spacing: 1px; white-space: nowrap; font-weight: 600; }}
+.pill-buy  {{ background: #004d25; color: #00ff88; border: 2px solid #00cc66; }}
+.pill-sell {{ background: #4d0010; color: #ff4466; border: 2px solid #cc0033; }}
+.section-line {{ flex: 1; height: 1px; background: #1e3a5a; }}
+.section-note {{ font-size: 11px; color: #88aacc; letter-spacing: 1.5px; white-space: nowrap; font-weight: 800; text-transform: uppercase; }}
 
 /* TABLE WRAPPER */
 .tbl-wrap {{
   width: 100%; overflow-x: auto;
-  border: 1px solid var(--border2); border-radius: 12px;
+  border: 1px solid #1e3a5a; border-radius: 12px;
   margin-bottom: 28px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
   -webkit-overflow-scrolling: touch;
+  background: #080f1e;
 }}
 table {{ width: 100%; border-collapse: collapse; min-width: 1500px; }}
 
-/* GROUP HEADER ROW */
+/* GROUP HEADER ROW — solid bold backgrounds, pure white text */
 .grp-row th {{
-  font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-  padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--border);
+  font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+  padding: 9px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
   white-space: nowrap;
 }}
-.grp-stock {{ background: rgba(0,188,212,0.18); color: #4de8f8; font-size:9px; }}
-.grp-trade {{ background: rgba(0,230,118,0.15); color: #40ff90; font-size:9px; }}
-.grp-tech  {{ background: rgba(0,212,255,0.15); color: #40ddff; font-size:9px; }}
-.grp-fund  {{ background: rgba(255,171,0,0.15); color: #ffc040; font-size:9px; }}
-.grp-meta  {{ background: rgba(124,77,255,0.18); color: #b090ff; font-size:9px; }}
+.grp-stock {{ background: #0d3a42; color: #00f5ff; text-shadow: 0 0 8px rgba(0,245,255,0.6); }}
+.grp-trade {{ background: #0a3320; color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
+.grp-tech  {{ background: #0a2a40; color: #40c8ff; text-shadow: 0 0 8px rgba(64,200,255,0.6); }}
+.grp-fund  {{ background: #3a2a00; color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.6); }}
+.grp-meta  {{ background: #28124a; color: #cc99ff; text-shadow: 0 0 8px rgba(204,153,255,0.6); }}
 
-/* COLUMN HEADER ROW */
+/* COLUMN HEADER ROW — solid background, pure white labels */
 .col-row th {{
-  font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
-  padding: 8px 10px; color: #c8ddf0;
-  background: var(--surface2);
-  border-bottom: 2px solid var(--border2);
+  font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  padding: 9px 10px; color: #ffffff;
+  background: #0c1a2e;
+  border-bottom: 3px solid #1e3a5a;
   white-space: nowrap; text-align: left;
 }}
-.ch-stock {{ border-top: 2px solid #4de8f8; }}
-.ch-trade {{ border-top: 2px solid #40ff90; }}
-.ch-tech  {{ border-top: 2px solid #40ddff; }}
-.ch-fund  {{ border-top: 2px solid #ffc040; }}
-.ch-meta  {{ border-top: 2px solid #b090ff; }}
+.ch-stock {{ border-top: 3px solid #00f5ff; color: #b0f0ff; }}
+.ch-trade {{ border-top: 3px solid #00ff88; color: #b0ffe0; }}
+.ch-tech  {{ border-top: 3px solid #40c8ff; color: #c0e8ff; }}
+.ch-fund  {{ border-top: 3px solid #ffcc00; color: #fff0a0; }}
+.ch-meta  {{ border-top: 3px solid #cc99ff; color: #e8d0ff; }}
 
 /* Group separator */
-.gsep {{ border-left: 2px solid var(--border2) !important; }}
+.gsep {{ border-left: 2px solid rgba(255,255,255,0.12) !important; }}
 
 /* DATA ROWS */
 td {{
-  padding: 10px 10px; border-bottom: 1px solid var(--border);
+  padding: 11px 10px; border-bottom: 1px solid #0e2040;
   vertical-align: middle; white-space: nowrap;
 }}
 tr:last-child td {{ border-bottom: none; }}
-tr:nth-child(even) td {{ background: rgba(255,255,255,0.015); }}
-tr:hover td {{ background: rgba(0,212,255,0.04); transition: background 0.15s; }}
+tr:nth-child(even) td {{ background: rgba(255,255,255,0.025); }}
+tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }}
 
 /* ── CELL STYLES ── */
-.stock-name {{ font-size: 13px; font-weight: 600; color: var(--text2); }}
-.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #40ddff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
-.stock-sec  {{ font-size: 9px; color: #8aabcc; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }}
-.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--gold); }}
+.stock-name {{ font-size: 13px; font-weight: 700; color: #ffffff; }}
+.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #00f5ff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
+.stock-sec  {{ font-size: 10px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
+.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #ffcc00; }}
 
-/* Rating badge */
+/* Rating badge — solid opaque backgrounds */
 .badge {{
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 9px; font-weight: 700; padding: 4px 9px;
+  font-size: 10px; font-weight: 800; padding: 5px 10px;
   border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;
 }}
-.badge-sb {{ background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }}
-.badge-b  {{ background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }}
-.badge-h  {{ background: rgba(74,96,128,0.25); color: #8aa0c0; border: 1px solid rgba(74,96,128,0.3); }}
-.badge-s  {{ background: rgba(255,61,87,0.15);  color: #ff3d57; border: 1px solid rgba(255,61,87,0.3); }}
-.badge-ss {{ background: rgba(255,61,87,0.22);  color: #ff6b7a; border: 1px solid rgba(255,61,87,0.4); }}
+.badge-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
+.badge-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #00f5ff; }}
+.badge-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #445566; }}
+.badge-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
+.badge-ss {{ background: #5a0015; color: #ff7788; border: 1px solid #ff7788; }}
 
 /* Score */
 .score-wrap {{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 6px; }}
-.score-num  {{ font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; }}
-.score-track {{ width: 44px; height: 3px; background: var(--border2); border-radius: 2px; }}
+.score-num  {{ font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }}
+.score-track {{ width: 44px; height: 4px; background: #1a2a3a; border-radius: 2px; }}
 .score-fill  {{ height: 100%; border-radius: 2px; transition: width 0.5s ease; }}
 
 /* Target / Stop */
 .target-badge {{
-  font-size: 7px; font-weight: 700; padding: 2px 6px;
+  font-size: 9px; font-weight: 800; padding: 3px 7px;
   border-radius: 4px; letter-spacing: 0.5px;
-  display: block; margin-bottom: 3px;
+  display: block; margin-bottom: 4px;
 }}
-.tb-real    {{ background: rgba(0,230,118,0.15); color: #40ff90; border: 1px solid rgba(0,230,118,0.3); }}
-.tb-partial {{ background: rgba(255,171,0,0.15);  color: #ffc040; border: 1px solid rgba(255,171,0,0.3); }}
-.tb-ath     {{ background: rgba(0,212,255,0.15);  color: #40ddff; border: 1px solid rgba(0,212,255,0.3); }}
-.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text2); }}
-.t2-val {{ font-size: 10px; color: #8aabcc; margin-top: 2px; font-weight: 600; }}
-.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--red); }}
-.sl-pct {{ font-size: 10px; color: #8aabcc; margin-top: 2px; font-weight: 600; }}
-.sl-type {{ font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 3px; display: inline-block; }}
-.slt-atr  {{ background: rgba(0,230,118,0.15); color: #40ff90; }}
-.slt-beta {{ background: rgba(255,171,0,0.15);  color: #ffc040; }}
+.tb-real    {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
+.tb-partial {{ background: #4d3300; color: #ffcc00; border: 1px solid #ffcc00; }}
+.tb-ath     {{ background: #003a4d; color: #00f5ff; border: 1px solid #00f5ff; }}
+.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: #ffffff; }}
+.t2-val {{ font-size: 11px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: #ff4466; }}
+.sl-pct {{ font-size: 11px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.sl-type {{ font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }}
+.slt-atr  {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
+.slt-beta {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
 
-.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; }}
-.upside-val.up {{ color: var(--green); }}
-.upside-val.dn {{ color: var(--red); }}
-.rr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
-.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #4de8f8; }}
-.atr-sub {{ font-size: 9px; color: #8aabcc; margin-top: 1px; font-weight: 600; }}
+.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; }}
+.upside-val.up {{ color: #00ff88; }}
+.upside-val.dn {{ color: #ff4466; }}
+.rr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
+.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: #00f5ff; }}
+.atr-sub {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
 
 /* Technicals */
-.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
-.rsi-sig {{ font-size: 9px; color: #8aabcc; margin-top: 1px; font-weight: 600; }}
-.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
-.adx-lbl {{ font-size: 9px; color: #8aabcc; margin-top: 1px; font-weight: 600; }}
-.adx-strong {{ color: #40ff90; }}
-.adx-mod    {{ color: #ffc040; }}
-.adx-weak   {{ color: #a0bcd8; }}
-.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
-.vol-lbl {{ font-size: 9px; color: #8aabcc; margin-top: 1px; font-weight: 600; }}
-.vol-high {{ color: #40ff90; }}
-.vol-norm {{ color: var(--text); }}
-.vol-low  {{ color: #a0bcd8; }}
-.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
-.sdist-close {{ color: var(--green); }}
-.sdist-mid   {{ color: var(--gold); }}
-.sdist-far   {{ color: var(--red); }}
+.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.rsi-sig {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.adx-lbl {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.adx-strong {{ color: #00ff88; }}
+.adx-mod    {{ color: #ffcc00; }}
+.adx-weak   {{ color: #aabbcc; }}
+.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.vol-lbl {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.vol-high {{ color: #00ff88; }}
+.vol-norm {{ color: #ddeeff; }}
+.vol-low  {{ color: #aabbcc; }}
+.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.sdist-close {{ color: #00ff88; }}
+.sdist-mid   {{ color: #ffcc00; }}
+.sdist-far   {{ color: #ff4466; }}
 
 /* Fundamentals */
-.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }}
+.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }}
 
-/* Badges */
-.qbadge {{ font-size: 8px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }}
-.qb-ex {{ background: rgba(0,230,118,0.12); color: #00e676; }}
-.qb-gd {{ background: rgba(0,188,212,0.12); color: #00bcd4; }}
-.qb-av {{ background: rgba(255,171,0,0.12);  color: #ffab00; }}
-.qb-po {{ background: rgba(255,61,87,0.12);  color: #ff3d57; }}
+/* Badges — solid opaque */
+.qbadge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
+.qb-ex {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
+.qb-gd {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
+.qb-av {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
+.qb-po {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
 
-.analyst-badge {{ font-size: 8px; font-weight: 700; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }}
-.ab-sb {{ background: rgba(0,230,118,0.12); color: #00e676; }}
-.ab-b  {{ background: rgba(0,212,255,0.12); color: #00d4ff; }}
-.ab-h  {{ background: rgba(74,96,128,0.20); color: #8aa0c0; }}
-.ab-s  {{ background: rgba(255,61,87,0.12); color: #ff3d57; }}
+.analyst-badge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }}
+.ab-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
+.ab-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
+.ab-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #334455; }}
+.ab-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
 
-.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #4de8f8; font-weight: 600; }}
-.rnum {{ font-size: 11px; color: #a0bcd8; font-weight: 600; }}
-.macd-bull {{ color: var(--green); font-weight: 600; font-size: 11px; }}
-.macd-bear {{ color: var(--red);   font-weight: 600; font-size: 11px; }}
+.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #00f5ff; font-weight: 700; }}
+.rnum {{ font-size: 12px; color: #88bbdd; font-weight: 700; }}
+.macd-bull {{ color: #00ff88; font-weight: 800; font-size: 12px; }}
+.macd-bear {{ color: #ff4466; font-weight: 800; font-size: 12px; }}
 
 /* DISCLAIMER */
 .disc {{
-  background: var(--surface); border: 1px solid var(--border2);
-  border-left: 3px solid var(--red);
-  padding: 12px 16px; border-radius: 8px;
-  font-size: 11px; color: #8aabcc; line-height: 1.8;
+  background: #0c1a2e; border: 1px solid #1e3a5a;
+  border-left: 4px solid #ff4466;
+  padding: 14px 18px; border-radius: 8px;
+  font-size: 12px; color: #aaccee; line-height: 1.9;
   margin: 16px 0;
 }}
 
 /* FOOTER */
 footer {{
   text-align: center; padding: 16px;
-  background: var(--surface); border-top: 1px solid var(--border2);
-  font-size: 11px; color: #8aabcc; letter-spacing: 1px;
+  background: #080f1e; border-top: 1px solid #1e3a5a;
+  font-size: 12px; color: #88aacc; letter-spacing: 1px;
 }}
-footer strong {{ color: var(--accent); }}
+footer strong {{ color: #00f5ff; }}
 
 /* MOBILE */
 @media(max-width: 900px) {{
