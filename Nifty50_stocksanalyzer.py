@@ -1,24 +1,18 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — AURORA GLASS THEME v2
+NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v3
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
-UPGRADES from v1:
-  - 12-Month Swing-High/Low S/R detection (replacing 60-day quantile)
-  - Round number S/R levels (context-aware step sizing)
-  - ATR-based stop losses anchored near real S/R zones
-  - Beta-adjusted ATR multiplier + maximum SL cap
-  - ADX (trend strength indicator)
-  - Volume/Avg ratio (20-day)
-  - Support Distance % column
-  - Dynamic Target Promotion (ATR floor on targets)
-  - Earnings Date column
-  - Analyst Consensus label
-  - Sector column
-  - Live index strip: SENSEX / NIFTY 50 / BANK NIFTY
-  - Live IST clock
-  - Full-width mobile-responsive layout
-  - ATH Zone / Partial S/R / Real S/R target badges
-  - Stop type badge (ATR Stop vs Beta Cap)
+UPGRADES from v2:
+  - Grouped column headers: STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META
+  - Color-coded column group bands with top-border accents
+  - Score displayed as number + animated fill bar
+  - Stop type badge anchored directly under SL price
+  - Target S/R badge above target price for instant context
+  - Auto-scrolling ticker tape (CSS animation, no JS dependency)
+  - Live clock with seconds
+  - Space Grotesk + IBM Plex Mono typography
+  - Vertical group separators for clean scanning
+  - All original analysis logic preserved
 
 Requirements:
     pip install yfinance pandas numpy pytz
@@ -69,7 +63,7 @@ class Nifty100CompleteAnalyzer:
             'ONGC.NS':        'ONGC',
             'TECHM.NS':       'Tech Mahindra',
             'M&M.NS':         'M&M',
-            'TMCV.NS':        'Tata Motors Commerical',
+            'TMCV.NS':        'Tata Motors Commercial',
             'TMPV.NS':        'Tata Motors Passenger',
             'TATASTEEL.NS':   'Tata Steel',
             'INDUSINDBK.NS':  'IndusInd Bank',
@@ -224,11 +218,10 @@ class Nifty100CompleteAnalyzer:
         return "N/A"
 
     def fetch_index_data(self):
-        """Fetch SENSEX / NIFTY 50 / BANK NIFTY at report time."""
         indices = {
-            'SENSEX':    '^BSESN',
-            'NIFTY 50':  '^NSEI',
-            'BANK NIFTY':'^NSEBANK',
+            'SENSEX':     '^BSESN',
+            'NIFTY 50':   '^NSEI',
+            'BANK NIFTY': '^NSEBANK',
         }
         result = {}
         for label, sym in indices.items():
@@ -251,7 +244,7 @@ class Nifty100CompleteAnalyzer:
         return result
 
     # =========================================================================
-    #  RESISTANCE & SUPPORT  (12-month swing detection + round numbers + 52W)
+    #  RESISTANCE & SUPPORT
     # =========================================================================
     def find_resistance_levels(self, df, current_price, num_levels=5):
         window      = 5
@@ -262,11 +255,9 @@ class Nifty100CompleteAnalyzer:
                 if (highs[i] > max(highs[i-window:i]) and
                         highs[i] > max(highs[i+1:i+window+1])):
                     swing_highs.append(highs[i])
-        # 52-week high
         high_52w = df['High'].tail(252).max()
         if high_52w > current_price * 1.005:
             swing_highs.append(high_52w)
-        # Round-number levels above price
         magnitude = 10 ** (len(str(int(current_price))) - 2)
         step      = magnitude * 5
         level     = current_price
@@ -299,11 +290,9 @@ class Nifty100CompleteAnalyzer:
                 if (lows[i] < min(lows[i-window:i]) and
                         lows[i] < min(lows[i+1:i+window+1])):
                     swing_lows.append(lows[i])
-        # 52-week low
         low_52w = df['Low'].tail(252).min()
         if low_52w < current_price * 0.995:
             swing_lows.append(low_52w)
-        # Round-number levels below price
         magnitude = 10 ** (len(str(int(current_price))) - 2)
         step      = magnitude * 5
         level     = current_price
@@ -328,7 +317,7 @@ class Nifty100CompleteAnalyzer:
         return sorted(sup, key=lambda x: x['level'], reverse=True)[:num_levels]
 
     # =========================================================================
-    #  DYNAMIC TARGETS  (ATR floor, promotion logic)
+    #  DYNAMIC TARGETS
     # =========================================================================
     def calculate_dynamic_targets(self, current_price, resistance_levels,
                                    support_levels, target_price, atr):
@@ -426,7 +415,6 @@ class Nifty100CompleteAnalyzer:
             high_52w = df['High'].tail(252).max()
             low_52w  = df['Low'].tail(252).min()
 
-            # ── Advanced S/R ──────────────────────────────────────
             resistance_levels = self.find_resistance_levels(df, current_price)
             support_levels    = self.find_support_levels(df, current_price)
 
@@ -440,7 +428,6 @@ class Nifty100CompleteAnalyzer:
             support_dist_pct = round(
                 ((current_price - nearest_support) / current_price) * 100, 2)
 
-            # ── Technical Score ───────────────────────────────────
             tech_score = 0
             tech_score += 1 if current_price > sma_20  else -1
             tech_score += 1 if current_price > sma_50  else -1
@@ -458,7 +445,6 @@ class Nifty100CompleteAnalyzer:
             if adx > 25:
                 tech_score = min(tech_score + 1, 6)
 
-            # ── Fundamental Data ──────────────────────────────────
             pe_ratio         = info.get('trailingPE', info.get('forwardPE', 0))
             pb_ratio         = info.get('priceToBook', 0)
             peg_ratio        = info.get('pegRatio', 0)
@@ -488,7 +474,6 @@ class Nifty100CompleteAnalyzer:
             earnings_date = self.get_earnings_date(info)
 
             fund_score = self.get_fundamental_score(info)
-
             tech_score_normalized = ((tech_score + 6) / 12) * 100
             combined_score        = (tech_score_normalized * 0.5) + (fund_score * 0.5)
 
@@ -503,7 +488,6 @@ class Nifty100CompleteAnalyzer:
             else:
                 rating = "⭐ STRONG SELL";         recommendation = "STRONG SELL"
 
-            # ── Beta-adjusted ATR stop ────────────────────────────
             stock_beta = beta if beta else 1.0
             if stock_beta < 0.8:
                 atr_multiplier = 1.0;  max_sl_pct = 5.0
@@ -561,60 +545,60 @@ class Nifty100CompleteAnalyzer:
             else:                  quality = "Poor"
 
             return {
-                'Symbol':          symbol.replace('.NS', ''),
-                'Name':            name,
-                'Price':           round(current_price, 2),
-                'Sector':          sector,
-                'RSI':             round(rsi, 2),
-                'RSI_Signal':      rsi_signal,
-                'MACD':            macd_signal,
-                'ADX':             adx,
-                'Vol_Ratio':       vol_ratio,
-                'SMA_20':          round(sma_20, 2),
-                'SMA_50':          round(sma_50, 2),
-                'SMA_200':         round(sma_200, 2),
-                'Support':         round(nearest_support, 2),
-                'Resistance':      round(nearest_resistance, 2),
-                'Support_Dist_Pct':support_dist_pct,
-                '52W_High':        round(high_52w, 2),
-                '52W_Low':         round(low_52w, 2),
-                'Tech_Score':      tech_score,
-                'Tech_Score_Norm': round(tech_score_normalized, 1),
-                'ATR':             atr,
-                'ATR_Pct':         atr_pct,
-                'ATR_Multiplier':  atr_multiplier,
-                'Stop_Type':       stop_type,
-                'PE_Ratio':        round(pe_ratio, 2)           if pe_ratio else 0,
-                'PB_Ratio':        round(pb_ratio, 2)           if pb_ratio else 0,
-                'PEG_Ratio':       round(peg_ratio, 2)          if peg_ratio else 0,
-                'ROE':             round(roe * 100, 2)          if roe else 0,
-                'ROA':             round(roa * 100, 2)          if roa else 0,
-                'Profit_Margin':   round(profit_margin * 100, 2)    if profit_margin else 0,
-                'Operating_Margin':round(operating_margin * 100, 2) if operating_margin else 0,
-                'EPS':             round(eps, 2)                if eps else 0,
-                'Dividend_Yield':  round(dividend_yield * 100, 2)   if dividend_yield else 0,
-                'Revenue_Growth':  round(revenue_growth * 100, 2)   if revenue_growth else 0,
-                'Earnings_Growth': round(earnings_growth * 100, 2)  if earnings_growth else 0,
-                'Debt_to_Equity':  round(debt_to_equity, 2)    if debt_to_equity else 0,
-                'Current_Ratio':   round(current_ratio, 2)     if current_ratio else 0,
-                'Market_Cap':      round(market_cap / 1e12, 2) if market_cap else 0,
-                'Beta':            round(beta, 2)               if beta else 1.0,
-                'Fund_Score':      round(fund_score, 1),
-                'Quality':         quality,
-                'Combined_Score':  round(combined_score, 1),
-                'Rating':          rating,
-                'Recommendation':  recommendation,
-                'Stop_Loss':       round(stop_loss, 2),
-                'SL_Percentage':   round(sl_percentage, 2),
-                'Target_1':        round(target_1, 2),
-                'Target_2':        round(target_2, 2),
-                'Target_Price':    round(target_price, 2) if target_price else 0,
-                'Upside':          round(upside, 2),
-                'Risk_Reward':     risk_reward,
-                'Targets_Hit':     targets_hit,
-                'Target_Status':   target_status,
-                'Analyst':         analyst_label,
-                'Earnings_Date':   earnings_date,
+                'Symbol':           symbol.replace('.NS', ''),
+                'Name':             name,
+                'Price':            round(current_price, 2),
+                'Sector':           sector,
+                'RSI':              round(rsi, 2),
+                'RSI_Signal':       rsi_signal,
+                'MACD':             macd_signal,
+                'ADX':              adx,
+                'Vol_Ratio':        vol_ratio,
+                'SMA_20':           round(sma_20, 2),
+                'SMA_50':           round(sma_50, 2),
+                'SMA_200':          round(sma_200, 2),
+                'Support':          round(nearest_support, 2),
+                'Resistance':       round(nearest_resistance, 2),
+                'Support_Dist_Pct': support_dist_pct,
+                '52W_High':         round(high_52w, 2),
+                '52W_Low':          round(low_52w, 2),
+                'Tech_Score':       tech_score,
+                'Tech_Score_Norm':  round(tech_score_normalized, 1),
+                'ATR':              atr,
+                'ATR_Pct':          atr_pct,
+                'ATR_Multiplier':   atr_multiplier,
+                'Stop_Type':        stop_type,
+                'PE_Ratio':         round(pe_ratio, 2)            if pe_ratio else 0,
+                'PB_Ratio':         round(pb_ratio, 2)            if pb_ratio else 0,
+                'PEG_Ratio':        round(peg_ratio, 2)           if peg_ratio else 0,
+                'ROE':              round(roe * 100, 2)           if roe else 0,
+                'ROA':              round(roa * 100, 2)           if roa else 0,
+                'Profit_Margin':    round(profit_margin * 100, 2)     if profit_margin else 0,
+                'Operating_Margin': round(operating_margin * 100, 2)  if operating_margin else 0,
+                'EPS':              round(eps, 2)                 if eps else 0,
+                'Dividend_Yield':   round(dividend_yield * 100, 2)    if dividend_yield else 0,
+                'Revenue_Growth':   round(revenue_growth * 100, 2)    if revenue_growth else 0,
+                'Earnings_Growth':  round(earnings_growth * 100, 2)   if earnings_growth else 0,
+                'Debt_to_Equity':   round(debt_to_equity, 2)     if debt_to_equity else 0,
+                'Current_Ratio':    round(current_ratio, 2)      if current_ratio else 0,
+                'Market_Cap':       round(market_cap / 1e12, 2)  if market_cap else 0,
+                'Beta':             round(beta, 2)                if beta else 1.0,
+                'Fund_Score':       round(fund_score, 1),
+                'Quality':          quality,
+                'Combined_Score':   round(combined_score, 1),
+                'Rating':           rating,
+                'Recommendation':   recommendation,
+                'Stop_Loss':        round(stop_loss, 2),
+                'SL_Percentage':    round(sl_percentage, 2),
+                'Target_1':         round(target_1, 2),
+                'Target_2':         round(target_2, 2),
+                'Target_Price':     round(target_price, 2) if target_price else 0,
+                'Upside':           round(upside, 2),
+                'Risk_Reward':      risk_reward,
+                'Targets_Hit':      targets_hit,
+                'Target_Status':    target_status,
+                'Analyst':          analyst_label,
+                'Earnings_Date':    earnings_date,
             }
         except Exception:
             return None
@@ -634,7 +618,7 @@ class Nifty100CompleteAnalyzer:
         print(f"\n✅ {len(self.results)} stocks analyzed\n")
 
     # =========================================================================
-    #  TOP RECOMMENDATIONS  (same quality filter as US script)
+    #  TOP RECOMMENDATIONS
     # =========================================================================
     def get_top_recommendations(self):
         df = pd.DataFrame(self.results)
@@ -652,7 +636,7 @@ class Nifty100CompleteAnalyzer:
         return top_buys, top_sells
 
     # =========================================================================
-    #  HTML — Aurora Glass v2 (full-width, mobile-responsive, index strip)
+    #  HTML — Redesigned v3: Grouped Columns + IBM Plex Mono + Score Bars
     # =========================================================================
     def generate_html(self):
         df = pd.DataFrame(self.results)
@@ -669,214 +653,346 @@ class Nifty100CompleteAnalyzer:
         sell_count        = len(df[df['Recommendation'] == 'SELL'])
         strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
 
+        # ── ticker tape items ──────────────────────────────────────────────
+        ticker_items = ""
+        for t in self.results[:12]:
+            pct  = ((t['Price'] - t['SMA_20']) / t['SMA_20']) * 100
+            cls  = "tick-up" if pct >= 0 else "tick-dn"
+            sign = "+" if pct >= 0 else ""
+            ticker_items += (
+                f'<span class="tick">'
+                f'<span class="tick-sym">{t["Symbol"]}</span>'
+                f'<span class="tick-px">₹{t["Price"]:,.2f}</span>'
+                f'<span class="{cls}">{sign}{pct:.1f}%</span>'
+                f'</span>'
+            )
+        # duplicate for seamless loop
+        ticker_html = ticker_items + ticker_items
+
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>NIFTY 100 Market Influencers — {time_of_day} Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>NIFTY 100 Market Influencers — {time_of_day} Report · {now.strftime('%d %b %Y')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root {{
-    --bg:#050f0e; --bg2:#071412; --card:#0a1c1a; --card2:#0d2220;
-    --accent:#4dd0c4; --accent2:#2dd4bf;
-    --green:#22c55e; --red:#ef4444; --blue:#60a5fa;
-    --gold:#f59e0b; --teal:#4dd0c4; --purple:#a78bfa;
-    --text:#b2dfdb; --text2:#e0f2f1;
-    --sym:#80cbc4; --t2c:#4dd0c4; --muted:#4a7a78;
-    --border:#0d3330; --border2:#134540;
-  }}
-  *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
+:root {{
+  --bg:       #04080f;
+  --bg2:      #060d18;
+  --surface:  #0a1628;
+  --surface2: #0e1d35;
+  --border:   #132240;
+  --border2:  #1a2e50;
+  --accent:   #00d4ff;
+  --accent2:  #0099cc;
+  --green:    #00e676;
+  --green2:   #00c853;
+  --red:      #ff3d57;
+  --gold:     #ffab00;
+  --purple:   #7c4dff;
+  --teal:     #00bcd4;
+  --text:     #cdd6f4;
+  --text2:    #e8eeff;
+  --muted:    #4a6080;
+  --muted2:   #6a80a0;
+}}
+*, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
 
-  body {{
-    background:var(--bg); color:var(--text);
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-size:13px; line-height:1.4;
-    background-image:
-      radial-gradient(ellipse at 0% 0%,   rgba(77,208,196,0.07) 0%,transparent 50%),
-      radial-gradient(ellipse at 100% 100%,rgba(45,212,191,0.04) 0%,transparent 40%);
-  }}
+body {{
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 10% 0%, rgba(0,212,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 90% 100%, rgba(124,77,255,0.05) 0%, transparent 50%);
+}}
 
-  /* ── HEADER ── */
-  header {{ background:linear-gradient(180deg,#071412,var(--bg2)); border-bottom:2px solid var(--accent); }}
-  .h-top {{
-    width:100%; display:flex; align-items:center;
-    justify-content:space-between; padding:12px 16px;
-    gap:12px; flex-wrap:wrap;
-  }}
-  .brand {{ display:flex; align-items:center; gap:10px; min-width:0; }}
-  .brand-icon {{
-    width:36px; height:36px; flex-shrink:0;
-    background:linear-gradient(135deg,var(--accent),var(--gold));
-    border-radius:8px; display:flex; align-items:center;
-    justify-content:center; font-size:17px;
-  }}
-  .brand-t {{ font-size:clamp(12px,1.8vw,17px); font-weight:800; color:var(--text2); white-space:nowrap; }}
-  .brand-s {{ font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }}
-  .h-meta {{ display:flex; flex-wrap:wrap; gap:0; align-items:center; }}
-  .hm {{ padding:6px 14px; border-left:1px solid var(--border2); text-align:right; }}
-  .hm-l {{ font-size:8px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }}
-  .hm-v {{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; margin-top:1px; }}
+/* ── HEADER ── */
+header {{
+  background: linear-gradient(180deg, #060d18 0%, #04080f 100%);
+  border-bottom: 1px solid var(--border2);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}}
+.h-top {{
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px; gap: 16px; flex-wrap: wrap;
+}}
+.brand {{ display: flex; align-items: center; gap: 12px; }}
+.brand-gem {{
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #00d4ff, #7c4dff);
+  border-radius: 10px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(0,212,255,0.3);
+}}
+.brand-name {{
+  font-family: 'Syne', sans-serif;
+  font-size: 17px; font-weight: 800;
+  color: var(--text2); letter-spacing: -0.5px;
+}}
+.brand-sub {{
+  font-size: 9px; color: var(--muted2);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;
+}}
 
-  /* ── INDEX STRIP ── */
-  .idx-strip {{
-    display:flex; align-items:center;
-    background:rgba(0,0,0,0.35); border:1px solid var(--border2);
-    border-radius:8px; padding:4px 0; margin:0 8px;
-  }}
-  .idx-item {{ display:flex; align-items:center; gap:8px; padding:6px 16px; }}
-  .idx-name  {{ font-size:9px; font-weight:800; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }}
-  .idx-price {{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:var(--text2); }}
-  .idx-chg   {{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); }}
-  .idx-chg.up {{ color:var(--green); }}
-  .idx-chg.dn {{ color:var(--red); }}
-  .idx-sep   {{ width:1px; height:30px; background:var(--border2); }}
+/* INDEX STRIP */
+.idx-strip {{
+  display: flex; align-items: center;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border2);
+  border-radius: 10px; overflow: hidden;
+}}
+.idx-item {{
+  display: flex; flex-direction: column;
+  align-items: center; padding: 6px 20px;
+  border-right: 1px solid var(--border); gap: 2px;
+}}
+.idx-item:last-child {{ border-right: none; }}
+.idx-name  {{ font-size: 8px; font-weight: 700; letter-spacing: 2px; color: var(--muted2); text-transform: uppercase; }}
+.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text2); }}
+.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; }}
+.idx-chg.up {{ color: var(--green); }}
+.idx-chg.dn {{ color: var(--red); }}
 
-  /* ── LIVE CLOCK ── */
-  .live-clock-wrap {{
-    display:flex; flex-direction:column; align-items:center;
-    padding:6px 16px; border-left:1px solid var(--border2); min-width:130px;
-  }}
-  .lc-label {{ font-size:8px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }}
-  .lc-time  {{ font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--green); letter-spacing:2px; margin-top:2px; }}
-  .lc-date  {{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); margin-top:1px; }}
-  .lc-last  {{ font-size:8px; color:var(--accent2); margin-top:3px; letter-spacing:0.3px; white-space:nowrap; }}
+/* CLOCK */
+.clock-box {{
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+}}
+.clock-time {{
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px; font-weight: 600; color: var(--green);
+  text-shadow: 0 0 12px rgba(0,230,118,0.4);
+}}
+.clock-meta {{ font-size: 9px; color: var(--muted2); letter-spacing: 1px; }}
+.clock-next {{ font-size: 8px; color: var(--muted); margin-top: 2px; }}
 
-  /* ── TICKER TAPE ── */
-  .ticker {{ background:#020808; border-bottom:1px solid var(--border); }}
-  .ticker-inner {{ display:flex; padding:0 16px; overflow-x:auto; scrollbar-width:none; }}
-  .ticker-inner::-webkit-scrollbar {{ display:none; }}
-  .ti {{ display:flex; gap:5px; align-items:center; padding:5px 10px; border-right:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:10px; white-space:nowrap; }}
-  .ti-s {{ color:var(--accent2); font-weight:700; }}
-  .ti-p {{ color:var(--text2); }}
-  .ti-u {{ color:var(--green); }}
-  .ti-d {{ color:var(--red); }}
+/* TICKER TAPE */
+.ticker {{
+  background: rgba(0,0,0,0.6);
+  border-top: 1px solid var(--border); overflow: hidden;
+}}
+.ticker-track {{ display: flex; white-space: nowrap; }}
+.ticker-inner {{
+  display: flex; white-space: nowrap;
+  animation: ticker-scroll 50s linear infinite;
+  padding: 5px 0;
+}}
+@keyframes ticker-scroll {{
+  0%   {{ transform: translateX(0); }}
+  100% {{ transform: translateX(-50%); }}
+}}
+.tick {{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 18px; border-right: 1px solid var(--border);
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+}}
+.tick-sym  {{ color: var(--accent); font-weight: 600; }}
+.tick-px   {{ color: var(--text2); }}
+.tick-up   {{ color: var(--green); }}
+.tick-dn   {{ color: var(--red); }}
 
-  /* ── KPI BAND ── */
-  .kpi-band {{ background:var(--card); border-bottom:1px solid var(--border2); }}
-  .kpi-inner {{ display:grid; grid-template-columns:repeat(5,1fr); width:100%; }}
-  .kc {{ padding:12px 10px; border-right:1px solid var(--border); text-align:center; }}
-  .kc:last-child {{ border-right:none; }}
-  .kn {{ font-size:clamp(20px,4vw,30px); font-weight:800; line-height:1; }}
-  .kl {{ font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-top:3px; }}
-  .kbar {{ height:2px; border-radius:1px; margin:3px auto 0; width:32px; }}
+/* KPI BAND */
+.kpi-band {{
+  display: flex; align-items: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+}}
+.kpi-item {{
+  display: flex; flex-direction: column; align-items: center;
+  padding: 14px 24px; border-right: 1px solid var(--border); flex: 1;
+}}
+.kpi-item:last-child {{ border-right: none; }}
+.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }}
+.kpi-label {{ font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); margin-top: 4px; }}
+.kpi-bar   {{ height: 2px; width: 40px; border-radius: 1px; margin-top: 6px; }}
 
-  /* ── MAIN ── */
-  .main {{ width:100%; padding:12px 16px; }}
+/* MAIN */
+.main {{ padding: 20px; }}
 
-  /* ── SECTION HEADER ── */
-  .sh {{ display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }}
-  .sh-icon {{ width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }}
-  .shi-buy  {{ background:rgba(34,197,94,0.15); }}
-  .shi-sell {{ background:rgba(239,68,68,0.15); }}
-  .sh-title {{ font-size:15px; font-weight:800; color:var(--text2); }}
-  .sh-divider {{ flex:1; height:1px; background:var(--border); min-width:10px; }}
-  .sh-count {{ font-size:9px; color:var(--muted); white-space:nowrap; }}
+/* SECTION HEADER */
+.section-hdr {{
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}}
+.section-pill {{
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 100px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+}}
+.pill-buy  {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }}
+.pill-sell {{ background: rgba(255,61,87,0.12);  color: var(--red);   border: 1px solid rgba(255,61,87,0.25); }}
+.section-line {{ flex: 1; height: 1px; background: var(--border); }}
+.section-note {{ font-size: 9px; color: var(--muted); letter-spacing: 1px; white-space: nowrap; }}
 
-  /* ── TABLE ── */
-  .tbl-wrap {{
-    width:100%; overflow-x:auto;
-    border:1px solid var(--border2); border-radius:8px;
-    margin-bottom:20px; background:var(--card);
-    box-shadow:0 4px 24px rgba(0,0,0,0.3);
-    -webkit-overflow-scrolling:touch;
-  }}
-  table {{ width:100%; border-collapse:collapse; min-width:1200px; }}
-  th {{
-    font-size:8px; font-weight:700; letter-spacing:1.5px;
-    text-transform:uppercase; color:var(--teal);
-    padding:8px 9px; background:var(--card2);
-    border-bottom:1px solid var(--border2); text-align:left; white-space:nowrap;
-  }}
-  td {{ padding:8px 9px; border-bottom:1px solid var(--border); vertical-align:middle; white-space:nowrap; }}
-  tr:hover td {{ background:rgba(77,208,196,0.05); }}
-  tr:nth-child(even) td {{ background:rgba(0,0,0,0.15); }}
-  tr:last-child td {{ border-bottom:none; }}
+/* TABLE WRAPPER */
+.tbl-wrap {{
+  width: 100%; overflow-x: auto;
+  border: 1px solid var(--border2); border-radius: 12px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  -webkit-overflow-scrolling: touch;
+}}
+table {{ width: 100%; border-collapse: collapse; min-width: 1500px; }}
 
-  /* ── CELL COMPONENTS ── */
-  .sn  {{ font-size:13px; font-weight:700; color:var(--text2); }}
-  .ss  {{ font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:600; color:var(--sym); letter-spacing:1px; margin-top:2px; }}
-  .sec {{ font-size:8px; color:var(--muted); margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; }}
-  .pv  {{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--gold); }}
-  .rt  {{ display:inline-block; font-size:8px; font-weight:700; padding:3px 7px; border-radius:3px; white-space:nowrap; letter-spacing:0.5px; }}
-  .rt-sb {{ background:rgba(34,197,94,0.15);  color:#4ade80; border:1px solid rgba(34,197,94,0.3); }}
-  .rt-b  {{ background:rgba(77,208,196,0.15); color:#4dd0c4; border:1px solid rgba(77,208,196,0.3); }}
-  .rt-s  {{ background:rgba(239,68,68,0.15);  color:#f87171; border:1px solid rgba(239,68,68,0.3); }}
-  .rt-ss {{ background:rgba(239,68,68,0.22);  color:#fca5a5; border:1px solid rgba(239,68,68,0.4); }}
-  .scn {{ font-size:20px; font-weight:800; }}
-  .scb {{ height:3px; border-radius:2px; margin-top:3px; width:36px; }}
-  .up {{ color:#4ade80; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }}
-  .dn {{ color:#f87171; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }}
-  .t1 {{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--text2); }}
-  .t2 {{ font-size:9px; color:var(--t2c); margin-top:1px; }}
-  .sl1 {{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:#f87171; }}
-  .sl2 {{ font-size:9px; color:var(--muted); margin-top:1px; }}
-  .rv  {{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }}
-  .rsb {{ font-size:8px; color:var(--muted); }}
-  .rrv {{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }}
-  .qb    {{ font-size:8px; font-weight:700; padding:2px 6px; border-radius:3px; }}
-  .qb-ex {{ background:rgba(34,197,94,0.15);  color:#4ade80; }}
-  .qb-gd {{ background:rgba(77,208,196,0.15); color:#4dd0c4; }}
-  .qb-av {{ background:rgba(245,158,11,0.15); color:#fbbf24; }}
-  .qb-po {{ background:rgba(239,68,68,0.15);  color:#f87171; }}
-  .ts {{ font-size:7px; font-weight:700; padding:2px 5px; border-radius:3px; letter-spacing:0.5px; display:inline-block; margin-bottom:2px; }}
-  .ts-real    {{ background:rgba(34,197,94,0.15);  color:#4ade80; }}
-  .ts-partial {{ background:rgba(245,158,11,0.15); color:#fbbf24; }}
-  .ts-ath     {{ background:rgba(77,208,196,0.15); color:#4dd0c4; }}
-  .sb {{ font-size:7px; font-weight:700; padding:2px 5px; border-radius:3px; display:inline-block; margin-top:2px; }}
-  .sb-atr  {{ background:rgba(34,197,94,0.15);  color:#4ade80; }}
-  .sb-beta {{ background:rgba(245,158,11,0.15); color:#fbbf24; }}
-  .ab {{ font-size:8px; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }}
-  .ab-sb {{ background:rgba(34,197,94,0.15);  color:#4ade80; }}
-  .ab-b  {{ background:rgba(77,208,196,0.15); color:#4dd0c4; }}
-  .ab-h  {{ background:rgba(74,122,120,0.2);  color:#80cbc4; }}
-  .ab-s  {{ background:rgba(239,68,68,0.15);  color:#f87171; }}
-  .adx-strong {{ color:#4ade80; font-weight:700; }}
-  .adx-mid    {{ color:#fbbf24; font-weight:600; }}
-  .adx-weak   {{ color:#4a7a78; }}
-  .vol-high {{ color:#4ade80; font-weight:700; }}
-  .vol-norm {{ color:var(--text); }}
-  .vol-low  {{ color:#4a7a78; }}
-  .earn {{ font-size:9px; color:var(--teal); font-family:'JetBrains Mono',monospace; }}
-  .sdist-close {{ color:#4ade80;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }}
-  .sdist-mid   {{ color:#fbbf24;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }}
-  .sdist-far   {{ color:#f87171;  font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace; }}
+/* GROUP HEADER ROW */
+.grp-row th {{
+  font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}}
+.grp-stock {{ background: rgba(0,188,212,0.10); color: var(--teal); }}
+.grp-trade {{ background: rgba(0,230,118,0.08); color: var(--green); }}
+.grp-tech  {{ background: rgba(0,212,255,0.08); color: var(--accent); }}
+.grp-fund  {{ background: rgba(255,171,0,0.08); color: var(--gold); }}
+.grp-meta  {{ background: rgba(124,77,255,0.08); color: var(--purple); }}
 
-  /* ── DISCLAIMER ── */
-  .disc {{
-    background:var(--card); border:1px solid var(--border2);
-    border-left:3px solid var(--accent); padding:12px 16px;
-    margin:16px 0; font-size:11px; color:var(--muted); line-height:1.7;
-  }}
-  .disc strong {{ color:#f87171; }}
+/* COLUMN HEADER ROW */
+.col-row th {{
+  font-size: 9px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 8px 10px; color: var(--muted2);
+  background: var(--surface2);
+  border-bottom: 2px solid var(--border2);
+  white-space: nowrap; text-align: left;
+}}
+.ch-stock {{ border-top: 2px solid var(--teal); }}
+.ch-trade {{ border-top: 2px solid var(--green); }}
+.ch-tech  {{ border-top: 2px solid var(--accent); }}
+.ch-fund  {{ border-top: 2px solid var(--gold); }}
+.ch-meta  {{ border-top: 2px solid var(--purple); }}
 
-  /* ── FOOTER ── */
-  footer {{
-    background:linear-gradient(90deg,var(--bg2),#071412,var(--bg2));
-    border-top:2px solid var(--accent); text-align:center;
-    padding:14px; font-size:10px; color:var(--muted); letter-spacing:1px;
-  }}
-  footer strong {{ color:var(--accent2); }}
+/* Group separator */
+.gsep {{ border-left: 2px solid var(--border2) !important; }}
 
-  /* ── MOBILE ── */
-  @media(max-width:900px) {{
-    .kpi-inner {{ grid-template-columns:repeat(3,1fr); }}
-    .hm:nth-child(n+4) {{ display:none; }}
-    .idx-strip {{ display:none; }}
-  }}
-  @media(max-width:600px) {{
-    .kpi-inner {{ grid-template-columns:repeat(2,1fr); }}
-    .brand-t {{ font-size:12px; }}
-    .hm:nth-child(n+3) {{ display:none; }}
-    .main {{ padding:8px; }}
-    .h-top {{ padding:10px 10px; }}
-    th {{ font-size:7px; padding:6px 7px; letter-spacing:0.5px; }}
-    td {{ padding:7px 7px; }}
-    .sn {{ font-size:12px; }}
-    .kn {{ font-size:18px; }}
-    .kl {{ font-size:7px; }}
-    .live-clock-wrap {{ display:none; }}
-  }}
+/* DATA ROWS */
+td {{
+  padding: 10px 10px; border-bottom: 1px solid var(--border);
+  vertical-align: middle; white-space: nowrap;
+}}
+tr:last-child td {{ border-bottom: none; }}
+tr:nth-child(even) td {{ background: rgba(255,255,255,0.015); }}
+tr:hover td {{ background: rgba(0,212,255,0.04); transition: background 0.15s; }}
+
+/* ── CELL STYLES ── */
+.stock-name {{ font-size: 13px; font-weight: 600; color: var(--text2); }}
+.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--accent); font-weight: 600; letter-spacing: 1px; margin-top: 2px; }}
+.stock-sec  {{ font-size: 8px; color: var(--muted2); margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }}
+.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--gold); }}
+
+/* Rating badge */
+.badge {{
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; padding: 4px 9px;
+  border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;
+}}
+.badge-sb {{ background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }}
+.badge-b  {{ background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }}
+.badge-h  {{ background: rgba(74,96,128,0.25); color: #8aa0c0; border: 1px solid rgba(74,96,128,0.3); }}
+.badge-s  {{ background: rgba(255,61,87,0.15);  color: #ff3d57; border: 1px solid rgba(255,61,87,0.3); }}
+.badge-ss {{ background: rgba(255,61,87,0.22);  color: #ff6b7a; border: 1px solid rgba(255,61,87,0.4); }}
+
+/* Score */
+.score-wrap {{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 6px; }}
+.score-num  {{ font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; }}
+.score-track {{ width: 44px; height: 3px; background: var(--border2); border-radius: 2px; }}
+.score-fill  {{ height: 100%; border-radius: 2px; transition: width 0.5s ease; }}
+
+/* Target / Stop */
+.target-badge {{
+  font-size: 7px; font-weight: 700; padding: 2px 6px;
+  border-radius: 4px; letter-spacing: 0.5px;
+  display: block; margin-bottom: 3px;
+}}
+.tb-real    {{ background: rgba(0,230,118,0.12); color: #00e676; }}
+.tb-partial {{ background: rgba(255,171,0,0.12);  color: #ffab00; }}
+.tb-ath     {{ background: rgba(0,212,255,0.12);  color: #00d4ff; }}
+.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text2); }}
+.t2-val {{ font-size: 9px; color: var(--muted2); margin-top: 2px; }}
+.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--red); }}
+.sl-pct {{ font-size: 9px; color: var(--muted2); margin-top: 2px; }}
+.sl-type {{ font-size: 7px; font-weight: 700; padding: 2px 5px; border-radius: 4px; margin-top: 3px; display: inline-block; }}
+.slt-atr  {{ background: rgba(0,230,118,0.10); color: #00e676; }}
+.slt-beta {{ background: rgba(255,171,0,0.10);  color: #ffab00; }}
+
+.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; }}
+.upside-val.up {{ color: var(--green); }}
+.upside-val.dn {{ color: var(--red); }}
+.rr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--teal); }}
+.atr-sub {{ font-size: 8px; color: var(--muted2); margin-top: 1px; }}
+
+/* Technicals */
+.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
+.rsi-sig {{ font-size: 8px; color: var(--muted2); margin-top: 1px; }}
+.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
+.adx-lbl {{ font-size: 8px; color: var(--muted2); margin-top: 1px; }}
+.adx-strong {{ color: var(--green); }}
+.adx-mod    {{ color: var(--gold); }}
+.adx-weak   {{ color: var(--muted2); }}
+.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
+.vol-lbl {{ font-size: 8px; color: var(--muted2); margin-top: 1px; }}
+.vol-high {{ color: var(--green); }}
+.vol-norm {{ color: var(--text); }}
+.vol-low  {{ color: var(--muted2); }}
+.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }}
+.sdist-close {{ color: var(--green); }}
+.sdist-mid   {{ color: var(--gold); }}
+.sdist-far   {{ color: var(--red); }}
+
+/* Fundamentals */
+.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }}
+
+/* Badges */
+.qbadge {{ font-size: 8px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }}
+.qb-ex {{ background: rgba(0,230,118,0.12); color: #00e676; }}
+.qb-gd {{ background: rgba(0,188,212,0.12); color: #00bcd4; }}
+.qb-av {{ background: rgba(255,171,0,0.12);  color: #ffab00; }}
+.qb-po {{ background: rgba(255,61,87,0.12);  color: #ff3d57; }}
+
+.analyst-badge {{ font-size: 8px; font-weight: 700; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }}
+.ab-sb {{ background: rgba(0,230,118,0.12); color: #00e676; }}
+.ab-b  {{ background: rgba(0,212,255,0.12); color: #00d4ff; }}
+.ab-h  {{ background: rgba(74,96,128,0.20); color: #8aa0c0; }}
+.ab-s  {{ background: rgba(255,61,87,0.12); color: #ff3d57; }}
+
+.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--teal); }}
+.rnum {{ font-size: 10px; color: var(--muted); font-weight: 500; }}
+.macd-bull {{ color: var(--green); font-weight: 600; font-size: 11px; }}
+.macd-bear {{ color: var(--red);   font-weight: 600; font-size: 11px; }}
+
+/* DISCLAIMER */
+.disc {{
+  background: var(--surface); border: 1px solid var(--border2);
+  border-left: 3px solid var(--red);
+  padding: 12px 16px; border-radius: 8px;
+  font-size: 10px; color: var(--muted2); line-height: 1.8;
+  margin: 16px 0;
+}}
+
+/* FOOTER */
+footer {{
+  text-align: center; padding: 16px;
+  background: var(--surface); border-top: 1px solid var(--border2);
+  font-size: 10px; color: var(--muted2); letter-spacing: 1px;
+}}
+footer strong {{ color: var(--accent); }}
+
+/* MOBILE */
+@media(max-width: 900px) {{
+  .idx-strip {{ display: none; }}
+  .kpi-item  {{ padding: 10px 12px; }}
+  .kpi-num   {{ font-size: 24px; }}
+}}
+@media(max-width: 600px) {{
+  .h-top  {{ padding: 8px 12px; }}
+  .main   {{ padding: 10px; }}
+  .kpi-band {{ flex-wrap: wrap; }}
+  .kpi-item {{ flex: 0 0 50%; border-bottom: 1px solid var(--border); }}
+}}
 </style>
 </head>
 <body>
@@ -885,27 +1001,24 @@ class Nifty100CompleteAnalyzer:
 <header>
   <div class="h-top">
     <div class="brand">
-      <div class="brand-icon">💎</div>
+      <div class="brand-gem">💎</div>
       <div>
-        <div class="brand-t">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-s">12M S/R · ATR Stops · Tech &amp; Fundamental v2</div>
+        <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
+        <div class="brand-sub">12M S/R · ATR Stops · Tech &amp; Fundamental v3</div>
       </div>
     </div>
 
-    <!-- ── INDEX STRIP ── -->
     <div class="idx-strip">
       <div class="idx-item">
         <span class="idx-name">SENSEX</span>
         <span class="idx-price">{idx_data['SENSEX']['price']}</span>
         <span class="idx-chg {idx_data['SENSEX']['cls']}">{idx_data['SENSEX']['chg']}</span>
       </div>
-      <div class="idx-sep"></div>
       <div class="idx-item">
-        <span class="idx-name">NIFTY</span>
+        <span class="idx-name">NIFTY 50</span>
         <span class="idx-price">{idx_data['NIFTY 50']['price']}</span>
         <span class="idx-chg {idx_data['NIFTY 50']['cls']}">{idx_data['NIFTY 50']['chg']}</span>
       </div>
-      <div class="idx-sep"></div>
       <div class="idx-item">
         <span class="idx-name">BANK NIFTY</span>
         <span class="idx-price">{idx_data['BANK NIFTY']['price']}</span>
@@ -913,247 +1026,321 @@ class Nifty100CompleteAnalyzer:
       </div>
     </div>
 
-    <div class="h-meta">
-      <div class="hm"><div class="hm-l">Date</div><div class="hm-v" style="color:var(--gold)">{now.strftime('%d %b %Y')}</div></div>
-      <div class="live-clock-wrap">
-        <div class="lc-label">TIME</div>
-        <div class="lc-time" id="liveClock">--:-- --</div>
-        <div class="lc-date" id="liveDate">{now.strftime('%d %b %Y')}</div>
-        <div class="lc-last">Report: {now.strftime('%d %b %Y %I:%M %p')} IST</div>
-      </div>
-      <div class="hm"><div class="hm-l">Session</div><div class="hm-v" style="color:var(--green)">▲ {time_of_day.upper()}</div></div>
-      <div class="hm"><div class="hm-l">Next Update</div><div class="hm-v" style="color:var(--accent2)">{next_update}</div></div>
+    <div class="clock-box">
+      <div class="clock-time" id="liveClock">--:-- --</div>
+      <div class="clock-meta" id="liveDate">{now.strftime('%d %b %Y')} · IST</div>
+      <div class="clock-next">Report: {now.strftime('%d %b %Y %I:%M %p')} IST</div>
+      <div class="clock-next">Next Update: <strong style="color:var(--accent2)">{next_update}</strong></div>
     </div>
   </div>
 
-  <!-- TICKER TAPE -->
-  <div class="ticker"><div class="ticker-inner">
-"""
-        for t in self.results[:8]:
-            pct  = ((t['Price'] - t['SMA_20']) / t['SMA_20']) * 100
-            cls  = "ti-u" if pct >= 0 else "ti-d"
-            sign = "+" if pct >= 0 else ""
-            html += (f'<div class="ti">'
-                     f'<span class="ti-s">{t["Symbol"]}</span>'
-                     f'<span class="ti-p">₹{t["Price"]:,.2f}</span>'
-                     f'<span class="{cls}">{sign}{pct:.1f}%</span>'
-                     f'</div>')
-
-        html += f"""  </div></div>
+  <div class="ticker">
+    <div class="ticker-inner">{ticker_html}</div>
+  </div>
 </header>
 
 <!-- KPI BAND -->
 <div class="kpi-band">
-  <div class="kpi-inner">
-    <div class="kc"><div class="kn" style="color:var(--accent2)">{len(self.results)}</div><div class="kl">Analyzed</div><div class="kbar" style="background:var(--accent)"></div></div>
-    <div class="kc"><div class="kn" style="color:var(--green)">{strong_buy_count}</div><div class="kl">Strong Buy</div><div class="kbar" style="background:var(--green)"></div></div>
-    <div class="kc"><div class="kn" style="color:var(--teal)">{buy_count}</div><div class="kl">Buy</div><div class="kbar" style="background:var(--teal)"></div></div>
-    <div class="kc"><div class="kn" style="color:var(--red)">{sell_count + strong_sell_count}</div><div class="kl">Sell</div><div class="kbar" style="background:var(--red)"></div></div>
-    <div class="kc"><div class="kn" style="color:var(--blue)">{hold_count}</div><div class="kl">Hold</div><div class="kbar" style="background:var(--blue)"></div></div>
-  </div>
+  <div class="kpi-item"><div class="kpi-num" style="color:var(--accent)">{len(self.results)}</div><div class="kpi-label">Analyzed</div><div class="kpi-bar" style="background:var(--accent)"></div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:var(--green)">{strong_buy_count}</div><div class="kpi-label">Strong Buy</div><div class="kpi-bar" style="background:var(--green)"></div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:var(--teal)">{buy_count}</div><div class="kpi-label">Buy</div><div class="kpi-bar" style="background:var(--teal)"></div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:var(--red)">{sell_count + strong_sell_count}</div><div class="kpi-label">Sell / Strong Sell</div><div class="kpi-bar" style="background:var(--red)"></div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:#60a5fa">{hold_count}</div><div class="kpi-label">Hold</div><div class="kpi-bar" style="background:#60a5fa"></div></div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 """
 
-        # ── helpers ──────────────────────────────────────────────────────────
+        # ── helper functions ──────────────────────────────────────────────────
+        def rating_badge(rec, rating_text):
+            cls_map = {
+                'STRONG BUY':  'badge-sb',
+                'BUY':         'badge-b',
+                'HOLD':        'badge-h',
+                'SELL':        'badge-s',
+                'STRONG SELL': 'badge-ss',
+            }
+            cls = cls_map.get(rec, 'badge-h')
+            return f'<span class="badge {cls}">{rating_text}</span>'
+
+        def score_cell(val, color, bar_color):
+            pct = min(int(val), 100)
+            return (f'<div class="score-wrap">'
+                    f'<div class="score-num" style="color:{color}">{val:.0f}</div>'
+                    f'<div class="score-track">'
+                    f'<div class="score-fill" style="width:{pct}%;background:{bar_color}"></div>'
+                    f'</div></div>')
+
+        def target_badge_html(ts):
+            if 'ATH' in ts:       return 'tb-ath',     '🚀 ATH Zone'
+            elif 'Partial' in ts: return 'tb-partial',  '⚡ Partial S/R'
+            else:                  return 'tb-real',    '📍 Real S/R'
+
+        def adx_cell(v):
+            if v >= 30:   cls, lbl = 'adx-strong', 'Strong'
+            elif v >= 20: cls, lbl = 'adx-mod',    'Moderate'
+            else:         cls, lbl = 'adx-weak',   'Weak'
+            return (f'<div class="adx-val {cls}">{v:.0f}</div>'
+                    f'<div class="adx-lbl">{lbl}</div>')
+
+        def vol_cell(v):
+            cls = 'vol-high' if v >= 1.5 else ('vol-low' if v < 0.7 else 'vol-norm')
+            lbl = 'High Vol' if v >= 1.5 else ('Low Vol' if v < 0.7 else 'Avg Vol')
+            return (f'<div class="vol-val {cls}">{v:.1f}×</div>'
+                    f'<div class="vol-lbl">{lbl}</div>')
+
+        def sdist_cell(v):
+            cls = 'sdist-close' if v <= 3 else ('sdist-mid' if v <= 8 else 'sdist-far')
+            return f'<span class="sdist-val {cls}">{v:.1f}%</span>'
+
         def analyst_badge(label):
             m = {'Strong Buy': 'ab-sb', 'Buy': 'ab-b',
                  'Hold': 'ab-h', 'Sell': 'ab-s', 'Strong Sell': 'ab-s'}
-            return f'<span class="ab {m.get(label, "ab-h")}">{label}</span>'
+            return f'<span class="analyst-badge {m.get(label, "ab-h")}">{label}</span>'
 
-        def adx_cell(v):
-            if v >= 30:   cls, lbl = "adx-strong", "Strong"
-            elif v >= 20: cls, lbl = "adx-mid",    "Moderate"
-            else:         cls, lbl = "adx-weak",   "Weak"
-            return f'<div class="rv {cls}">{v:.0f}</div><div class="rsb">{lbl}</div>'
+        def quality_badge(q):
+            m = {'Excellent': 'qb-ex', 'Good': 'qb-gd', 'Average': 'qb-av', 'Poor': 'qb-po'}
+            return f'<span class="qbadge {m.get(q, "qb-av")}">{q}</span>'
 
-        def vol_cell(v):
-            cls = "vol-high" if v >= 1.5 else ("vol-low" if v < 0.7 else "vol-norm")
-            lbl = "High Vol" if v >= 1.5 else ("Low Vol" if v < 0.7 else "Avg Vol")
-            return f'<div class="rv {cls}">{v:.1f}×</div><div class="rsb">{lbl}</div>'
+        def rr_color(v):
+            return '#00e676' if v >= 2 else ('#00d4ff' if v >= 1 else '#ff3d57')
 
-        def sdist_cell(v):
-            cls = "sdist-close" if v <= 3 else ("sdist-mid" if v <= 8 else "sdist-far")
-            return f'<span class="{cls}">{v:.1f}%</span>'
+        def pe_color(v, direction='buy'):
+            if v <= 0: return '#4a6080'
+            if direction == 'buy':
+                return '#00e676' if v < 25 else ('#ffab00' if v < 40 else '#ff3d57')
+            else:
+                return '#ff3d57' if v > 40 else ('#ffab00' if v > 25 else '#00e676')
 
-        def target_badge(ts, th):
-            if 'ATH' in ts:      return 'ts-ath',     '🚀 ATH Zone'
-            elif 'Partial' in ts: return 'ts-partial', '⚡ Partial S/R'
-            else:                 return 'ts-real',    '📍 Real S/R'
+        def w52_color(pct):
+            return '#ff3d57' if pct >= -5 else ('#ffab00' if pct >= -20 else '#00e676')
+
+        def beta_color(v):
+            return '#ff3d57' if v > 1.5 else ('#ffab00' if v > 1.0 else '#00e676')
 
         # ── BUY TABLE ─────────────────────────────────────────────────────────
         if not top_buys.empty:
-            html += """  <div class="sh">
-    <div class="sh-icon shi-buy">▲</div>
-    <span class="sh-title">Top 20 Buy Recommendations</span>
-    <div class="sh-divider"></div>
-    <span class="sh-count">12M S/R · ATR Stop · Sector · Vol · ADX · Earnings</span>
+            html += """
+  <div class="section-hdr">
+    <div class="section-pill pill-buy">▲ Top 20 Buy Recommendations</div>
+    <div class="section-line"></div>
+    <div class="section-note">STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META</div>
   </div>
   <div class="tbl-wrap"><table>
-    <thead><tr>
-      <th>#</th><th>Stock / Sector</th><th>Price</th><th>Rating</th>
-      <th>Score</th><th>Upside</th><th>Target (S/R)</th><th>Stop Loss</th>
-      <th>ATR</th><th>Sup Dist</th><th>RSI</th><th>ADX</th><th>Vol/Avg</th>
-      <th>R:R</th><th>52W Hi%</th><th>Beta</th><th>P/E</th><th>Div%</th>
-      <th>Analyst</th><th>Earnings</th><th>Quality</th>
-    </tr></thead><tbody>
+    <thead>
+      <tr class="grp-row">
+        <th class="grp-stock" colspan="3">STOCK INFO</th>
+        <th class="grp-trade gsep" colspan="6">TRADE SETUP</th>
+        <th class="grp-tech gsep"  colspan="5">TECHNICALS</th>
+        <th class="grp-fund gsep"  colspan="4">FUNDAMENTALS</th>
+        <th class="grp-meta gsep"  colspan="3">META</th>
+      </tr>
+      <tr class="col-row">
+        <th class="ch-stock" style="width:26px">#</th>
+        <th class="ch-stock">Stock / Sector</th>
+        <th class="ch-stock">Price</th>
+        <th class="ch-trade gsep">Rating / Score</th>
+        <th class="ch-trade">Upside</th>
+        <th class="ch-trade">Target (S/R)</th>
+        <th class="ch-trade">Stop Loss</th>
+        <th class="ch-trade">ATR</th>
+        <th class="ch-trade">R : R</th>
+        <th class="ch-tech gsep">RSI</th>
+        <th class="ch-tech">ADX</th>
+        <th class="ch-tech">Vol / Avg</th>
+        <th class="ch-tech">Sup Dist</th>
+        <th class="ch-tech">52W Hi %</th>
+        <th class="ch-fund gsep">P/E</th>
+        <th class="ch-fund">Beta</th>
+        <th class="ch-fund">Div %</th>
+        <th class="ch-fund">Quality</th>
+        <th class="ch-meta gsep">Analyst</th>
+        <th class="ch-meta">Earnings</th>
+        <th class="ch-meta">Action</th>
+      </tr>
+    </thead>
+    <tbody>
 """
             for i, (_, row) in enumerate(top_buys.iterrows(), 1):
-                rtag  = "rt-sb" if row['Recommendation'] == "STRONG BUY" else "rt-b"
-                sc_c  = "#4ade80" if row['Combined_Score'] >= 75 else ("#4dd0c4" if row['Combined_Score'] >= 55 else "#fbbf24")
-                sc_b  = "#22c55e" if row['Combined_Score'] >= 75 else ("#14b8a6" if row['Combined_Score'] >= 55 else "#f59e0b")
-                upcls = "up" if row['Upside'] >= 0 else "dn"
-                rsic  = "#f87171" if row['RSI'] > 70 else ("#4ade80" if row['RSI'] < 30 else "#60a5fa")
-                w52   = ((row['Price'] - row['52W_High']) / row['52W_High']) * 100
-                w52c  = "#f87171" if w52 >= -5 else ("#d4a85a" if w52 >= -20 else "#4ade80")
-                betac = "#f87171" if row['Beta'] > 1.5 else ("#fbbf24" if row['Beta'] > 1.0 else "#4ade80")
-                rr    = row['Risk_Reward']
-                rrc   = "#4ade80" if rr >= 2 else ("#4dd0c4" if rr >= 1 else "#f87171")
-                pe    = f"{row['PE_Ratio']:.1f}" if row['PE_Ratio'] > 0 else "N/A"
-                pec   = "#4a7a78" if row['PE_Ratio'] <= 0 else ("#4ade80" if row['PE_Ratio'] < 25 else ("#fbbf24" if row['PE_Ratio'] < 40 else "#f87171"))
-                div   = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else "—"
-                divc  = "#4ade80" if row['Dividend_Yield'] > 0 else "#4a7a78"
-                qcls  = {"Excellent": "qb-ex", "Good": "qb-gd", "Average": "qb-av", "Poor": "qb-po"}.get(row['Quality'], "qb-av")
-                tbcls, tbtxt = target_badge(row.get('Target_Status', ''), row.get('Targets_Hit', 0))
-                st    = row.get('Stop_Type', 'ATR Stop')
-                scls  = "sb-atr" if st == "ATR Stop" else "sb-beta"
-                slbl  = f"{'📐' if st == 'ATR Stop' else '🔒'} {st}"
-                sec   = row.get('Sector', 'N/A')
-                ed    = row.get('Earnings_Date', 'N/A')
+                rec      = row['Recommendation']
+                sc_color = '#00e676' if row['Combined_Score'] >= 75 else ('#00d4ff' if row['Combined_Score'] >= 55 else '#ffab00')
+                sc_bar   = '#00c853' if row['Combined_Score'] >= 75 else ('#0099cc' if row['Combined_Score'] >= 55 else '#f59e0b')
+                upcls    = 'up' if row['Upside'] >= 0 else 'dn'
+                rsic     = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#60a5fa')
+                w52      = ((row['Price'] - row['52W_High']) / row['52W_High']) * 100
+                tbcls, tbtxt = target_badge_html(row.get('Target_Status', ''))
+                st       = row.get('Stop_Type', 'ATR Stop')
+                scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
+                slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
+                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '—'
+                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
+                rr       = row['Risk_Reward']
+
                 html += f"""      <tr>
-        <td style="color:#4a7a78;font-size:11px">{i}</td>
+        <td><span class="rnum">{i}</span></td>
         <td>
-          <div class="sn">{row['Name']}</div>
-          <div class="ss">{row['Symbol']}</div>
-          <div class="sec">{sec}</div>
+          <div class="stock-name">{row['Name']}</div>
+          <div class="stock-sym">{row['Symbol']}</div>
+          <div class="stock-sec">{row.get('Sector','N/A')}</div>
         </td>
-        <td><div class="pv">₹{row['Price']:,.2f}</div></td>
-        <td><span class="rt {rtag}">{row['Rating']}</span></td>
-        <td>
-          <div class="scn" style="color:{sc_c}">{row['Combined_Score']:.0f}</div>
-          <div class="scb" style="background:{sc_b}"></div>
+        <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
+        <td class="gsep">
+          {rating_badge(rec, row['Rating'])}
+          {score_cell(row['Combined_Score'], sc_color, sc_bar)}
         </td>
-        <td class="{upcls}">{row['Upside']:+.1f}%</td>
+        <td><span class="upside-val {upcls}">{row['Upside']:+.1f}%</span></td>
         <td>
-          <span class="ts {tbcls}">{tbtxt}</span>
-          <div class="t1">₹{row['Target_1']:,.2f}</div>
-          <div class="t2">T2: ₹{row['Target_2']:,.2f}</div>
-        </td>
-        <td>
-          <div class="sl1">₹{row['Stop_Loss']:,.2f}</div>
-          <div class="sl2">-{row['SL_Percentage']:.1f}%</div>
-          <span class="sb {scls}">{slbl}</span>
+          <span class="target-badge {tbcls}">{tbtxt}</span>
+          <div class="t1-val">₹{row['Target_1']:,.2f}</div>
+          <div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div>
         </td>
         <td>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹{row['ATR']:,.2f}</div>
-          <div style="font-size:8px;color:var(--muted)">{row['ATR_Pct']:.1f}% · {row['ATR_Multiplier']}×</div>
+          <div class="sl-val">₹{row['Stop_Loss']:,.2f}</div>
+          <div class="sl-pct">-{row['SL_Percentage']:.1f}%</div>
+          <span class="sl-type {scls}">{slbl}</span>
         </td>
-        <td>{sdist_cell(row.get('Support_Dist_Pct', 0))}</td>
         <td>
-          <div class="rv" style="color:{rsic}">{row['RSI']:.0f}</div>
-          <div class="rsb">{row['RSI_Signal']}</div>
+          <div class="atr-val">₹{row['ATR']:,.2f}</div>
+          <div class="atr-sub">{row['ATR_Pct']:.1f}% · {row['ATR_Multiplier']}×</div>
+        </td>
+        <td><span class="rr-val" style="color:{rr_color(rr)}">{rr:.1f}×</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div>
+          <div class="rsi-sig">{row['RSI_Signal']}</div>
         </td>
         <td>{adx_cell(row.get('ADX', 0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td class="rrv" style="color:{rrc}">{rr:.1f}×</td>
-        <td style="color:{w52c};font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600">{w52:+.1f}%</td>
-        <td style="color:{betac};font-size:11px">{row['Beta']:.2f}</td>
-        <td style="color:{pec};font-size:11px">{pe}</td>
-        <td style="color:{divc};font-size:11px">{div}</td>
-        <td>{analyst_badge(row.get('Analyst', 'N/A'))}</td>
-        <td><div class="earn">{ed}</div></td>
-        <td><span class="qb {qcls}">{row['Quality']}</span></td>
+        <td class="gsep">{sdist_cell(row.get('Support_Dist_Pct', 0))}</td>
+        <td><span class="mono-sm" style="color:{w52_color(w52)}">{w52:+.1f}%</span></td>
+        <td class="gsep"><span class="mono-sm" style="color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
+        <td><span class="mono-sm" style="color:{beta_color(row['Beta'])}">{row['Beta']:.2f}</span></td>
+        <td><span class="mono-sm" style="color:{divc}">{div}</span></td>
+        <td>{quality_badge(row['Quality'])}</td>
+        <td class="gsep">{analyst_badge(row.get('Analyst','N/A'))}</td>
+        <td><div class="earn-date">{row.get('Earnings_Date','N/A')}</div></td>
+        <td>{rating_badge(rec, 'BUY' if rec=='BUY' else 'STRONG BUY')}</td>
       </tr>
 """
             html += "    </tbody></table></div>\n"
 
         # ── SELL TABLE ────────────────────────────────────────────────────────
         if not top_sells.empty:
-            html += """  <div class="sh">
-    <div class="sh-icon shi-sell">▼</div>
-    <span class="sh-title">Top 20 Sell Recommendations</span>
-    <div class="sh-divider"></div>
-    <span class="sh-count">12M S/R · ATR Stop · Sector · Vol · ADX · Earnings</span>
+            html += """
+  <div class="section-hdr">
+    <div class="section-pill pill-sell">▼ Top 20 Sell Recommendations</div>
+    <div class="section-line"></div>
+    <div class="section-note">STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META</div>
   </div>
   <div class="tbl-wrap"><table>
-    <thead><tr>
-      <th>#</th><th>Stock / Sector</th><th>Price</th><th>Rating</th>
-      <th>Score</th><th>RSI</th><th>MACD</th><th>ADX</th>
-      <th>Downside</th><th>Target (S/R)</th><th>Stop Loss</th>
-      <th>ATR</th><th>Vol/Avg</th><th>R:R</th>
-      <th>Beta</th><th>P/E</th><th>Analyst</th><th>Earnings</th><th>Quality</th>
-    </tr></thead><tbody>
+    <thead>
+      <tr class="grp-row">
+        <th class="grp-stock" colspan="3">STOCK INFO</th>
+        <th class="grp-trade gsep" colspan="6">TRADE SETUP</th>
+        <th class="grp-tech gsep"  colspan="5">TECHNICALS</th>
+        <th class="grp-fund gsep"  colspan="4">FUNDAMENTALS</th>
+        <th class="grp-meta gsep"  colspan="3">META</th>
+      </tr>
+      <tr class="col-row">
+        <th class="ch-stock" style="width:26px">#</th>
+        <th class="ch-stock">Stock / Sector</th>
+        <th class="ch-stock">Price</th>
+        <th class="ch-trade gsep">Rating / Score</th>
+        <th class="ch-trade">Downside</th>
+        <th class="ch-trade">Target (S/R)</th>
+        <th class="ch-trade">Stop Loss</th>
+        <th class="ch-trade">ATR</th>
+        <th class="ch-trade">R : R</th>
+        <th class="ch-tech gsep">RSI</th>
+        <th class="ch-tech">MACD</th>
+        <th class="ch-tech">ADX</th>
+        <th class="ch-tech">Vol / Avg</th>
+        <th class="ch-tech">52W Hi %</th>
+        <th class="ch-fund gsep">P/E</th>
+        <th class="ch-fund">Beta</th>
+        <th class="ch-fund">Div %</th>
+        <th class="ch-fund">Quality</th>
+        <th class="ch-meta gsep">Analyst</th>
+        <th class="ch-meta">Earnings</th>
+        <th class="ch-meta">Action</th>
+      </tr>
+    </thead>
+    <tbody>
 """
             for i, (_, row) in enumerate(top_sells.iterrows(), 1):
-                rtag  = "rt-ss" if row['Recommendation'] == "STRONG SELL" else "rt-s"
-                rsic  = "#f87171" if row['RSI'] > 70 else ("#4ade80" if row['RSI'] < 30 else "#fbbf24")
-                mcdcl = "#f87171" if row['MACD'] == "Bearish" else "#4ade80"
-                dncls = "dn" if row['Upside'] >= 0 else "up"
-                rr    = row['Risk_Reward']
-                rrc   = "#4ade80" if rr >= 2 else ("#fbbf24" if rr >= 1 else "#f87171")
-                betac = "#f87171" if row['Beta'] > 1.5 else ("#fbbf24" if row['Beta'] > 1.0 else "#4ade80")
-                pe    = f"{row['PE_Ratio']:.1f}" if row['PE_Ratio'] > 0 else "N/A"
-                pec   = "#4a7a78" if row['PE_Ratio'] <= 0 else ("#f87171" if row['PE_Ratio'] > 40 else ("#fbbf24" if row['PE_Ratio'] > 25 else "#4ade80"))
-                qcls  = {"Excellent": "qb-ex", "Good": "qb-gd", "Average": "qb-av", "Poor": "qb-po"}.get(row['Quality'], "qb-av")
-                tbcls, tbtxt = target_badge(row.get('Target_Status', ''), 0)
-                st    = row.get('Stop_Type', 'ATR Stop')
-                scls  = "sb-atr" if st == "ATR Stop" else "sb-beta"
-                slbl  = f"{'📐' if st == 'ATR Stop' else '🔒'} {st}"
-                sec   = row.get('Sector', 'N/A')
-                ed    = row.get('Earnings_Date', 'N/A')
+                rec      = row['Recommendation']
+                dncls    = 'dn' if row['Upside'] >= 0 else 'up'
+                rsic     = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#ffab00')
+                mcdcls   = 'macd-bear' if row['MACD'] == 'Bearish' else 'macd-bull'
+                w52      = ((row['Price'] - row['52W_High']) / row['52W_High']) * 100
+                tbcls, tbtxt = target_badge_html(row.get('Target_Status', ''))
+                st       = row.get('Stop_Type', 'ATR Stop')
+                scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
+                slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
+                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '—'
+                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
+                rr       = row['Risk_Reward']
+
                 html += f"""      <tr>
-        <td style="color:#4a7a78;font-size:11px">{i}</td>
+        <td><span class="rnum">{i}</span></td>
         <td>
-          <div class="sn">{row['Name']}</div>
-          <div class="ss">{row['Symbol']}</div>
-          <div class="sec">{sec}</div>
+          <div class="stock-name">{row['Name']}</div>
+          <div class="stock-sym">{row['Symbol']}</div>
+          <div class="stock-sec">{row.get('Sector','N/A')}</div>
         </td>
-        <td><div class="pv">₹{row['Price']:,.2f}</div></td>
-        <td><span class="rt {rtag}">{row['Rating']}</span></td>
-        <td><div class="scn" style="color:#f87171">{row['Combined_Score']:.0f}</div><div class="scb" style="background:#ef4444"></div></td>
-        <td><div class="rv" style="color:{rsic}">{row['RSI']:.0f}</div><div class="rsb">{row['RSI_Signal']}</div></td>
-        <td style="color:{mcdcl};font-weight:600;font-size:11px">{row['MACD']}</td>
+        <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
+        <td class="gsep">
+          {rating_badge(rec, row['Rating'])}
+          {score_cell(row['Combined_Score'], '#ff3d57', '#c62828')}
+        </td>
+        <td><span class="upside-val {dncls}">{row['Upside']:+.1f}%</span></td>
+        <td>
+          <span class="target-badge {tbcls}">{tbtxt}</span>
+          <div class="t1-val">₹{row['Target_1']:,.2f}</div>
+          <div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div>
+        </td>
+        <td>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div>
+          <div class="sl-pct">+{row['SL_Percentage']:.1f}%</div>
+          <span class="sl-type {scls}">{slbl}</span>
+        </td>
+        <td>
+          <div class="atr-val">₹{row['ATR']:,.2f}</div>
+          <div class="atr-sub">{row['ATR_Pct']:.1f}% · {row['ATR_Multiplier']}×</div>
+        </td>
+        <td><span class="rr-val" style="color:{rr_color(rr)}">{rr:.1f}×</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div>
+          <div class="rsi-sig">{row['RSI_Signal']}</div>
+        </td>
+        <td><span class="{mcdcls}">{row['MACD']}</span></td>
         <td>{adx_cell(row.get('ADX', 0))}</td>
-        <td class="{dncls}">{row['Upside']:+.1f}%</td>
-        <td>
-          <span class="ts {tbcls}">{tbtxt}</span>
-          <div class="t1">₹{row['Target_1']:,.2f}</div>
-          <div class="t2">T2: ₹{row['Target_2']:,.2f}</div>
-        </td>
-        <td>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#fbbf24">₹{row['Stop_Loss']:,.2f}</div>
-          <div class="sl2">+{row['SL_Percentage']:.1f}%</div>
-          <span class="sb {scls}">{slbl}</span>
-        </td>
-        <td>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--teal)">₹{row['ATR']:,.2f}</div>
-          <div style="font-size:8px;color:var(--muted)">{row['ATR_Pct']:.1f}% · {row['ATR_Multiplier']}×</div>
-        </td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td class="rrv" style="color:{rrc}">{rr:.1f}×</td>
-        <td style="color:{betac};font-size:11px">{row['Beta']:.2f}</td>
-        <td style="color:{pec};font-size:11px">{pe}</td>
-        <td>{analyst_badge(row.get('Analyst', 'N/A'))}</td>
-        <td><div class="earn">{ed}</div></td>
-        <td><span class="qb {qcls}">{row['Quality']}</span></td>
+        <td><span class="mono-sm" style="color:{w52_color(w52)}">{w52:+.1f}%</span></td>
+        <td class="gsep"><span class="mono-sm" style="color:{pe_color(row['PE_Ratio'],'sell')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
+        <td><span class="mono-sm" style="color:{beta_color(row['Beta'])}">{row['Beta']:.2f}</span></td>
+        <td><span class="mono-sm" style="color:{divc}">{div}</span></td>
+        <td>{quality_badge(row['Quality'])}</td>
+        <td class="gsep">{analyst_badge(row.get('Analyst','N/A'))}</td>
+        <td><div class="earn-date">{row.get('Earnings_Date','N/A')}</div></td>
+        <td>{rating_badge(rec, 'SELL' if rec=='SELL' else 'STRONG SELL')}</td>
       </tr>
 """
             html += "    </tbody></table></div>\n"
 
-        html += f"""  <div class="disc">
-    <strong>⚠ DISCLAIMER:</strong> For <strong>EDUCATIONAL PURPOSES ONLY</strong>. Not financial advice.
-    Stop losses are ATR-based near real 12-month S/R zones. Targets derived from swing highs/lows,
-    52-week extremes and round-number levels. Earnings dates are estimates.
+        html += f"""
+  <div class="disc">
+    <strong style="color:var(--red)">⚠ DISCLAIMER:</strong>
+    For <strong>EDUCATIONAL PURPOSES ONLY</strong>. Not financial advice.
+    Stop losses are ATR-based near real 12-month S/R zones. Targets derived from
+    swing highs/lows, 52-week extremes and round-number levels. Earnings dates are estimates.
     Always conduct your own research, consult a SEBI-registered financial advisor,
     and never invest more than you can afford to lose.
   </div>
 </div>
 
 <footer>
-  <strong>NIFTY 100 Market Influencers: NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · Sector · ADX · Vol · Earnings v2
+  <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
+  · 12M S/R · ATR Stops · Grouped Columns · ADX · Vol · Earnings v3
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -1161,19 +1348,19 @@ class Nifty100CompleteAnalyzer:
 function updateClock() {{
   var now  = new Date();
   var ist  = new Date(now.toLocaleString('en-US', {{timeZone: 'Asia/Kolkata'}}));
-  var h    = ist.getHours(), m = ist.getMinutes();
+  var h = ist.getHours(), m = ist.getMinutes(), s = ist.getSeconds();
   var ampm = h >= 12 ? 'PM' : 'AM';
   h = h % 12 || 12;
-  var pad = function(n) {{ return String(n).padStart(2, '0'); }};
-  document.getElementById('liveClock').textContent = pad(h) + ':' + pad(m) + ' ' + ampm + ' IST';
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var p = function(n) {{ return String(n).padStart(2,'0'); }};
+  document.getElementById('liveClock').textContent =
+    p(h) + ':' + p(m) + ':' + p(s) + ' ' + ampm + ' IST';
+  var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('liveDate').textContent =
-    pad(ist.getDate()) + ' ' + months[ist.getMonth()] + ' ' + ist.getFullYear();
+    p(ist.getDate()) + ' ' + mo[ist.getMonth()] + ' ' + ist.getFullYear() + ' · IST';
 }}
 updateClock();
 setInterval(updateClock, 1000);
 </script>
-
 </body></html>"""
         return html
 
@@ -1194,36 +1381,43 @@ setInterval(updateClock, 1000);
             from_email = os.environ.get('GMAIL_USER')
             password   = os.environ.get('GMAIL_APP_PASSWORD')
             if not from_email or not password:
-                print("❌ Set GMAIL_USER and GMAIL_APP_PASSWORD"); return False
+                print("❌ Set GMAIL_USER and GMAIL_APP_PASSWORD env vars")
+                return False
             now = self.get_ist_time()
             tod = "Morning" if now.hour < 12 else "Evening"
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v2 — {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report v3 — {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
-            srv.starttls(); srv.login(from_email, password)
-            srv.send_message(msg); srv.quit()
-            print(f"✅ Email sent to {to_email}"); return True
+            srv.starttls()
+            srv.login(from_email, password)
+            srv.send_message(msg)
+            srv.quit()
+            print(f"✅ Email sent to {to_email}")
+            return True
         except Exception as e:
-            print(f"❌ Email error: {e}"); return False
+            print(f"❌ Email error: {e}")
+            return False
 
     # =========================================================================
-    #  ENTRY
+    #  ENTRY POINT
     # =========================================================================
     def generate_complete_report(self, send_email_flag=True, recipient_email=None,
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v2 — ATR Stops + 12M S/R + ADX + Vol")
+        print("💎 NIFTY 100 ANALYZER v3 — Grouped UI + ATR Stops + 12M S/R")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
         self.save_html(output_file)
         if send_email_flag and recipient_email:
             self.send_email(recipient_email)
-        print("=" * 70); print("✅ DONE"); print("=" * 70)
+        print("=" * 70)
+        print("✅ DONE")
+        print("=" * 70)
 
 
 # =============================================================================
