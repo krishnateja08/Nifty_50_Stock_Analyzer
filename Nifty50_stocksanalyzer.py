@@ -681,41 +681,38 @@ class Nifty100CompleteAnalyzer:
   --bg:       #04080f;
   --bg2:      #060d18;
   --surface:  #0a1628;
-  --surface2: #0e1d35;
-  --border:   #132240;
-  --border2:  #1a2e50;
-  --accent:   #00d4ff;
-  --accent2:  #0099cc;
-  --green:    #00e676;
-  --green2:   #00c853;
-  --red:      #ff3d57;
-  --gold:     #ffab00;
-  --purple:   #7c4dff;
-  --teal:     #00bcd4;
-  --text:     #cdd6f4;
-  --text2:    #e8eeff;
-  --muted:    #7a95b8;
-  --muted2:   #a0bcd8;
+  --surface2: #0c1a2e;
+  --border:   #1e3a5a;
+  --border2:  #2a4a6a;
+  --accent:   #00f5ff;
+  --accent2:  #00ccee;
+  --green:    #00ff88;
+  --green2:   #00cc66;
+  --red:      #ff4466;
+  --gold:     #ffcc00;
+  --purple:   #cc99ff;
+  --teal:     #00f5ff;
+  --text:     #ddeeff;
+  --text2:    #ffffff;
+  --muted:    #aaccee;
+  --muted2:   #ccddff;
 }}
 *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
 
 body {{
-  background: var(--bg);
-  color: var(--text);
+  background: #04080f;
+  color: #ddeeff;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
   min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 80% 40% at 10% 0%, rgba(0,212,255,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 90% 100%, rgba(124,77,255,0.05) 0%, transparent 50%);
 }}
 
 /* ── HEADER ── */
 header {{
-  background: linear-gradient(180deg, #060d18 0%, #04080f 100%);
-  border-bottom: 1px solid var(--border2);
+  background: #060d18;
+  border-bottom: 2px solid #00f5ff;
   position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.8);
 }}
 .h-top {{
   display: flex; align-items: center;
@@ -733,11 +730,11 @@ header {{
 }}
 .brand-name {{
   font-family: 'Syne', sans-serif;
-  font-size: 17px; font-weight: 800;
-  color: var(--text2); letter-spacing: -0.5px;
+  font-size: 18px; font-weight: 800;
+  color: #ffffff; letter-spacing: -0.5px;
 }}
 .brand-sub {{
-  font-size: 10px; color: #88bbdd;
+  font-size: 10px; color: #aaddff;
   letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; font-weight: 700;
 }}
 
@@ -754,23 +751,24 @@ header {{
   border-right: 1px solid var(--border); gap: 2px;
 }}
 .idx-item:last-child {{ border-right: none; }}
-.idx-name  {{ font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #88bbdd; text-transform: uppercase; }}
-.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text2); }}
-.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; }}
-.idx-chg.up {{ color: var(--green); }}
-.idx-chg.dn {{ color: var(--red); }}
+.idx-name  {{ font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #aaddff; text-transform: uppercase; }}
+.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; color: #ffffff; }}
+.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 800; }}
+.idx-chg.up {{ color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
+.idx-chg.dn {{ color: #ff4466; text-shadow: 0 0 8px rgba(255,68,102,0.6); }}
 
 /* CLOCK */
 .clock-box {{
-  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
 }}
 .clock-time {{
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 18px; font-weight: 600; color: var(--green);
-  text-shadow: 0 0 12px rgba(0,230,118,0.4);
+  font-size: 22px; font-weight: 800; color: #00ff88;
+  text-shadow: 0 0 16px rgba(0,255,136,0.8);
+  letter-spacing: 1px;
 }}
-.clock-meta {{ font-size: 11px; color: #aaccee; letter-spacing: 1px; font-weight: 700; }}
-.clock-next {{ font-size: 10px; color: #88aacc; margin-top: 2px; font-weight: 600; }}
+.clock-meta {{ font-size: 12px; color: #ffffff; letter-spacing: 1px; font-weight: 700; }}
+.clock-next {{ font-size: 11px; color: #aaddff; margin-top: 2px; font-weight: 700; }}
 
 /* TICKER TAPE */
 .ticker {{
@@ -789,28 +787,28 @@ header {{
 }}
 .tick {{
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 0 18px; border-right: 1px solid var(--border);
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  padding: 0 18px; border-right: 1px solid #1e3a5a;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
 }}
-.tick-sym  {{ color: var(--accent); font-weight: 600; }}
-.tick-px   {{ color: var(--text2); }}
-.tick-up   {{ color: var(--green); }}
-.tick-dn   {{ color: var(--red); }}
+.tick-sym  {{ color: #00f5ff; font-weight: 800; }}
+.tick-px   {{ color: #ffffff; font-weight: 600; }}
+.tick-up   {{ color: #00ff88; font-weight: 700; }}
+.tick-dn   {{ color: #ff4466; font-weight: 700; }}
 
 /* KPI BAND */
 .kpi-band {{
   display: flex; align-items: center;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border2);
+  background: #080f1e;
+  border-bottom: 2px solid #1e3a5a;
 }}
 .kpi-item {{
   display: flex; flex-direction: column; align-items: center;
-  padding: 14px 24px; border-right: 1px solid var(--border); flex: 1;
+  padding: 16px 24px; border-right: 1px solid #1e3a5a; flex: 1;
 }}
 .kpi-item:last-child {{ border-right: none; }}
-.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }}
-.kpi-label {{ font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #88bbdd; margin-top: 4px; }}
-.kpi-bar   {{ height: 2px; width: 40px; border-radius: 1px; margin-top: 6px; }}
+.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }}
+.kpi-label {{ font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aaddff; margin-top: 5px; }}
+.kpi-bar   {{ height: 3px; width: 50px; border-radius: 2px; margin-top: 8px; }}
 
 /* MAIN */
 .main {{ padding: 20px; }}
