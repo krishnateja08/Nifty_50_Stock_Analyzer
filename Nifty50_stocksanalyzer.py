@@ -1,8 +1,37 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5.1
+NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5.2
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 ═══════════════════════════════════════════════════════════════════════
+ACCURACY FIXES in v5.2 (resolves downtrending stocks appearing as BUY):
+  Diagnosed via SBIN case — strong fundamentals + clear chart downtrend
+  scored BUY/67 due to 4 logic gaps in the technical scoring engine.
+
+  V52-1  ADX direction-aware: bonus only granted when price > SMA50
+           Reason: ADX measures trend STRENGTH, not direction. A strong
+           downtrend scored the same +1 as a strong uptrend. Now the ADX
+           bonus is conditional on price being above SMA50 (confirms
+           the strong trend is actually an uptrend worth rewarding).
+
+  V52-2  RSI weak-momentum zone penalty (RSI 30–45 = −1 tech score)
+           Reason: RSI=33 falling from 68 is a momentum collapse but
+           fell into the "Neutral" zone with zero penalty. Added a
+           weak-momentum zone: RSI 30–45 scores −1 tech, flagged as
+           "Weak Momentum" so it's visible in the report table.
+
+  V52-3  Double SMA penalty: price < SMA20 AND < SMA50 = extra −1
+           Reason: Being below both short-term SMAs simultaneously
+           confirms an active short-term downtrend but was only counted
+           as two separate −1 penalties without a combined signal.
+           Now adds an additional −1 when both conditions are true.
+
+  V52-4  Sector-adjusted PE thresholds for Financial sector
+           Reason: PSU/private banks always trade at PE 8–15 due to
+           capital intensity and NPA provisions. PE=12.4 for SBIN
+           scored +10 (same as a growth tech stock at PE 22). Banks
+           and Financial Services stocks now use a sector-specific
+           baseline: PE < 15 = +10, 15–20 = +5, > 20 = 0.
+
 CALIBRATION FIXES in v5.1 (resolves "only 2 stocks" issue):
   CAL-1  Score thresholds relaxed to match realistic yFinance NSE data
            STRONG BUY: 75 → 70  |  BUY: 55 → 50
@@ -471,18 +500,35 @@ class Nifty100CompleteAnalyzer:
 
     # =========================================================================
     #  FUNDAMENTAL SCORE
-    #  v5: FCF weight +5→+15, D/E weight +10→+15 (NEW-6, NEW-7)
-    #  v4: negative growth penalised (FIX-5)
+    #  v5.2: Sector-adjusted PE thresholds for Financial sector (V52-4)
+    #  v5.1: CAL-4 growth penalty cap, CAL-5 partial credit for missing fields
+    #  v5:   FCF weight +5→+15, D/E weight +10→+15 (NEW-6, NEW-7)
+    #  v4:   negative growth penalised (FIX-5)
     # =========================================================================
-    def get_fundamental_score(self, info):
+    def get_fundamental_score(self, info, sector=''):
         score = 0
 
-        # Valuation
+        # V52-4: Sector-adjusted PE thresholds.
+        # Banks and Financial Services always trade at structurally low PE
+        # (8–15) due to capital intensity and NPA provisioning requirements.
+        # Using the same PE < 25 threshold as IT/FMCG stocks rewards PSU
+        # banks for being "cheap" when they are merely sector-typical.
+        # Financial sector: PE < 15 = +10, 15–20 = +5, > 20 = 0.
+        # All other sectors: PE < 25 = +10, 25–35 = +5 (unchanged).
         pe  = info.get('trailingPE', info.get('forwardPE', 0))
         pb  = info.get('priceToBook', 0)
         peg = info.get('pegRatio', 0)
-        if pe  and 0 < pe  < 25:     score += 10
-        elif pe  and 25 <= pe  < 35: score += 5
+
+        is_financial = sector in ('Financial Services', 'Banks', 'Banking',
+                                  'Insurance', 'Financial')
+        if is_financial:
+            if pe and 0 < pe < 15:      score += 10   # genuinely cheap bank
+            elif pe and 15 <= pe < 20:  score += 5    # fair value for a bank
+            # PE > 20 for a bank = expensive for its sector → 0 points
+        else:
+            if pe  and 0 < pe  < 25:    score += 10
+            elif pe  and 25 <= pe < 35: score += 5
+
         if pb  and 0 < pb  < 3:      score += 5
         elif pb  and 3 <= pb  < 5:   score += 3
         if peg and 0 < peg < 1:      score += 10
@@ -598,7 +644,13 @@ class Nifty100CompleteAnalyzer:
             tech_score += 1 if current_price > sma_50  else -1
             tech_score += 2 if current_price > sma_200 else -2
 
-            # FIX-3: RSI context-aware
+            # V52-3: Double SMA penalty — price below BOTH SMA20 and SMA50
+            # simultaneously confirms active short-term downtrend.
+            # Each SMA already gave -1 above; this adds a combined signal -1.
+            if current_price < sma_20 and current_price < sma_50:
+                tech_score -= 1   # confirmed short-term downtrend
+
+            # FIX-3: RSI context-aware + V52-2: weak-momentum zone
             if rsi < 30:
                 if current_price > sma_200:
                     tech_score += 2
@@ -608,14 +660,19 @@ class Nifty100CompleteAnalyzer:
                     rsi_signal = "Oversold (Downtrend)"
             elif rsi > 70:
                 # NEW-1: Apply divergence logic inside overbought zone
-                # In a bull run RSI can stay >70 — only penalise if bearish
-                # divergence is confirmed, not just because RSI is high
                 if rsi_divergence == 'Bearish Divergence':
-                    tech_score -= 3    # divergence = stronger sell signal
+                    tech_score -= 3
                     rsi_signal = "Bearish Divergence ⚠"
                 else:
-                    tech_score -= 1    # overbought but no divergence = mild penalty
+                    tech_score -= 1
                     rsi_signal = "Overbought"
+            elif 30 <= rsi <= 45:
+                # V52-2: Weak-momentum zone — RSI between 30 and 45 signals
+                # fading momentum, often seen in stocks rolling over from peaks.
+                # SBIN fell from RSI 68 → 33, landing here with zero penalty
+                # before. Now correctly flagged and penalised.
+                tech_score -= 1
+                rsi_signal = "Weak Momentum ⚠"
             else:
                 # NEW-1: Bullish divergence in neutral zone = bonus
                 if rsi_divergence == 'Bullish Divergence':
@@ -629,11 +686,16 @@ class Nifty100CompleteAnalyzer:
             else:
                 tech_score -= 1;  macd_signal = "Bearish"
 
-            # FIX-2: ADX trend strength
+            # FIX-2 + V52-1: ADX trend strength — now direction-aware.
+            # ADX bonus only when price > SMA50 (confirms uptrend direction).
+            # A strong downtrend has high ADX but should NOT be rewarded.
             if adx > 25:
-                tech_score = min(tech_score + 1, 6)
+                if current_price > sma_50:
+                    tech_score = min(tech_score + 1, 6)   # strong uptrend ✅
+                else:
+                    tech_score -= 1   # strong downtrend — penalise, not reward
             elif adx < 20:
-                tech_score -= 1
+                tech_score -= 1   # FIX-2: weak/no trend penalty retained
 
             # FIX-6: Volume influences tech score
             if vol_ratio > 1.5 and current_price > sma_20:
@@ -675,7 +737,7 @@ class Nifty100CompleteAnalyzer:
                 analyst_key.title() if analyst_key else 'N/A')
             earnings_date = self.get_earnings_date(info)
 
-            fund_score = self.get_fundamental_score(info)
+            fund_score = self.get_fundamental_score(info, sector)
 
             # FIX-1: Fundamentals 65%, technicals 35%
             tech_score_normalized = ((tech_score + 6) / 12) * 100
@@ -1197,7 +1259,7 @@ footer strong {{ color: #00f5ff; }}
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Sector Diversified · v5.1</div>
+        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Direction-Aware ADX · v5.2</div>
       </div>
     </div>
     <div class="idx-strip">
@@ -1539,7 +1601,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · RSI Divergence · Sector Cap · Data Sanity · v5.1
+  · 12M S/R · ATR Stops · Direction-Aware ADX · Sector PE · v5.2
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
