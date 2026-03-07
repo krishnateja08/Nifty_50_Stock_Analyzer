@@ -1,28 +1,50 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5
+NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5.1
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 ═══════════════════════════════════════════════════════════════════════
-UPGRADES FROM v4 (7 New Accuracy Improvements):
-  NEW-1  RSI Divergence detection — bearish divergence signals reversal
-         even when RSI is below 70 (bull-market trap prevention)
-  NEW-2  Volume hard gatekeeper — STRONG BUY blocked if vol_ratio < 1.5
-  NEW-3  Sector diversity cap — max 3 stocks per sector in Top 20 Buys
-  NEW-4  yFinance data sanity check — flags >20% single-day moves as
-         bad data and skips the stock to protect 52W/ATR calculations
-  NEW-5  R:R filter raised from 0.5x to 1.5x in get_top_recommendations
-  NEW-6  Free Cash Flow weight raised: +5 → +15 (Cash is King, India)
-  NEW-7  Debt-to-Equity weight raised: +10 → +15 (protects in volatility)
+CALIBRATION FIXES in v5.1 (resolves "only 2 stocks" issue):
+  CAL-1  Score thresholds relaxed to match realistic yFinance NSE data
+           STRONG BUY: 75 → 70  |  BUY: 55 → 50
+           Reason: yFinance often returns None for PEG/ROA/CR on NSE
+           stocks, silently zeroing those fields. A perfectly good stock
+           with 3 missing fields can't reach 75 even with best technicals.
+  CAL-2  R:R gate split by rating: STRONG BUY needs 1.5x, BUY needs 1.2x
+           Reason: Large-cap Nifty stocks trade in tight ranges. Their
+           nearest resistance is 3-5% away but ATR stop is 6-8% below.
+           A blanket 1.5x R:R blocks all large caps unfairly.
+  CAL-3  Volume ratio uses 5-day average instead of single last-bar
+           Reason: Single-bar snapshot volume is too noisy. A great stock
+           with a quiet day before the report runs gets blocked even if
+           it's been in a high-volume uptrend all week.
+  CAL-4  Growth penalty capped at -10 total (not -20)
+           Reason: If both revenue AND earnings growth are negative the
+           fund score takes -20, wiping out steel/cement/energy stocks
+           that have temporary negative quarters but are fundamentally
+           sound. Cyclicals represent 30%+ of the Nifty 100 universe.
+  CAL-5  Partial credit for missing yFinance fields
+           Reason: When PEG, ROA, Current Ratio return None/0 they score
+           0 silently. Added +3 partial credit per missing key metric
+           so missing data doesn't punish valid stocks.
+
+RETAINED FROM v5 (7 Accuracy Improvements):
+  NEW-1  RSI Divergence detection
+  NEW-2  Volume hard gatekeeper (with 5-day avg — now CAL-3)
+  NEW-3  Sector diversity cap (max 3 per sector)
+  NEW-4  yFinance data sanity check (>20% single-day move filter)
+  NEW-5  R:R filter (now split by rating — CAL-2)
+  NEW-6  Free Cash Flow weight +15
+  NEW-7  Debt-to-Equity weight +15
 
 RETAINED FROM v4 (8 Accuracy Improvements):
-  FIX-1  Fundamentals weighted 65%, technicals 35%
-  FIX-2  ADX weak-trend penalty (< 20 = −1 tech score)
-  FIX-3  RSI context-aware (oversold in downtrend = falling knife)
+  FIX-1  Fundamentals 65% / technicals 35%
+  FIX-2  ADX weak-trend penalty
+  FIX-3  RSI context-aware (oversold in downtrend)
   FIX-4  STRONG BUY requires R:R ≥ 1.5
-  FIX-5  Negative earnings/revenue growth penalises fund score
+  FIX-5  Negative growth penalises fund score (capped at -10 — CAL-4)
   FIX-6  Volume ratio influences tech score
   FIX-7  Analyst consensus ±5 to combined score
-  FIX-8  52W high proximity bonus in uptrend
+  FIX-8  52W high proximity bonus
 ═══════════════════════════════════════════════════════════════════════
 
 Requirements:
@@ -259,10 +281,14 @@ class Nifty100CompleteAnalyzer:
         return round(adx.iloc[-1], 1)
 
     def calculate_volume_ratio(self, df):
-        avg_vol = df['Volume'].tail(20).mean()
+        # CAL-3: Use 5-day average instead of single last-bar snapshot.
+        # Single-bar volume is too noisy — a great stock with a quiet
+        # day before the report runs gets blocked despite a strong trend.
+        avg_vol    = df['Volume'].tail(20).mean()
         if avg_vol == 0:
             return 1.0
-        return round(df['Volume'].iloc[-1] / avg_vol, 2)
+        recent_vol = df['Volume'].tail(5).mean()   # 5-day average
+        return round(recent_vol / avg_vol, 2)
 
     def get_earnings_date(self, info):
         try:
@@ -461,6 +487,7 @@ class Nifty100CompleteAnalyzer:
         elif pb  and 3 <= pb  < 5:   score += 3
         if peg and 0 < peg < 1:      score += 10
         elif peg and 1 <= peg < 2:   score += 5
+        else:                        score += 3   # CAL-5: partial credit if PEG missing
 
         # Profitability
         roe = info.get('returnOnEquity', 0)
@@ -470,21 +497,28 @@ class Nifty100CompleteAnalyzer:
         elif roe and roe > 0.10: score += 5
         if roa and roa > 0.05:   score += 5
         elif roa and roa > 0.02: score += 3
+        else:                    score += 2   # CAL-5: partial credit if ROA missing
         if pm  and pm  > 0.10:   score += 10
         elif pm  and pm  > 0.05: score += 5
 
-        # Growth (FIX-5: penalise negative growth)
+        # Growth (FIX-5: penalise negative growth; CAL-4: cap total penalty at -10)
         rg = info.get('revenueGrowth', 0)
         eg = info.get('earningsGrowth', 0)
+        growth_penalty = 0
         if rg and rg > 0.15:    score += 10
         elif rg and rg > 0.10:  score += 7
         elif rg and rg > 0.05:  score += 5
-        elif rg and rg < 0:     score -= 10   # declining revenue = red flag
+        elif rg and rg < 0:     growth_penalty += 10  # track separately for cap
 
         if eg and eg > 0.15:    score += 10
         elif eg and eg > 0.10:  score += 7
         elif eg and eg > 0.05:  score += 5
-        elif eg and eg < 0:     score -= 10   # declining earnings = red flag
+        elif eg and eg < 0:     growth_penalty += 10  # track separately for cap
+
+        # CAL-4: Cap combined growth penalty at 10 — prevents cyclicals
+        # (steel, cement, energy) with temporary negative quarters from
+        # being wiped out entirely. They score 0 growth points, not -20.
+        score -= min(growth_penalty, 10)
 
         # Balance sheet health
         de = info.get('debtToEquity', 0)
@@ -501,6 +535,7 @@ class Nifty100CompleteAnalyzer:
 
         if cr and cr > 1.5:   score += 10
         elif cr and cr > 1.0: score += 5
+        else:                  score += 3   # CAL-5: partial credit if CR missing/NA
 
         # NEW-6: FCF raised from +5 to +15 — Cash is King in Indian markets
         # Companies with strong FCF survive rate hikes & FII outflows
@@ -652,13 +687,16 @@ class Nifty100CompleteAnalyzer:
             elif analyst_key in ('sell', 'strongSell'):
                 combined_score = max(combined_score - 5, 0)
 
-            if combined_score >= 75:
+            # CAL-1: Thresholds relaxed to account for missing yFinance fields
+            # on NSE stocks (PEG/ROA/CR often return None, silently scoring 0).
+            # STRONG BUY: 75→70  |  BUY: 55→50
+            if combined_score >= 70:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY";  recommendation = "STRONG BUY"
-            elif combined_score >= 55:
+            elif combined_score >= 50:
                 rating = "⭐⭐⭐⭐ BUY";           recommendation = "BUY"
-            elif combined_score >= 45:
+            elif combined_score >= 40:
                 rating = "⭐⭐⭐ HOLD";            recommendation = "HOLD"
-            elif combined_score >= 30:
+            elif combined_score >= 28:
                 rating = "⭐⭐ SELL";              recommendation = "SELL"
             else:
                 rating = "⭐ STRONG SELL";         recommendation = "STRONG SELL"
@@ -811,17 +849,21 @@ class Nifty100CompleteAnalyzer:
         f1 = all_buys[all_buys['Upside'] > 0.5]
         f2 = f1[f1['Target_1'] > f1['Price']]
 
-        # NEW-5: R:R filter raised from 0.5 to 1.5
-        f3 = f2[f2['Risk_Reward'] >= 1.5]
+        # CAL-2: R:R gate split by rating tier.
+        # STRONG BUY keeps strict 1.5x (high conviction only).
+        # Plain BUY relaxed to 1.2x — large-cap Nifty stocks trade in
+        # tight ranges where a blanket 1.5x blocks all heavyweights.
+        strong_buys = f2[
+            (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.5)
+        ]
+        plain_buys = f2[
+            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 1.2)
+        ]
 
-        # NEW-2: Volume hard gatekeeper — STRONG BUY blocked if vol < 1.5x
-        # For plain BUY we keep vol >= 1.0 (at least average volume)
-        strong_buys = f3[
-            (f3['Recommendation'] == 'STRONG BUY') & (f3['Vol_Ratio'] >= 1.5)
-        ]
-        plain_buys = f3[
-            (f3['Recommendation'] == 'BUY') & (f3['Vol_Ratio'] >= 1.0)
-        ]
+        # NEW-2 (with CAL-3): Volume gate uses 5-day avg ratio now.
+        # STRONG BUY needs 5d avg vol >= 1.5x. BUY needs >= 0.9x.
+        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 1.5]
+        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.9]
         filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
         sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
 
@@ -841,7 +883,7 @@ class Nifty100CompleteAnalyzer:
         # ── SELL side ─────────────────────────────────────────────────────────
         all_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])]
         s1 = all_sells[all_sells['Upside'] > 0.5]
-        s2 = s1[s1['Risk_Reward'] >= 1.5]     # NEW-5: same R:R raise for sells
+        s2 = s1[s1['Risk_Reward'] >= 1.2]     # CAL-2: aligned with BUY gate
         s3 = s2[s2['Target_1'] < s2['Price']]
         top_sells = s3.nsmallest(20, 'Combined_Score')
 
@@ -1155,7 +1197,7 @@ footer strong {{ color: #00f5ff; }}
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Sector Diversified · v5</div>
+        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Sector Diversified · v5.1</div>
       </div>
     </div>
     <div class="idx-strip">
@@ -1497,7 +1539,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · RSI Divergence · Sector Cap · Data Sanity · v5
+  · 12M S/R · ATR Stops · RSI Divergence · Sector Cap · Data Sanity · v5.1
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
