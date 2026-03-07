@@ -1,16 +1,29 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v4
+NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
-UPGRADES from v3 (Accuracy Improvements for STRONG BUY):
-  1. Fundamental weight increased to 65% (from 50%) — reduces noise from short-term technicals
-  2. ADX weak-trend penalty added — no score boost for trendless markets
-  3. RSI Oversold context-aware — penalises oversold in downtrend (below SMA 200)
-  4. STRONG BUY requires R:R >= 1.5 — prevents weak risk/reward from reaching STRONG BUY
-  5. Negative earnings/revenue growth now penalises fundamental score
-  6. Volume ratio now influences tech score — confirms breakouts, penalises thin moves
-  7. Analyst consensus now contributes ±5 to combined score
-  8. 52W High proximity bonus — near-ATH in uptrend = breakout confirmation
+═══════════════════════════════════════════════════════════════════════
+UPGRADES FROM v4 (7 New Accuracy Improvements):
+  NEW-1  RSI Divergence detection — bearish divergence signals reversal
+         even when RSI is below 70 (bull-market trap prevention)
+  NEW-2  Volume hard gatekeeper — STRONG BUY blocked if vol_ratio < 1.5
+  NEW-3  Sector diversity cap — max 3 stocks per sector in Top 20 Buys
+  NEW-4  yFinance data sanity check — flags >20% single-day moves as
+         bad data and skips the stock to protect 52W/ATR calculations
+  NEW-5  R:R filter raised from 0.5x to 1.5x in get_top_recommendations
+  NEW-6  Free Cash Flow weight raised: +5 → +15 (Cash is King, India)
+  NEW-7  Debt-to-Equity weight raised: +10 → +15 (protects in volatility)
+
+RETAINED FROM v4 (8 Accuracy Improvements):
+  FIX-1  Fundamentals weighted 65%, technicals 35%
+  FIX-2  ADX weak-trend penalty (< 20 = −1 tech score)
+  FIX-3  RSI context-aware (oversold in downtrend = falling knife)
+  FIX-4  STRONG BUY requires R:R ≥ 1.5
+  FIX-5  Negative earnings/revenue growth penalises fund score
+  FIX-6  Volume ratio influences tech score
+  FIX-7  Analyst consensus ±5 to combined score
+  FIX-8  52W high proximity bonus in uptrend
+═══════════════════════════════════════════════════════════════════════
 
 Requirements:
     pip install yfinance pandas numpy pytz
@@ -28,6 +41,9 @@ from email.mime.text import MIMEText
 import os
 
 warnings.filterwarnings('ignore')
+
+# ── Sector diversity cap: max picks per sector in Top 20 Buy table ──
+MAX_PICKS_PER_SECTOR = 3
 
 
 class Nifty100CompleteAnalyzer:
@@ -152,6 +168,56 @@ class Nifty100CompleteAnalyzer:
         rs    = gain / loss
         return (100 - (100 / (1 + rs))).iloc[-1]
 
+    # ── NEW-1: RSI Divergence helper ─────────────────────────────────────────
+    def detect_rsi_divergence(self, prices, window=14):
+        """
+        Bearish divergence: price makes a HIGHER high in last 20 bars,
+        but RSI makes a LOWER high over the same window.
+        Returns: 'Bearish Divergence', 'Bullish Divergence', or 'None'
+        """
+        try:
+            # Calculate RSI series (last 60 bars is enough)
+            delta    = prices.diff()
+            gain     = delta.where(delta > 0, 0).rolling(window).mean()
+            loss     = (-delta.where(delta < 0, 0)).rolling(window).mean()
+            rsi_ser  = 100 - (100 / (1 + gain / loss))
+            rsi_ser  = rsi_ser.dropna()
+
+            lookback  = 20   # bars to compare
+            if len(prices) < lookback + window or len(rsi_ser) < lookback:
+                return 'None'
+
+            # Recent window vs prior window
+            recent_price = prices.iloc[-lookback:]
+            prior_price  = prices.iloc[-(lookback * 2):-lookback]
+            recent_rsi   = rsi_ser.iloc[-lookback:]
+            prior_rsi    = rsi_ser.iloc[-(lookback * 2):-lookback]
+
+            recent_price_high = recent_price.max()
+            prior_price_high  = prior_price.max()
+            recent_rsi_high   = recent_rsi.max()
+            prior_rsi_high    = prior_rsi.max()
+
+            recent_price_low  = recent_price.min()
+            prior_price_low   = prior_price.min()
+            recent_rsi_low    = recent_rsi.min()
+            prior_rsi_low     = prior_rsi.min()
+
+            # Bearish: price higher high + RSI lower high
+            if (recent_price_high > prior_price_high * 1.005 and
+                    recent_rsi_high < prior_rsi_high * 0.97):
+                return 'Bearish Divergence'
+
+            # Bullish: price lower low + RSI higher low
+            if (recent_price_low < prior_price_low * 0.995 and
+                    recent_rsi_low > prior_rsi_low * 1.03):
+                return 'Bullish Divergence'
+
+            return 'None'
+        except Exception:
+            return 'None'
+    # ─────────────────────────────────────────────────────────────────────────
+
     def calculate_macd(self, prices):
         ema12  = prices.ewm(span=12, adjust=False).mean()
         ema26  = prices.ewm(span=26, adjust=False).mean()
@@ -176,10 +242,10 @@ class Nifty100CompleteAnalyzer:
         close = df['Close']
         plus_dm  = high.diff()
         minus_dm = low.diff().abs()
-        plus_dm[plus_dm < 0]   = 0
-        minus_dm[minus_dm < 0] = 0
-        plus_dm[plus_dm < minus_dm]  = 0
-        minus_dm[minus_dm < plus_dm] = 0
+        plus_dm[plus_dm < 0]        = 0
+        minus_dm[minus_dm < 0]      = 0
+        plus_dm[plus_dm < minus_dm] = 0
+        minus_dm[minus_dm < plus_dm]= 0
         tr = pd.concat([
             high - low,
             abs(high - close.shift(1)),
@@ -240,6 +306,40 @@ class Nifty100CompleteAnalyzer:
             except Exception:
                 result[label] = {'price': 'N/A', 'chg': '—', 'cls': ''}
         return result
+
+    # =========================================================================
+    #  NEW-4: yFINANCE DATA SANITY CHECK
+    # Detects >20% single-day price move as likely bad/unadjusted data
+    # =========================================================================
+    def is_data_clean(self, df):
+        """
+        Returns (True, '') if data looks valid.
+        Returns (False, reason) if a suspicious spike is detected.
+        Checks daily close-to-close % change — any move >20% in a single
+        bar without a corresponding volume surge is flagged as dirty data.
+        """
+        try:
+            close      = df['Close']
+            volume     = df['Volume']
+            pct_change = close.pct_change().abs()
+
+            # Find days with >20% price move
+            spike_days = pct_change[pct_change > 0.20]
+            if spike_days.empty:
+                return True, ''
+
+            for spike_date, spike_val in spike_days.items():
+                # Check if volume on that day was at least 3x average
+                # (corporate actions like splits usually come with high volume)
+                avg_vol = volume.mean()
+                spike_vol = volume.loc[spike_date] if spike_date in volume.index else 0
+                if avg_vol > 0 and spike_vol < avg_vol * 3:
+                    # Large price move with normal volume = likely data error
+                    return False, f"Suspicious {spike_val*100:.0f}% move on {spike_date.date()} — possible bad data"
+
+            return True, ''
+        except Exception:
+            return True, ''   # if check fails, don't block the stock
 
     # =========================================================================
     #  RESISTANCE & SUPPORT
@@ -344,10 +444,14 @@ class Nifty100CompleteAnalyzer:
         return round(t1, 2), round(t2, 2), 0, target_status
 
     # =========================================================================
-    #  FUNDAMENTAL SCORE  [v4: penalises negative growth]
+    #  FUNDAMENTAL SCORE
+    #  v5: FCF weight +5→+15, D/E weight +10→+15 (NEW-6, NEW-7)
+    #  v4: negative growth penalised (FIX-5)
     # =========================================================================
     def get_fundamental_score(self, info):
         score = 0
+
+        # Valuation
         pe  = info.get('trailingPE', info.get('forwardPE', 0))
         pb  = info.get('priceToBook', 0)
         peg = info.get('pegRatio', 0)
@@ -357,6 +461,8 @@ class Nifty100CompleteAnalyzer:
         elif pb  and 3 <= pb  < 5:   score += 3
         if peg and 0 < peg < 1:      score += 10
         elif peg and 1 <= peg < 2:   score += 5
+
+        # Profitability
         roe = info.get('returnOnEquity', 0)
         roa = info.get('returnOnAssets', 0)
         pm  = info.get('profitMargins', 0)
@@ -367,35 +473,43 @@ class Nifty100CompleteAnalyzer:
         if pm  and pm  > 0.10:   score += 10
         elif pm  and pm  > 0.05: score += 5
 
-        # ── FIX 5: penalise negative growth ──────────────────────────────────
+        # Growth (FIX-5: penalise negative growth)
         rg = info.get('revenueGrowth', 0)
         eg = info.get('earningsGrowth', 0)
-        if rg and rg > 0.15:        score += 10
-        elif rg and rg > 0.10:      score += 7
-        elif rg and rg > 0.05:      score += 5
-        elif rg and rg < 0:         score -= 10  # revenue declining = red flag
+        if rg and rg > 0.15:    score += 10
+        elif rg and rg > 0.10:  score += 7
+        elif rg and rg > 0.05:  score += 5
+        elif rg and rg < 0:     score -= 10   # declining revenue = red flag
 
-        if eg and eg > 0.15:        score += 10
-        elif eg and eg > 0.10:      score += 7
-        elif eg and eg > 0.05:      score += 5
-        elif eg and eg < 0:         score -= 10  # earnings declining = red flag
-        # ─────────────────────────────────────────────────────────────────────
+        if eg and eg > 0.15:    score += 10
+        elif eg and eg > 0.10:  score += 7
+        elif eg and eg > 0.05:  score += 5
+        elif eg and eg < 0:     score -= 10   # declining earnings = red flag
 
+        # Balance sheet health
         de = info.get('debtToEquity', 0)
         cr = info.get('currentRatio', 0)
         fc = info.get('freeCashflow', 0)
+
+        # NEW-7: D/E raised from +10 to +15 — high-debt firms collapse in
+        # Indian market volatility (IL&FS, YES Bank, DHFL lessons)
         if de is not None:
-            if de < 50:    score += 10
-            elif de < 100: score += 5
+            if de < 50:    score += 15   # was +10
+            elif de < 100: score += 7    # was +5
         else:
             score += 5
+
         if cr and cr > 1.5:   score += 10
         elif cr and cr > 1.0: score += 5
-        if fc and fc > 0:     score += 5
+
+        # NEW-6: FCF raised from +5 to +15 — Cash is King in Indian markets
+        # Companies with strong FCF survive rate hikes & FII outflows
+        if fc and fc > 0:     score += 15   # was +5
+
         return min(max(score, 0), 100)   # clamp 0–100
 
     # =========================================================================
-    #  MAIN ANALYSIS  [v4: all 8 accuracy fixes applied here]
+    #  MAIN ANALYSIS
     # =========================================================================
     def analyze_stock(self, symbol, name):
         try:
@@ -404,6 +518,13 @@ class Nifty100CompleteAnalyzer:
             info  = stock.info
             if df.empty or len(df) < 200:
                 return None
+
+            # ── NEW-4: Data sanity check — skip stocks with bad yFinance data ──
+            data_ok, data_warn = self.is_data_clean(df)
+            if not data_ok:
+                print(f"  ⚠ Skipping {symbol}: {data_warn}")
+                return None
+            # ──────────────────────────────────────────────────────────────────
 
             current_price = df['Close'].iloc[-1]
             sma_20  = df['Close'].rolling(20).mean().iloc[-1]
@@ -416,6 +537,9 @@ class Nifty100CompleteAnalyzer:
             atr_pct      = round((atr / current_price) * 100, 2)
             adx          = self.calculate_adx(df)
             vol_ratio    = self.calculate_volume_ratio(df)
+
+            # NEW-1: RSI Divergence detection
+            rsi_divergence = self.detect_rsi_divergence(df['Close'])
 
             high_52w = df['High'].tail(252).max()
             low_52w  = df['Low'].tail(252).min()
@@ -439,38 +563,50 @@ class Nifty100CompleteAnalyzer:
             tech_score += 1 if current_price > sma_50  else -1
             tech_score += 2 if current_price > sma_200 else -2
 
-            # FIX 3: RSI context-aware — oversold only bullish when above SMA 200
+            # FIX-3: RSI context-aware
             if rsi < 30:
                 if current_price > sma_200:
-                    tech_score += 2   # oversold in uptrend = good entry
+                    tech_score += 2
                     rsi_signal = "Oversold"
                 else:
-                    tech_score -= 1   # oversold in downtrend = falling knife
+                    tech_score -= 1
                     rsi_signal = "Oversold (Downtrend)"
             elif rsi > 70:
-                tech_score -= 2
-                rsi_signal = "Overbought"
+                # NEW-1: Apply divergence logic inside overbought zone
+                # In a bull run RSI can stay >70 — only penalise if bearish
+                # divergence is confirmed, not just because RSI is high
+                if rsi_divergence == 'Bearish Divergence':
+                    tech_score -= 3    # divergence = stronger sell signal
+                    rsi_signal = "Bearish Divergence ⚠"
+                else:
+                    tech_score -= 1    # overbought but no divergence = mild penalty
+                    rsi_signal = "Overbought"
             else:
-                rsi_signal = "Neutral"
+                # NEW-1: Bullish divergence in neutral zone = bonus
+                if rsi_divergence == 'Bullish Divergence':
+                    tech_score = min(tech_score + 1, 6)
+                    rsi_signal = "Bullish Divergence ✅"
+                else:
+                    rsi_signal = "Neutral"
 
             if macd > signal:
                 tech_score += 1;  macd_signal = "Bullish"
             else:
                 tech_score -= 1;  macd_signal = "Bearish"
 
-            # FIX 2: ADX — reward strong trend, penalise trendless market
+            # FIX-2: ADX trend strength
             if adx > 25:
                 tech_score = min(tech_score + 1, 6)
             elif adx < 20:
-                tech_score -= 1   # no clear trend = lower confidence
+                tech_score -= 1
 
-            # FIX 6: Volume ratio influences tech score
+            # FIX-6: Volume influences tech score
             if vol_ratio > 1.5 and current_price > sma_20:
-                tech_score = min(tech_score + 1, 6)  # high-volume breakout
+                tech_score = min(tech_score + 1, 6)
             elif vol_ratio < 0.7:
-                tech_score -= 1   # low-volume move = less reliable
+                tech_score -= 1
 
-            # FIX 8: Near 52W high in uptrend = breakout confirmation bonus
+            # FIX-8: Near 52W high in uptrend
             pct_from_52w_high = ((current_price - high_52w) / high_52w) * 100
             if pct_from_52w_high >= -5 and current_price > sma_200:
                 tech_score = min(tech_score + 1, 6)
@@ -506,11 +642,11 @@ class Nifty100CompleteAnalyzer:
 
             fund_score = self.get_fundamental_score(info)
 
-            # FIX 1: Weight fundamentals 65%, technicals 35% for better accuracy
+            # FIX-1: Fundamentals 65%, technicals 35%
             tech_score_normalized = ((tech_score + 6) / 12) * 100
             combined_score        = (tech_score_normalized * 0.35) + (fund_score * 0.65)
 
-            # FIX 7: Analyst consensus adjustment ±5 points
+            # FIX-7: Analyst consensus ±5
             if analyst_key in ('strongBuy', 'buy'):
                 combined_score = min(combined_score + 5, 100)
             elif analyst_key in ('sell', 'strongSell'):
@@ -578,7 +714,7 @@ class Nifty100CompleteAnalyzer:
             reward      = abs(target_1 - current_price)
             risk_reward = round(reward / risk, 2) if risk > 0 else 0
 
-            # FIX 4: STRONG BUY requires R:R >= 1.5, else downgrade to BUY
+            # FIX-4: STRONG BUY needs R:R ≥ 1.5
             if recommendation == "STRONG BUY" and risk_reward < 1.5:
                 recommendation = "BUY"
                 rating         = "⭐⭐⭐⭐ BUY"
@@ -589,61 +725,62 @@ class Nifty100CompleteAnalyzer:
             else:                  quality = "Poor"
 
             return {
-                'Symbol':           symbol.replace('.NS', ''),
-                'Name':             name,
-                'Price':            round(current_price, 2),
-                'Sector':           sector,
-                'RSI':              round(rsi, 2),
-                'RSI_Signal':       rsi_signal,
-                'MACD':             macd_signal,
-                'ADX':              adx,
-                'Vol_Ratio':        vol_ratio,
-                'SMA_20':           round(sma_20, 2),
-                'SMA_50':           round(sma_50, 2),
-                'SMA_200':          round(sma_200, 2),
-                'Support':          round(nearest_support, 2),
-                'Resistance':       round(nearest_resistance, 2),
-                'Support_Dist_Pct': support_dist_pct,
-                '52W_High':         round(high_52w, 2),
-                '52W_Low':          round(low_52w, 2),
+                'Symbol':            symbol.replace('.NS', ''),
+                'Name':              name,
+                'Price':             round(current_price, 2),
+                'Sector':            sector,
+                'RSI':               round(rsi, 2),
+                'RSI_Signal':        rsi_signal,
+                'RSI_Divergence':    rsi_divergence,
+                'MACD':              macd_signal,
+                'ADX':               adx,
+                'Vol_Ratio':         vol_ratio,
+                'SMA_20':            round(sma_20, 2),
+                'SMA_50':            round(sma_50, 2),
+                'SMA_200':           round(sma_200, 2),
+                'Support':           round(nearest_support, 2),
+                'Resistance':        round(nearest_resistance, 2),
+                'Support_Dist_Pct':  support_dist_pct,
+                '52W_High':          round(high_52w, 2),
+                '52W_Low':           round(low_52w, 2),
                 'Pct_From_52W_High': round(pct_from_52w_high, 2),
-                'Tech_Score':       tech_score,
-                'Tech_Score_Norm':  round(tech_score_normalized, 1),
-                'ATR':              atr,
-                'ATR_Pct':          atr_pct,
-                'ATR_Multiplier':   atr_multiplier,
-                'Stop_Type':        stop_type,
-                'PE_Ratio':         round(pe_ratio, 2)            if pe_ratio else 0,
-                'PB_Ratio':         round(pb_ratio, 2)            if pb_ratio else 0,
-                'PEG_Ratio':        round(peg_ratio, 2)           if peg_ratio else 0,
-                'ROE':              round(roe * 100, 2)           if roe else 0,
-                'ROA':              round(roa * 100, 2)           if roa else 0,
-                'Profit_Margin':    round(profit_margin * 100, 2)     if profit_margin else 0,
-                'Operating_Margin': round(operating_margin * 100, 2)  if operating_margin else 0,
-                'EPS':              round(eps, 2)                 if eps else 0,
-                'Dividend_Yield':   round(dividend_yield * 100, 2)    if dividend_yield else 0,
-                'Revenue_Growth':   round(revenue_growth * 100, 2)    if revenue_growth else 0,
-                'Earnings_Growth':  round(earnings_growth * 100, 2)   if earnings_growth else 0,
-                'Debt_to_Equity':   round(debt_to_equity, 2)     if debt_to_equity else 0,
-                'Current_Ratio':    round(current_ratio, 2)      if current_ratio else 0,
-                'Market_Cap':       round(market_cap / 1e12, 2)  if market_cap else 0,
-                'Beta':             round(beta, 2)                if beta else 1.0,
-                'Fund_Score':       round(fund_score, 1),
-                'Quality':          quality,
-                'Combined_Score':   round(combined_score, 1),
-                'Rating':           rating,
-                'Recommendation':   recommendation,
-                'Stop_Loss':        round(stop_loss, 2),
-                'SL_Percentage':    round(sl_percentage, 2),
-                'Target_1':         round(target_1, 2),
-                'Target_2':         round(target_2, 2),
-                'Target_Price':     round(target_price, 2) if target_price else 0,
-                'Upside':           round(upside, 2),
-                'Risk_Reward':      risk_reward,
-                'Targets_Hit':      targets_hit,
-                'Target_Status':    target_status,
-                'Analyst':          analyst_label,
-                'Earnings_Date':    earnings_date,
+                'Tech_Score':        tech_score,
+                'Tech_Score_Norm':   round(tech_score_normalized, 1),
+                'ATR':               atr,
+                'ATR_Pct':           atr_pct,
+                'ATR_Multiplier':    atr_multiplier,
+                'Stop_Type':         stop_type,
+                'PE_Ratio':          round(pe_ratio, 2)             if pe_ratio else 0,
+                'PB_Ratio':          round(pb_ratio, 2)             if pb_ratio else 0,
+                'PEG_Ratio':         round(peg_ratio, 2)            if peg_ratio else 0,
+                'ROE':               round(roe * 100, 2)            if roe else 0,
+                'ROA':               round(roa * 100, 2)            if roa else 0,
+                'Profit_Margin':     round(profit_margin * 100, 2)      if profit_margin else 0,
+                'Operating_Margin':  round(operating_margin * 100, 2)   if operating_margin else 0,
+                'EPS':               round(eps, 2)                  if eps else 0,
+                'Dividend_Yield':    round(dividend_yield * 100, 2)     if dividend_yield else 0,
+                'Revenue_Growth':    round(revenue_growth * 100, 2)     if revenue_growth else 0,
+                'Earnings_Growth':   round(earnings_growth * 100, 2)    if earnings_growth else 0,
+                'Debt_to_Equity':    round(debt_to_equity, 2)      if debt_to_equity else 0,
+                'Current_Ratio':     round(current_ratio, 2)       if current_ratio else 0,
+                'Market_Cap':        round(market_cap / 1e12, 2)   if market_cap else 0,
+                'Beta':              round(beta, 2)                 if beta else 1.0,
+                'Fund_Score':        round(fund_score, 1),
+                'Quality':           quality,
+                'Combined_Score':    round(combined_score, 1),
+                'Rating':            rating,
+                'Recommendation':    recommendation,
+                'Stop_Loss':         round(stop_loss, 2),
+                'SL_Percentage':     round(sl_percentage, 2),
+                'Target_1':          round(target_1, 2),
+                'Target_2':          round(target_2, 2),
+                'Target_Price':      round(target_price, 2) if target_price else 0,
+                'Upside':            round(upside, 2),
+                'Risk_Reward':       risk_reward,
+                'Targets_Hit':       targets_hit,
+                'Target_Status':     target_status,
+                'Analyst':           analyst_label,
+                'Earnings_Date':     earnings_date,
             }
         except Exception:
             return None
@@ -664,24 +801,54 @@ class Nifty100CompleteAnalyzer:
 
     # =========================================================================
     #  TOP RECOMMENDATIONS
+    #  v5: NEW-2 volume hard gate, NEW-3 sector cap, NEW-5 R:R raised to 1.5
     # =========================================================================
     def get_top_recommendations(self):
         df = pd.DataFrame(self.results)
+
+        # ── BUY side ──────────────────────────────────────────────────────────
         all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
         f1 = all_buys[all_buys['Upside'] > 0.5]
-        f2 = f1[f1['Risk_Reward'] >= 0.5]
-        f3 = f2[f2['Target_1'] > f2['Price']]
-        top_buys = f3.nlargest(20, 'Combined_Score')
+        f2 = f1[f1['Target_1'] > f1['Price']]
 
+        # NEW-5: R:R filter raised from 0.5 to 1.5
+        f3 = f2[f2['Risk_Reward'] >= 1.5]
+
+        # NEW-2: Volume hard gatekeeper — STRONG BUY blocked if vol < 1.5x
+        # For plain BUY we keep vol >= 1.0 (at least average volume)
+        strong_buys = f3[
+            (f3['Recommendation'] == 'STRONG BUY') & (f3['Vol_Ratio'] >= 1.5)
+        ]
+        plain_buys = f3[
+            (f3['Recommendation'] == 'BUY') & (f3['Vol_Ratio'] >= 1.0)
+        ]
+        filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
+        sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
+
+        # NEW-3: Sector diversity cap — max MAX_PICKS_PER_SECTOR per sector
+        top_buys_rows = []
+        sector_counts = {}
+        for _, row in sorted_buys.iterrows():
+            sec = row.get('Sector', 'N/A')
+            sector_counts[sec] = sector_counts.get(sec, 0)
+            if sector_counts[sec] < MAX_PICKS_PER_SECTOR:
+                top_buys_rows.append(row)
+                sector_counts[sec] += 1
+            if len(top_buys_rows) >= 20:
+                break
+        top_buys = pd.DataFrame(top_buys_rows)
+
+        # ── SELL side ─────────────────────────────────────────────────────────
         all_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])]
         s1 = all_sells[all_sells['Upside'] > 0.5]
-        s2 = s1[s1['Risk_Reward'] >= 0.5]
+        s2 = s1[s1['Risk_Reward'] >= 1.5]     # NEW-5: same R:R raise for sells
         s3 = s2[s2['Target_1'] < s2['Price']]
         top_sells = s3.nsmallest(20, 'Combined_Score')
+
         return top_buys, top_sells
 
     # =========================================================================
-    #  HTML — Redesigned v4: All accuracy improvements reflected in UI
+    #  HTML — v5: Divergence column added to Buy table
     # =========================================================================
     def generate_html(self):
         df = pd.DataFrame(self.results)
@@ -698,7 +865,13 @@ class Nifty100CompleteAnalyzer:
         sell_count        = len(df[df['Recommendation'] == 'SELL'])
         strong_sell_count = len(df[df['Recommendation'] == 'STRONG SELL'])
 
-        # ── ticker tape items ──────────────────────────────────────────────
+        # Sector distribution summary for KPI band
+        if not top_buys.empty:
+            sector_summary = top_buys['Sector'].value_counts().head(4)
+            sector_kpi = ' · '.join([f"{s}: {c}" for s, c in sector_summary.items()])
+        else:
+            sector_kpi = 'No buys'
+
         ticker_items = ""
         for t in self.results[:12]:
             pct  = ((t['Price'] - t['SMA_20']) / t['SMA_20']) * 100
@@ -742,19 +915,13 @@ class Nifty100CompleteAnalyzer:
   --muted2:   #ccddff;
 }}
 *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
-
 body {{
-  background: #04080f;
-  color: #ddeeff;
+  background: #04080f; color: #ddeeff;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  min-height: 100vh;
+  font-size: 13px; min-height: 100vh;
 }}
-
-/* ── HEADER ── */
 header {{
-  background: #060d18;
-  border-bottom: 2px solid #00f5ff;
+  background: #060d18; border-bottom: 2px solid #00f5ff;
   position: sticky; top: 0; z-index: 100;
   box-shadow: 0 4px 24px rgba(0,0,0,0.8);
 }}
@@ -773,16 +940,13 @@ header {{
   box-shadow: 0 0 20px rgba(0,212,255,0.3);
 }}
 .brand-name {{
-  font-family: 'Syne', sans-serif;
-  font-size: 18px; font-weight: 800;
-  color: #ffffff; letter-spacing: -0.5px;
+  font-family: 'Syne', sans-serif; font-size: 18px;
+  font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
 }}
 .brand-sub {{
-  font-size: 10px; color: #aaddff;
-  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; font-weight: 700;
+  font-size: 10px; color: #aaddff; letter-spacing: 2px;
+  text-transform: uppercase; margin-top: 2px; font-weight: 700;
 }}
-
-/* INDEX STRIP */
 .idx-strip {{
   display: flex; align-items: center;
   background: rgba(0,0,0,0.4);
@@ -790,9 +954,8 @@ header {{
   border-radius: 10px; overflow: hidden;
 }}
 .idx-item {{
-  display: flex; flex-direction: column;
-  align-items: center; padding: 6px 20px;
-  border-right: 1px solid var(--border); gap: 2px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 6px 20px; border-right: 1px solid var(--border); gap: 2px;
 }}
 .idx-item:last-child {{ border-right: none; }}
 .idx-name  {{ font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #aaddff; text-transform: uppercase; }}
@@ -800,30 +963,20 @@ header {{
 .idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 800; }}
 .idx-chg.up {{ color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
 .idx-chg.dn {{ color: #ff4466; text-shadow: 0 0 8px rgba(255,68,102,0.6); }}
-
-/* CLOCK */
-.clock-box {{
-  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
-}}
+.clock-box {{ display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }}
 .clock-time {{
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 22px; font-weight: 800; color: #00ff88;
-  text-shadow: 0 0 16px rgba(0,255,136,0.8);
-  letter-spacing: 1px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px;
+  font-weight: 800; color: #00ff88;
+  text-shadow: 0 0 16px rgba(0,255,136,0.8); letter-spacing: 1px;
 }}
 .clock-meta {{ font-size: 12px; color: #ffffff; letter-spacing: 1px; font-weight: 700; }}
 .clock-next {{ font-size: 11px; color: #aaddff; margin-top: 2px; font-weight: 700; }}
-
-/* TICKER TAPE */
 .ticker {{
-  background: rgba(0,0,0,0.6);
-  border-top: 1px solid var(--border); overflow: hidden;
+  background: rgba(0,0,0,0.6); border-top: 1px solid var(--border); overflow: hidden;
 }}
-.ticker-track {{ display: flex; white-space: nowrap; }}
 .ticker-inner {{
   display: flex; white-space: nowrap;
-  animation: ticker-scroll 50s linear infinite;
-  padding: 5px 0;
+  animation: ticker-scroll 50s linear infinite; padding: 5px 0;
 }}
 @keyframes ticker-scroll {{
   0%   {{ transform: translateX(0); }}
@@ -834,16 +987,13 @@ header {{
   padding: 0 18px; border-right: 1px solid #1e3a5a;
   font-family: 'IBM Plex Mono', monospace; font-size: 12px;
 }}
-.tick-sym  {{ color: #00f5ff; font-weight: 800; }}
-.tick-px   {{ color: #ffffff; font-weight: 600; }}
-.tick-up   {{ color: #00ff88; font-weight: 700; }}
-.tick-dn   {{ color: #ff4466; font-weight: 700; }}
-
-/* KPI BAND */
+.tick-sym {{ color: #00f5ff; font-weight: 800; }}
+.tick-px  {{ color: #ffffff; font-weight: 600; }}
+.tick-up  {{ color: #00ff88; font-weight: 700; }}
+.tick-dn  {{ color: #ff4466; font-weight: 700; }}
 .kpi-band {{
   display: flex; align-items: center;
-  background: #080f1e;
-  border-bottom: 2px solid #1e3a5a;
+  background: #080f1e; border-bottom: 2px solid #1e3a5a;
 }}
 .kpi-item {{
   display: flex; flex-direction: column; align-items: center;
@@ -853,14 +1003,9 @@ header {{
 .kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }}
 .kpi-label {{ font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aaddff; margin-top: 5px; }}
 .kpi-bar   {{ height: 3px; width: 50px; border-radius: 2px; margin-top: 8px; }}
-
-/* MAIN */
+.kpi-sub   {{ font-size: 10px; color: #6699bb; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }}
 .main {{ padding: 20px; }}
-
-/* SECTION HEADER */
-.section-hdr {{
-  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-}}
+.section-hdr {{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }}
 .section-pill {{
   display: flex; align-items: center; gap: 8px;
   padding: 8px 20px; border-radius: 100px;
@@ -870,48 +1015,34 @@ header {{
 .pill-sell {{ background: #4d0010; color: #ff4466; border: 2px solid #cc0033; }}
 .section-line {{ flex: 1; height: 1px; background: #1e3a5a; }}
 .section-note {{ font-size: 11px; color: #88aacc; letter-spacing: 1.5px; white-space: nowrap; font-weight: 800; text-transform: uppercase; }}
-
-/* TABLE WRAPPER */
 .tbl-wrap {{
   width: 100%; overflow-x: auto;
   border: 1px solid #1e3a5a; border-radius: 12px;
-  margin-bottom: 28px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  -webkit-overflow-scrolling: touch;
-  background: #080f1e;
+  margin-bottom: 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  -webkit-overflow-scrolling: touch; background: #080f1e;
 }}
-table {{ width: 100%; border-collapse: collapse; min-width: 1500px; }}
-
-/* GROUP HEADER ROW */
+table {{ width: 100%; border-collapse: collapse; min-width: 1600px; }}
 .grp-row th {{
   font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-  padding: 9px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
-  white-space: nowrap;
+  padding: 9px 10px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap;
 }}
 .grp-stock {{ background: #0d3a42; color: #00f5ff; text-shadow: 0 0 8px rgba(0,245,255,0.6); }}
 .grp-trade {{ background: #0a3320; color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
 .grp-tech  {{ background: #0a2a40; color: #40c8ff; text-shadow: 0 0 8px rgba(64,200,255,0.6); }}
 .grp-fund  {{ background: #3a2a00; color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.6); }}
 .grp-meta  {{ background: #28124a; color: #cc99ff; text-shadow: 0 0 8px rgba(204,153,255,0.6); }}
-
-/* COLUMN HEADER ROW */
 .col-row th {{
   font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
-  padding: 9px 10px; color: #ffffff;
-  background: #0c1a2e;
-  border-bottom: 3px solid #1e3a5a;
-  white-space: nowrap; text-align: left;
+  padding: 9px 10px; color: #ffffff; background: #0c1a2e;
+  border-bottom: 3px solid #1e3a5a; white-space: nowrap; text-align: left;
 }}
 .ch-stock {{ border-top: 3px solid #00f5ff; color: #b0f0ff; }}
 .ch-trade {{ border-top: 3px solid #00ff88; color: #b0ffe0; }}
 .ch-tech  {{ border-top: 3px solid #40c8ff; color: #c0e8ff; }}
 .ch-fund  {{ border-top: 3px solid #ffcc00; color: #fff0a0; }}
 .ch-meta  {{ border-top: 3px solid #cc99ff; color: #e8d0ff; }}
-
-/* Group separator */
 .gsep {{ border-left: 2px solid rgba(255,255,255,0.12) !important; }}
-
-/* DATA ROWS */
 td {{
   padding: 11px 10px; border-bottom: 1px solid #0e2040;
   vertical-align: middle; white-space: nowrap;
@@ -919,14 +1050,10 @@ td {{
 tr:last-child td {{ border-bottom: none; }}
 tr:nth-child(even) td {{ background: rgba(255,255,255,0.025); }}
 tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }}
-
-/* ── CELL STYLES ── */
 .stock-name {{ font-size: 13px; font-weight: 700; color: #ffffff; }}
 .stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #00f5ff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
 .stock-sec  {{ font-size: 10px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
 .price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #ffcc00; }}
-
-/* Rating badge */
 .badge {{
   display: inline-flex; align-items: center; gap: 4px;
   font-size: 10px; font-weight: 800; padding: 5px 10px;
@@ -937,18 +1064,13 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 .badge-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #445566; }}
 .badge-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
 .badge-ss {{ background: #5a0015; color: #ff7788; border: 1px solid #ff7788; }}
-
-/* Score */
 .score-wrap {{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 6px; }}
 .score-num  {{ font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }}
 .score-track {{ width: 44px; height: 4px; background: #1a2a3a; border-radius: 2px; }}
 .score-fill  {{ height: 100%; border-radius: 2px; transition: width 0.5s ease; }}
-
-/* Target / Stop */
 .target-badge {{
   font-size: 9px; font-weight: 800; padding: 3px 7px;
-  border-radius: 4px; letter-spacing: 0.5px;
-  display: block; margin-bottom: 4px;
+  border-radius: 4px; letter-spacing: 0.5px; display: block; margin-bottom: 4px;
 }}
 .tb-real    {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
 .tb-partial {{ background: #4d3300; color: #ffcc00; border: 1px solid #ffcc00; }}
@@ -960,17 +1082,18 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 .sl-type {{ font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }}
 .slt-atr  {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .slt-beta {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
-
 .upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; }}
 .upside-val.up {{ color: #00ff88; }}
 .upside-val.dn {{ color: #ff4466; }}
-.rr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
+.rr-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
 .atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: #00f5ff; }}
 .atr-sub {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-
-/* Technicals */
 .rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
 .rsi-sig {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.div-badge {{ font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }}
+.div-bear {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
+.div-bull {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
+.div-none {{ background: #1a2a3a; color: #88aacc; border: 1px solid #334455; }}
 .adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
 .adx-lbl {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
 .adx-strong {{ color: #00ff88; }}
@@ -985,46 +1108,33 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 .sdist-close {{ color: #00ff88; }}
 .sdist-mid   {{ color: #ffcc00; }}
 .sdist-far   {{ color: #ff4466; }}
-
-/* Fundamentals */
 .mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }}
-
-/* Badges */
 .qbadge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
 .qb-ex {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .qb-gd {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
 .qb-av {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
 .qb-po {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-
 .analyst-badge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }}
 .ab-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .ab-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
 .ab-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #334455; }}
 .ab-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-
 .earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #00f5ff; font-weight: 700; }}
 .rnum {{ font-size: 12px; color: #88bbdd; font-weight: 700; }}
 .macd-bull {{ color: #00ff88; font-weight: 800; font-size: 12px; }}
 .macd-bear {{ color: #ff4466; font-weight: 800; font-size: 12px; }}
-
-/* DISCLAIMER */
 .disc {{
   background: #0c1a2e; border: 1px solid #1e3a5a;
   border-left: 4px solid #ff4466;
   padding: 14px 18px; border-radius: 8px;
-  font-size: 12px; color: #aaccee; line-height: 1.9;
-  margin: 16px 0;
+  font-size: 12px; color: #aaccee; line-height: 1.9; margin: 16px 0;
 }}
-
-/* FOOTER */
 footer {{
   text-align: center; padding: 16px;
   background: #080f1e; border-top: 1px solid #1e3a5a;
   font-size: 12px; color: #88aacc; letter-spacing: 1px;
 }}
 footer strong {{ color: #00f5ff; }}
-
-/* MOBILE */
 @media(max-width: 900px) {{
   .idx-strip {{ display: none; }}
   .kpi-item  {{ padding: 10px 12px; }}
@@ -1039,18 +1149,15 @@ footer strong {{ color: #00f5ff; }}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header>
   <div class="h-top">
     <div class="brand">
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · Tech &amp; Fundamental v4 · Enhanced Accuracy</div>
+        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Sector Diversified · v5</div>
       </div>
     </div>
-
     <div class="idx-strip">
       <div class="idx-item">
         <span class="idx-name">SENSEX</span>
@@ -1068,7 +1175,6 @@ footer strong {{ color: #00f5ff; }}
         <span class="idx-chg {idx_data['BANK NIFTY']['cls']}">{idx_data['BANK NIFTY']['chg']}</span>
       </div>
     </div>
-
     <div class="clock-box">
       <div class="clock-time" id="liveClock">--:-- --</div>
       <div class="clock-meta" id="liveDate">{now.strftime('%d %b %Y')} · IST</div>
@@ -1076,19 +1182,17 @@ footer strong {{ color: #00f5ff; }}
       <div class="clock-next">Next Update: <strong style="color:var(--accent2)">{next_update}</strong></div>
     </div>
   </div>
-
   <div class="ticker">
     <div class="ticker-inner">{ticker_html}</div>
   </div>
 </header>
 
-<!-- KPI BAND -->
 <div class="kpi-band">
   <div class="kpi-item"><div class="kpi-num" style="color:var(--accent)">{len(self.results)}</div><div class="kpi-label">Analyzed</div><div class="kpi-bar" style="background:var(--accent)"></div></div>
   <div class="kpi-item"><div class="kpi-num" style="color:var(--green)">{strong_buy_count}</div><div class="kpi-label">Strong Buy</div><div class="kpi-bar" style="background:var(--green)"></div></div>
   <div class="kpi-item"><div class="kpi-num" style="color:var(--teal)">{buy_count}</div><div class="kpi-label">Buy</div><div class="kpi-bar" style="background:var(--teal)"></div></div>
   <div class="kpi-item"><div class="kpi-num" style="color:var(--red)">{sell_count + strong_sell_count}</div><div class="kpi-label">Sell / Strong Sell</div><div class="kpi-bar" style="background:var(--red)"></div></div>
-  <div class="kpi-item"><div class="kpi-num" style="color:#60a5fa">{hold_count}</div><div class="kpi-label">Hold</div><div class="kpi-bar" style="background:#60a5fa"></div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:#60a5fa">{hold_count}</div><div class="kpi-label">Hold</div><div class="kpi-bar" style="background:#60a5fa"></div><div class="kpi-sub">Sectors: {sector_kpi}</div></div>
 </div>
 
 <div class="main">
@@ -1097,14 +1201,11 @@ footer strong {{ color: #00f5ff; }}
         # ── helper functions ──────────────────────────────────────────────────
         def rating_badge(rec, rating_text):
             cls_map = {
-                'STRONG BUY':  'badge-sb',
-                'BUY':         'badge-b',
-                'HOLD':        'badge-h',
-                'SELL':        'badge-s',
+                'STRONG BUY':  'badge-sb', 'BUY': 'badge-b',
+                'HOLD':        'badge-h',  'SELL': 'badge-s',
                 'STRONG SELL': 'badge-ss',
             }
-            cls = cls_map.get(rec, 'badge-h')
-            return f'<span class="badge {cls}">{rating_text}</span>'
+            return f'<span class="badge {cls_map.get(rec, "badge-h")}">{rating_text}</span>'
 
         def score_cell(val, color, bar_color):
             pct = min(int(val), 100)
@@ -1118,6 +1219,14 @@ footer strong {{ color: #00f5ff; }}
             if 'ATH' in ts:       return 'tb-ath',     '🚀 ATH Zone'
             elif 'Partial' in ts: return 'tb-partial',  '⚡ Partial S/R'
             else:                  return 'tb-real',    '📍 Real S/R'
+
+        def divergence_badge(div):
+            if div == 'Bearish Divergence':
+                return '<span class="div-badge div-bear">⚠ Bear Div</span>'
+            elif div == 'Bullish Divergence':
+                return '<span class="div-badge div-bull">✅ Bull Div</span>'
+            else:
+                return '<span class="div-badge div-none">—</span>'
 
         def adx_cell(v):
             if v >= 30:   cls, lbl = 'adx-strong', 'Strong'
@@ -1146,7 +1255,7 @@ footer strong {{ color: #00f5ff; }}
             return f'<span class="qbadge {m.get(q, "qb-av")}">{q}</span>'
 
         def rr_color(v):
-            return '#00e676' if v >= 2 else ('#00d4ff' if v >= 1 else '#ff3d57')
+            return '#00e676' if v >= 2 else ('#00d4ff' if v >= 1.5 else ('#ffab00' if v >= 1 else '#ff3d57'))
 
         def pe_color(v, direction='buy'):
             if v <= 0: return '#4a6080'
@@ -1165,7 +1274,7 @@ footer strong {{ color: #00f5ff; }}
         if not top_buys.empty:
             html += """
   <div class="section-hdr">
-    <div class="section-pill pill-buy">▲ Top 20 Buy Recommendations</div>
+    <div class="section-pill pill-buy">▲ Top Buy Recommendations — Sector Diversified</div>
     <div class="section-line"></div>
     <div class="section-note">STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META</div>
   </div>
@@ -1174,7 +1283,7 @@ footer strong {{ color: #00f5ff; }}
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
         <th class="grp-trade gsep" colspan="6">TRADE SETUP</th>
-        <th class="grp-tech gsep"  colspan="5">TECHNICALS</th>
+        <th class="grp-tech gsep"  colspan="6">TECHNICALS</th>
         <th class="grp-fund gsep"  colspan="4">FUNDAMENTALS</th>
         <th class="grp-meta gsep"  colspan="3">META</th>
       </tr>
@@ -1188,11 +1297,12 @@ footer strong {{ color: #00f5ff; }}
         <th class="ch-trade">Stop Loss</th>
         <th class="ch-trade">ATR</th>
         <th class="ch-trade">R : R</th>
-        <th class="ch-tech gsep">RSI</th>
+        <th class="ch-tech gsep">RSI / Div</th>
         <th class="ch-tech">ADX</th>
         <th class="ch-tech">Vol / Avg</th>
         <th class="ch-tech">Sup Dist</th>
         <th class="ch-tech">52W Hi %</th>
+        <th class="ch-tech">MACD</th>
         <th class="ch-fund gsep">P/E</th>
         <th class="ch-fund">Beta</th>
         <th class="ch-fund">Div %</th>
@@ -1218,6 +1328,7 @@ footer strong {{ color: #00f5ff; }}
                 div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '—'
                 divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
                 rr       = row['Risk_Reward']
+                mcdcls   = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -1250,11 +1361,13 @@ footer strong {{ color: #00f5ff; }}
         <td class="gsep">
           <div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div>
           <div class="rsi-sig">{row['RSI_Signal']}</div>
+          {divergence_badge(row.get('RSI_Divergence','None'))}
         </td>
         <td>{adx_cell(row.get('ADX', 0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td class="gsep">{sdist_cell(row.get('Support_Dist_Pct', 0))}</td>
+        <td>{sdist_cell(row.get('Support_Dist_Pct', 0))}</td>
         <td><span class="mono-sm" style="color:{w52_color(w52)}">{w52:+.1f}%</span></td>
+        <td><span class="{mcdcls}">{row['MACD']}</span></td>
         <td class="gsep"><span class="mono-sm" style="color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
         <td><span class="mono-sm" style="color:{beta_color(row['Beta'])}">{row['Beta']:.2f}</span></td>
         <td><span class="mono-sm" style="color:{divc}">{div}</span></td>
@@ -1376,6 +1489,7 @@ footer strong {{ color: #00f5ff; }}
     For <strong>EDUCATIONAL PURPOSES ONLY</strong>. Not financial advice.
     Stop losses are ATR-based near real 12-month S/R zones. Targets derived from
     swing highs/lows, 52-week extremes and round-number levels. Earnings dates are estimates.
+    RSI divergence signals are algorithmic and not a guarantee of reversal.
     Always conduct your own research, consult a SEBI-registered financial advisor,
     and never invest more than you can afford to lose.
   </div>
@@ -1383,7 +1497,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · Grouped Columns · ADX · Vol · Earnings v4 · Enhanced STRONG BUY Accuracy
+  · 12M S/R · ATR Stops · RSI Divergence · Sector Cap · Data Sanity · v5
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -1431,7 +1545,7 @@ setInterval(updateClock, 1000);
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v4 — {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report v5 — {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
             srv.starttls()
@@ -1451,7 +1565,7 @@ setInterval(updateClock, 1000);
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v4 — Enhanced STRONG BUY Accuracy")
+        print("💎 NIFTY 100 ANALYZER v5 — RSI Divergence · Sector Cap · Data Sanity")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
