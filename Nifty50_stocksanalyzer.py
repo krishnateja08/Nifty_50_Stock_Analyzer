@@ -1,18 +1,16 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v3
+NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v4
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
-UPGRADES from v2:
-  - Grouped column headers: STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META
-  - Color-coded column group bands with top-border accents
-  - Score displayed as number + animated fill bar
-  - Stop type badge anchored directly under SL price
-  - Target S/R badge above target price for instant context
-  - Auto-scrolling ticker tape (CSS animation, no JS dependency)
-  - Live clock with seconds
-  - Space Grotesk + IBM Plex Mono typography
-  - Vertical group separators for clean scanning
-  - All original analysis logic preserved
+UPGRADES from v3 (Accuracy Improvements for STRONG BUY):
+  1. Fundamental weight increased to 65% (from 50%) — reduces noise from short-term technicals
+  2. ADX weak-trend penalty added — no score boost for trendless markets
+  3. RSI Oversold context-aware — penalises oversold in downtrend (below SMA 200)
+  4. STRONG BUY requires R:R >= 1.5 — prevents weak risk/reward from reaching STRONG BUY
+  5. Negative earnings/revenue growth now penalises fundamental score
+  6. Volume ratio now influences tech score — confirms breakouts, penalises thin moves
+  7. Analyst consensus now contributes ±5 to combined score
+  8. 52W High proximity bonus — near-ATH in uptrend = breakout confirmation
 
 Requirements:
     pip install yfinance pandas numpy pytz
@@ -346,7 +344,7 @@ class Nifty100CompleteAnalyzer:
         return round(t1, 2), round(t2, 2), 0, target_status
 
     # =========================================================================
-    #  FUNDAMENTAL SCORE
+    #  FUNDAMENTAL SCORE  [v4: penalises negative growth]
     # =========================================================================
     def get_fundamental_score(self, info):
         score = 0
@@ -368,14 +366,21 @@ class Nifty100CompleteAnalyzer:
         elif roa and roa > 0.02: score += 3
         if pm  and pm  > 0.10:   score += 10
         elif pm  and pm  > 0.05: score += 5
+
+        # ── FIX 5: penalise negative growth ──────────────────────────────────
         rg = info.get('revenueGrowth', 0)
         eg = info.get('earningsGrowth', 0)
-        if rg and rg > 0.15:   score += 10
-        elif rg and rg > 0.10: score += 7
-        elif rg and rg > 0.05: score += 5
-        if eg and eg > 0.15:   score += 10
-        elif eg and eg > 0.10: score += 7
-        elif eg and eg > 0.05: score += 5
+        if rg and rg > 0.15:        score += 10
+        elif rg and rg > 0.10:      score += 7
+        elif rg and rg > 0.05:      score += 5
+        elif rg and rg < 0:         score -= 10  # revenue declining = red flag
+
+        if eg and eg > 0.15:        score += 10
+        elif eg and eg > 0.10:      score += 7
+        elif eg and eg > 0.05:      score += 5
+        elif eg and eg < 0:         score -= 10  # earnings declining = red flag
+        # ─────────────────────────────────────────────────────────────────────
+
         de = info.get('debtToEquity', 0)
         cr = info.get('currentRatio', 0)
         fc = info.get('freeCashflow', 0)
@@ -387,10 +392,10 @@ class Nifty100CompleteAnalyzer:
         if cr and cr > 1.5:   score += 10
         elif cr and cr > 1.0: score += 5
         if fc and fc > 0:     score += 5
-        return min(score, 100)
+        return min(max(score, 0), 100)   # clamp 0–100
 
     # =========================================================================
-    #  MAIN ANALYSIS
+    #  MAIN ANALYSIS  [v4: all 8 accuracy fixes applied here]
     # =========================================================================
     def analyze_stock(self, symbol, name):
         try:
@@ -428,22 +433,48 @@ class Nifty100CompleteAnalyzer:
             support_dist_pct = round(
                 ((current_price - nearest_support) / current_price) * 100, 2)
 
+            # ── TECHNICAL SCORE ───────────────────────────────────────────────
             tech_score = 0
             tech_score += 1 if current_price > sma_20  else -1
             tech_score += 1 if current_price > sma_50  else -1
             tech_score += 2 if current_price > sma_200 else -2
+
+            # FIX 3: RSI context-aware — oversold only bullish when above SMA 200
             if rsi < 30:
-                tech_score += 2;  rsi_signal = "Oversold"
+                if current_price > sma_200:
+                    tech_score += 2   # oversold in uptrend = good entry
+                    rsi_signal = "Oversold"
+                else:
+                    tech_score -= 1   # oversold in downtrend = falling knife
+                    rsi_signal = "Oversold (Downtrend)"
             elif rsi > 70:
-                tech_score -= 2;  rsi_signal = "Overbought"
+                tech_score -= 2
+                rsi_signal = "Overbought"
             else:
                 rsi_signal = "Neutral"
+
             if macd > signal:
                 tech_score += 1;  macd_signal = "Bullish"
             else:
                 tech_score -= 1;  macd_signal = "Bearish"
+
+            # FIX 2: ADX — reward strong trend, penalise trendless market
             if adx > 25:
                 tech_score = min(tech_score + 1, 6)
+            elif adx < 20:
+                tech_score -= 1   # no clear trend = lower confidence
+
+            # FIX 6: Volume ratio influences tech score
+            if vol_ratio > 1.5 and current_price > sma_20:
+                tech_score = min(tech_score + 1, 6)  # high-volume breakout
+            elif vol_ratio < 0.7:
+                tech_score -= 1   # low-volume move = less reliable
+
+            # FIX 8: Near 52W high in uptrend = breakout confirmation bonus
+            pct_from_52w_high = ((current_price - high_52w) / high_52w) * 100
+            if pct_from_52w_high >= -5 and current_price > sma_200:
+                tech_score = min(tech_score + 1, 6)
+            # ─────────────────────────────────────────────────────────────────
 
             pe_ratio         = info.get('trailingPE', info.get('forwardPE', 0))
             pb_ratio         = info.get('priceToBook', 0)
@@ -474,8 +505,16 @@ class Nifty100CompleteAnalyzer:
             earnings_date = self.get_earnings_date(info)
 
             fund_score = self.get_fundamental_score(info)
+
+            # FIX 1: Weight fundamentals 65%, technicals 35% for better accuracy
             tech_score_normalized = ((tech_score + 6) / 12) * 100
-            combined_score        = (tech_score_normalized * 0.5) + (fund_score * 0.5)
+            combined_score        = (tech_score_normalized * 0.35) + (fund_score * 0.65)
+
+            # FIX 7: Analyst consensus adjustment ±5 points
+            if analyst_key in ('strongBuy', 'buy'):
+                combined_score = min(combined_score + 5, 100)
+            elif analyst_key in ('sell', 'strongSell'):
+                combined_score = max(combined_score - 5, 0)
 
             if combined_score >= 75:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY";  recommendation = "STRONG BUY"
@@ -539,6 +578,11 @@ class Nifty100CompleteAnalyzer:
             reward      = abs(target_1 - current_price)
             risk_reward = round(reward / risk, 2) if risk > 0 else 0
 
+            # FIX 4: STRONG BUY requires R:R >= 1.5, else downgrade to BUY
+            if recommendation == "STRONG BUY" and risk_reward < 1.5:
+                recommendation = "BUY"
+                rating         = "⭐⭐⭐⭐ BUY"
+
             if fund_score >= 80:   quality = "Excellent"
             elif fund_score >= 60: quality = "Good"
             elif fund_score >= 40: quality = "Average"
@@ -562,6 +606,7 @@ class Nifty100CompleteAnalyzer:
                 'Support_Dist_Pct': support_dist_pct,
                 '52W_High':         round(high_52w, 2),
                 '52W_Low':          round(low_52w, 2),
+                'Pct_From_52W_High': round(pct_from_52w_high, 2),
                 'Tech_Score':       tech_score,
                 'Tech_Score_Norm':  round(tech_score_normalized, 1),
                 'ATR':              atr,
@@ -636,7 +681,7 @@ class Nifty100CompleteAnalyzer:
         return top_buys, top_sells
 
     # =========================================================================
-    #  HTML — Redesigned v3: Grouped Columns + IBM Plex Mono + Score Bars
+    #  HTML — Redesigned v4: All accuracy improvements reflected in UI
     # =========================================================================
     def generate_html(self):
         df = pd.DataFrame(self.results)
@@ -666,7 +711,6 @@ class Nifty100CompleteAnalyzer:
                 f'<span class="{cls}">{sign}{pct:.1f}%</span>'
                 f'</span>'
             )
-        # duplicate for seamless loop
         ticker_html = ticker_items + ticker_items
 
         html = f"""<!DOCTYPE html>
@@ -838,7 +882,7 @@ header {{
 }}
 table {{ width: 100%; border-collapse: collapse; min-width: 1500px; }}
 
-/* GROUP HEADER ROW — solid bold backgrounds, pure white text */
+/* GROUP HEADER ROW */
 .grp-row th {{
   font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
   padding: 9px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -850,7 +894,7 @@ table {{ width: 100%; border-collapse: collapse; min-width: 1500px; }}
 .grp-fund  {{ background: #3a2a00; color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.6); }}
 .grp-meta  {{ background: #28124a; color: #cc99ff; text-shadow: 0 0 8px rgba(204,153,255,0.6); }}
 
-/* COLUMN HEADER ROW — solid background, pure white labels */
+/* COLUMN HEADER ROW */
 .col-row th {{
   font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
   padding: 9px 10px; color: #ffffff;
@@ -882,7 +926,7 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 .stock-sec  {{ font-size: 10px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
 .price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #ffcc00; }}
 
-/* Rating badge — solid opaque backgrounds */
+/* Rating badge */
 .badge {{
   display: inline-flex; align-items: center; gap: 4px;
   font-size: 10px; font-weight: 800; padding: 5px 10px;
@@ -945,7 +989,7 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 /* Fundamentals */
 .mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }}
 
-/* Badges — solid opaque */
+/* Badges */
 .qbadge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
 .qb-ex {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .qb-gd {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
@@ -1003,7 +1047,7 @@ footer strong {{ color: #00f5ff; }}
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · Tech &amp; Fundamental v3</div>
+        <div class="brand-sub">12M S/R · ATR Stops · Tech &amp; Fundamental v4 · Enhanced Accuracy</div>
       </div>
     </div>
 
@@ -1339,7 +1383,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · Grouped Columns · ADX · Vol · Earnings v3
+  · 12M S/R · ATR Stops · Grouped Columns · ADX · Vol · Earnings v4 · Enhanced STRONG BUY Accuracy
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -1387,7 +1431,7 @@ setInterval(updateClock, 1000);
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v3 — {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report v4 — {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
             srv.starttls()
@@ -1407,7 +1451,7 @@ setInterval(updateClock, 1000);
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v3 — Grouped UI + ATR Stops + 12M S/R")
+        print("💎 NIFTY 100 ANALYZER v4 — Enhanced STRONG BUY Accuracy")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
@@ -1428,5 +1472,5 @@ if __name__ == "__main__":
     analyzer.generate_complete_report(
         send_email_flag=bool(recipient),
         recipient_email=recipient,
-        output_file='index.html'
+        output_file=os.environ.get('OUTPUT_FILE', 'index.html')
     )
