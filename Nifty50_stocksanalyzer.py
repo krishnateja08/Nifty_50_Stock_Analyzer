@@ -809,7 +809,12 @@ class Nifty100CompleteAnalyzer:
                     rsi_signal = "Neutral →"
             else:
                 # RSI 55-70: healthy zone — reward rising, penalise falling
-                if rsi_direction == 'Rising':
+                if rsi_direction == 'Rising' and rsi > 65:
+                    # V55-OB: RSI rising AND already above 65 = approaching overbought
+                    # Don't reward further — it's closer to danger than opportunity
+                    # Example: Coal India RSI 55→72 = overbought soon, not a buy signal
+                    rsi_signal = f"Near Overbought ⚠ ({rsi:.0f}↑)"
+                elif rsi_direction == 'Rising':
                     tech_score = min(tech_score + 1, 6)
                     rsi_signal = f"Momentum ↑ ({rsi_5bar:.0f}→{rsi:.0f})"
                 elif rsi_direction == 'Falling' and rsi_slope_strong:
@@ -1117,6 +1122,25 @@ class Nifty100CompleteAnalyzer:
         all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
         f1 = all_buys[all_buys['Upside'] > 0]          # any positive upside
         f2 = f1[f1['Target_1'] > f1['Price']]           # target must be above price
+
+        # V55-RSI-GATE: Block overbought and topping-out stocks from Buy table.
+        # Rule 1: RSI > 70 = overbought → block entirely (statistically high reversal risk)
+        # Rule 2: RSI 65-70 AND Falling → near overbought AND already rolling over → block
+        # Rule 3: RSI 60-70 AND falling fast (slope < -8) → already topping → block
+        # Stocks that pass: RSI < 65 rising/flat, or RSI 65-70 flat/rising (still has room)
+        def rsi_is_safe_to_buy(row):
+            rsi_val = row.get('RSI', 50)
+            rsi_dir = row.get('RSI_Direction', 'Flat')
+            rsi_slp = row.get('RSI_Slope', 0)
+            if rsi_val > 70:
+                return False                              # overbought — never buy
+            if rsi_val > 65 and rsi_dir == 'Falling':
+                return False                              # near overbought and already rolling
+            if rsi_val > 60 and rsi_slp < -8:
+                return False                              # topping out fast — e.g. 80→63
+            return True
+
+        f2 = f2[f2.apply(rsi_is_safe_to_buy, axis=1)]
 
         # R:R gate: STRONG BUY ≥ 1.2x, plain BUY ≥ 0.8x
         # Relaxed from 1.5/1.2 — large-cap Nifty stocks trade in tight ranges,
