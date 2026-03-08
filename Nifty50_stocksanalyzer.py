@@ -95,7 +95,6 @@ Requirements:
 
 import yfinance as yf
 import pandas as pd
-import numpy as np
 from datetime import datetime, timezone
 import pytz
 import warnings
@@ -952,47 +951,34 @@ class Nifty100CompleteAnalyzer:
                 'Sector':            sector,
                 'RSI':               round(rsi, 2),
                 'RSI_Signal':        rsi_signal,
-                'RSI_Divergence':    rsi_divergence,
+                'RSI_Divergence':    rsi_divergence,          # shown in buy table + watchlist
                 'MACD':              macd_signal,
                 'ADX':               adx,
                 'Vol_Ratio':         vol_ratio,
-                'SMA_20':            round(sma_20, 2),
-                'SMA_50':            round(sma_50, 2),
-                'SMA_200':           round(sma_200, 2),
-                'SMA_20_Declining':  sma_20_declining,
-                'Death_Cross':       death_cross_forming,
-                'SMA_200_Rising':    sma_200_rising,
+                'SMA_20':            round(sma_20, 2),        # used by watchlist sma_trend
+                'SMA_50':            round(sma_50, 2),        # used by watchlist sma_trend
+                'SMA_200':           round(sma_200, 2),       # used by watchlist sma_trend
+                'SMA_20_Declining':  sma_20_declining,        # used by watchlist sma_trend
+                'Death_Cross':       death_cross_forming,     # used by watchlist sma_trend
+                'SMA_200_Rising':    sma_200_rising,          # used by watchlist sma_trend
                 'Bearish_Signals':   bearish_signal_count,
                 'Weight_Mode':       weight_label,
-                'Veto_Fired':        veto_fired,
+                'Veto_Fired':        veto_fired,              # shown as badge in watchlist
                 'Support':           round(nearest_support, 2),
                 'Resistance':        round(nearest_resistance, 2),
-                'Support_Dist_Pct':  support_dist_pct,
+                'Support_Dist_Pct':  support_dist_pct,        # shown in buy table
                 '52W_High':          round(high_52w, 2),
-                '52W_Low':           round(low_52w, 2),
-                'Pct_From_52W_High': round(pct_from_52w_high, 2),
-                'Tech_Score':        tech_score,
-                'Tech_Score_Norm':   round(tech_score_normalized, 1),
+                'Pct_From_52W_High': round(pct_from_52w_high, 2),  # shown in sell table
+                'Tech_Score':        tech_score,              # shown in watchlist
                 'ATR':               atr,
                 'ATR_Pct':           atr_pct,
                 'ATR_Multiplier':    atr_multiplier,
                 'Stop_Type':         stop_type,
-                'PE_Ratio':          round(pe_ratio, 2)             if pe_ratio else 0,
-                'PB_Ratio':          round(pb_ratio, 2)             if pb_ratio else 0,
-                'PEG_Ratio':         round(peg_ratio, 2)            if peg_ratio else 0,
-                'ROE':               round(roe * 100, 2)            if roe else 0,
-                'ROA':               round(roa * 100, 2)            if roa else 0,
-                'Profit_Margin':     round(profit_margin * 100, 2)      if profit_margin else 0,
-                'Operating_Margin':  round(operating_margin * 100, 2)   if operating_margin else 0,
-                'EPS':               round(eps, 2)                  if eps else 0,
-                'Dividend_Yield':    round(dividend_yield * 100, 2)     if dividend_yield else 0,
-                'Revenue_Growth':    round(revenue_growth * 100, 2)     if revenue_growth else 0,
-                'Earnings_Growth':   round(earnings_growth * 100, 2)    if earnings_growth else 0,
-                'Debt_to_Equity':    round(debt_to_equity, 2)      if debt_to_equity else 0,
-                'Current_Ratio':     round(current_ratio, 2)       if current_ratio else 0,
-                'Market_Cap':        round(market_cap / 1e12, 2)   if market_cap else 0,
-                'Beta':              round(beta, 2)                 if beta else 1.0,
-                'Fund_Score':        round(fund_score, 1),
+                'PE_Ratio':          round(pe_ratio, 2)           if pe_ratio else 0,
+                'Profit_Margin':     round(profit_margin * 100, 2) if profit_margin else 0,
+                'Dividend_Yield':    round(dividend_yield * 100, 2) if dividend_yield else 0,
+                'Beta':              round(beta, 2)               if beta else 1.0,
+                'Fund_Score':        round(fund_score, 1),        # shown in watchlist
                 'Quality':           quality,
                 'Combined_Score':    round(combined_score, 1),
                 'Rating':            rating,
@@ -1001,10 +987,8 @@ class Nifty100CompleteAnalyzer:
                 'SL_Percentage':     round(sl_percentage, 2),
                 'Target_1':          round(target_1, 2),
                 'Target_2':          round(target_2, 2),
-                'Target_Price':      round(target_price, 2) if target_price else 0,
                 'Upside':            round(upside, 2),
                 'Risk_Reward':       risk_reward,
-                'Targets_Hit':       targets_hit,
                 'Target_Status':     target_status,
                 'Analyst':           analyst_label,
                 'Earnings_Date':     earnings_date,
@@ -1779,8 +1763,10 @@ footer strong {{ color: #00f5ff; }}
         <th>Sector</th>
         <th>Price</th>
         <th>Score</th>
+        <th>F/T Split</th>
         <th>Action</th>
         <th>RSI</th>
+        <th>RSI Div</th>
         <th>MACD</th>
         <th>SMA Trend</th>
         <th>Vol</th>
@@ -1846,6 +1832,30 @@ footer strong {{ color: #00f5ff; }}
             # data-rec attribute drives JS filter
             data_rec = rec.replace(' ', '_')
 
+            rsi_div   = row.get('RSI_Divergence', 'None')
+            fund_sc   = row.get('Fund_Score', 0)
+            tech_sc   = row.get('Tech_Score', 0)
+            veto      = row.get('Veto_Fired', False)
+
+            # F/T split pill: shows fund score / tech score
+            tech_col  = '#00e676' if tech_sc >= 3 else ('#ffab00' if tech_sc >= 0 else '#ff4466')
+            fund_col  = '#00e676' if fund_sc >= 70 else ('#ffab00' if fund_sc >= 50 else '#ff4466')
+            ft_cell   = (f'<span style="font-size:11px;color:{fund_col}">F:{fund_sc:.0f}</span>'
+                         f'<span style="color:#4a6080;font-size:10px"> / </span>'
+                         f'<span style="font-size:11px;color:{tech_col}">T:{tech_sc:+d}</span>')
+
+            # RSI divergence pill
+            if rsi_div == 'Bearish Divergence':
+                rsi_div_cell = '<span style="color:#ff4466;font-size:10px">⚠ Bear Div</span>'
+            elif rsi_div == 'Bullish Divergence':
+                rsi_div_cell = '<span style="color:#00e676;font-size:10px">✅ Bull Div</span>'
+            else:
+                rsi_div_cell = '<span style="color:#4a6080;font-size:10px">—</span>'
+
+            # Veto label inside action cell
+            veto_cell = ('<span style="display:block;font-size:9px;color:#ff8c00;margin-top:2px">🚫 Veto</span>'
+                         if veto else '')
+
             html += f"""      <tr data-rec="{data_rec}">
         <td><span class="rnum">{i}</span></td>
         <td>
@@ -1858,11 +1868,16 @@ footer strong {{ color: #00f5ff; }}
           <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
           {veto_badge(bs, wm)}
         </td>
-        <td>{action_button(rec)}</td>
+        <td>{ft_cell}</td>
+        <td>
+          {action_button(rec)}
+          {veto_cell}
+        </td>
         <td>
           <div class="rsi-val" style="color:{rsic};font-size:13px">{row['RSI']:.0f}</div>
           <div style="font-size:10px;color:#8899aa">{row['RSI_Signal']}</div>
         </td>
+        <td>{rsi_div_cell}</td>
         <td><span class="{mcdcls}" style="font-size:11px">{row['MACD']}</span></td>
         <td>{sma_trend}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
