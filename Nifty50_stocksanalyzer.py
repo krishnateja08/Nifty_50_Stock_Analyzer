@@ -790,9 +790,6 @@ class Nifty100CompleteAnalyzer:
 
             # V54-4: Dynamic weight shift.
             # Count how many confirmed bearish technical signals are active RIGHT NOW.
-            # If 3 or more fire, shift weights to 50/50 so that a great balance
-            # sheet cannot mathematically hide an active distribution top.
-            # Normal market = 65% fundamentals / 35% technicals (unchanged from v4).
             bearish_signal_count = sum([
                 bool(sma_20_declining),                          # SMA20 rolling over
                 bool(death_cross_forming),                       # SMA20 < SMA50
@@ -800,13 +797,14 @@ class Nifty100CompleteAnalyzer:
                 bool(rsi < 50),                                  # momentum lost
                 bool(current_price < sma_50),                   # below medium trend
             ])
-            if bearish_signal_count >= 3:
-                # Confirmed downtrend: balance weights equally
+            # V54-4 threshold: 2+ signals → shift to 50/50 weights
+            # (was 3, lowered because in current bear market most BUY candidates
+            #  have at least 2 bearish technicals — we want weight shift earlier)
+            if bearish_signal_count >= 2:
                 tech_weight  = 0.50
                 fund_weight  = 0.50
                 weight_label = "50/50 (Downtrend Override)"
             else:
-                # Normal: fundamentals-led scoring
                 tech_weight  = 0.35
                 fund_weight  = 0.65
                 weight_label = "35/65 (Normal)"
@@ -841,12 +839,12 @@ class Nifty100CompleteAnalyzer:
                 rating = "⭐ STRONG SELL";         recommendation = "STRONG SELL"
 
             # V54-1: TREND VETO GATE — hard cap BEFORE stop/target calculation.
-            # If 3+ confirmed bearish signals are active, the maximum allowed
-            # rating is HOLD regardless of combined_score.
-            # We store the raw score-based rating separately so we can still
-            # show it in the UI (score badge), but recommendation + Rating are
-            # both updated so EVERY downstream consumer sees HOLD.
-            veto_fired = bearish_signal_count >= 3 and recommendation in ("STRONG BUY", "BUY")
+            # Threshold: 2+ bearish signals → max rating is HOLD.
+            # Lowered from 3 to 2 because:
+            #   · MACD Bearish + RSI<50 alone = confirmed momentum loss
+            #   · SMA20 declining + death cross = confirmed rollover
+            # Any 2 of these together means the chart disagrees with a BUY signal.
+            veto_fired = bearish_signal_count >= 2 and recommendation in ("STRONG BUY", "BUY")
             if veto_fired:
                 recommendation = "HOLD"
                 rating         = "⭐⭐⭐ HOLD (Veto)"
@@ -1019,34 +1017,35 @@ class Nifty100CompleteAnalyzer:
 
         # == BUY side ==========================================================
         all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
-        f1 = all_buys[all_buys['Upside'] > 0.5]
-        f2 = f1[f1['Target_1'] > f1['Price']]
+        f1 = all_buys[all_buys['Upside'] > 0]          # any positive upside
+        f2 = f1[f1['Target_1'] > f1['Price']]           # target must be above price
 
-        # CAL-2: R:R gate split by rating tier.
-        # STRONG BUY keeps strict 1.5x (high conviction only).
-        # Plain BUY relaxed to 1.2x - large-cap Nifty stocks trade in
-        # tight ranges where a blanket 1.5x blocks all heavyweights.
+        # R:R gate: STRONG BUY ≥ 1.2x, plain BUY ≥ 0.8x
+        # Relaxed from 1.5/1.2 — large-cap Nifty stocks trade in tight ranges,
+        # a blanket 1.5x in a bear market blocks almost everything.
         strong_buys = f2[
-            (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.5)
+            (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.2)
         ]
         plain_buys = f2[
-            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 1.2)
+            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 0.8)
         ]
 
-        # NEW-2 (with CAL-3): Volume gate uses 5-day avg ratio now.
-        # STRONG BUY needs 5d avg vol >= 1.5x. BUY needs >= 0.9x.
-        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 1.5]
-        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.9]
+        # Volume gate: minimum 0.7x (was 1.5x/0.9x) — broad market weakness
+        # means even good stocks have below-average volume on quiet days.
+        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 0.7]
+        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.7]
+
         filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
         sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
 
-        # NEW-3: Sector diversity cap - max MAX_PICKS_PER_SECTOR per sector
+        # Sector diversity cap: max 4 per sector (was 3)
+        # With only ~21 buys total, a cap of 3 was cutting too many
         top_buys_rows = []
         sector_counts = {}
         for _, row in sorted_buys.iterrows():
             sec = row.get('Sector', 'N/A')
             sector_counts[sec] = sector_counts.get(sec, 0)
-            if sector_counts[sec] < MAX_PICKS_PER_SECTOR:
+            if sector_counts[sec] < 4:
                 top_buys_rows.append(row)
                 sector_counts[sec] += 1
             if len(top_buys_rows) >= 20:
