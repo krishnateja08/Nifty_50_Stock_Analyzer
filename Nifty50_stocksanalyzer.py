@@ -1711,6 +1711,138 @@ footer strong {{ color: #00f5ff; }}
 """
             html += "    </tbody></table></div>\n"
 
+        # == ALL STOCKS WATCHLIST TABLE =========================================
+        # Shows every analyzed stock sorted by Combined_Score desc.
+        # User can see all signals and decide their own action.
+        # Includes a JS filter bar (All / Strong Buy / Buy / Hold / Sell).
+        all_sorted = df.sort_values('Combined_Score', ascending=False)
+
+        html += """
+  <div class="section-hdr" style="margin-top:32px">
+    <div class="section-pill" style="background:linear-gradient(90deg,#1a2a4a,#0c1a2e);color:#aaccee;border:1px solid #2a4a6a;">
+      📋 Complete Watchlist — All {count} Stocks · Sorted by Score
+    </div>
+    <div class="section-line"></div>
+    <div class="section-note">Click a filter to show only that recommendation type · You decide the action</div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px 0;padding:0 4px">
+    <button onclick="filterWL('ALL')"        class="wl-btn wl-all"  id="wlf-ALL">All ({all_c})</button>
+    <button onclick="filterWL('STRONG BUY')" class="wl-btn wl-sb"   id="wlf-STRONG_BUY">⭐⭐ Strong Buy ({sb_c})</button>
+    <button onclick="filterWL('BUY')"        class="wl-btn wl-b"    id="wlf-BUY">▲ Buy ({b_c})</button>
+    <button onclick="filterWL('HOLD')"       class="wl-btn wl-h"    id="wlf-HOLD">◆ Hold ({h_c})</button>
+    <button onclick="filterWL('SELL')"       class="wl-btn wl-s"    id="wlf-SELL">▼ Sell ({s_c})</button>
+    <button onclick="filterWL('STRONG SELL')" class="wl-btn wl-ss"  id="wlf-STRONG_SELL">⚠ Strong Sell ({ss_c})</button>
+  </div>
+
+  <div class="tbl-wrap"><table id="watchlist-tbl">
+    <thead>
+      <tr class="col-row">
+        <th style="width:22px">#</th>
+        <th>Stock</th>
+        <th>Sector</th>
+        <th>Price</th>
+        <th>Score</th>
+        <th>Action</th>
+        <th>RSI</th>
+        <th>MACD</th>
+        <th>SMA Trend</th>
+        <th>Vol</th>
+        <th>Target 1</th>
+        <th>Stop Loss</th>
+        <th>R:R</th>
+        <th>Upside</th>
+        <th>P/E</th>
+        <th>Quality</th>
+        <th>Analyst</th>
+        <th>Signals</th>
+      </tr>
+    </thead>
+    <tbody>
+""".format(
+            count  = len(all_sorted),
+            all_c  = len(all_sorted),
+            sb_c   = len(all_sorted[all_sorted['Recommendation'] == 'STRONG BUY']),
+            b_c    = len(all_sorted[all_sorted['Recommendation'] == 'BUY']),
+            h_c    = len(all_sorted[all_sorted['Recommendation'] == 'HOLD']),
+            s_c    = len(all_sorted[all_sorted['Recommendation'] == 'SELL']),
+            ss_c   = len(all_sorted[all_sorted['Recommendation'] == 'STRONG SELL']),
+        )
+
+        for i, (_, row) in enumerate(all_sorted.iterrows(), 1):
+            rec   = row['Recommendation']
+            bs    = row.get('Bearish_Signals', 0)
+            wm    = row.get('Weight_Mode', '')
+            rsic  = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#60a5fa')
+            mcdcls = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
+            rr    = row['Risk_Reward']
+            upcls = 'up' if row['Upside'] >= 0 else 'dn'
+
+            # SMA trend summary: compact 3-light indicator
+            sma_declining = row.get('SMA_20_Declining', False)
+            death_cross   = row.get('Death_Cross', False)
+            sma200_rising = row.get('SMA_200_Rising', True)
+            if sma_declining and death_cross:
+                sma_trend = '<span style="color:#ff4466;font-size:11px">↓ Declining</span>'
+            elif sma_declining or death_cross:
+                sma_trend = '<span style="color:#ffab00;font-size:11px">⚠ Weakening</span>'
+            elif sma200_rising:
+                sma_trend = '<span style="color:#00e676;font-size:11px">↑ Rising</span>'
+            else:
+                sma_trend = '<span style="color:#60a5fa;font-size:11px">→ Flat</span>'
+
+            # Bearish signal count pill
+            if bs >= 4:
+                sig_pill = f'<span style="color:#ff4466;font-size:11px">🔴 {bs}/5 Bear</span>'
+            elif bs >= 3:
+                sig_pill = f'<span style="color:#ff8c00;font-size:11px">🟠 {bs}/5 Bear</span>'
+            elif bs >= 1:
+                sig_pill = f'<span style="color:#ffab00;font-size:11px">🟡 {bs}/5</span>'
+            else:
+                sig_pill = f'<span style="color:#00e676;font-size:11px">🟢 0/5</span>'
+
+            # Score colour
+            if row['Combined_Score'] >= 70:   sc = '#00ff88'
+            elif row['Combined_Score'] >= 50:  sc = '#00f5ff'
+            elif row['Combined_Score'] >= 40:  sc = '#ffab00'
+            else:                              sc = '#ff4466'
+
+            # data-rec attribute drives JS filter
+            data_rec = rec.replace(' ', '_')
+
+            html += f"""      <tr data-rec="{data_rec}">
+        <td><span class="rnum">{i}</span></td>
+        <td>
+          <div class="stock-name" style="font-size:12px">{row['Name']}</div>
+          <div class="stock-sym">{row['Symbol']}</div>
+        </td>
+        <td><span style="font-size:11px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
+        <td><div class="price-val" style="font-size:13px">₹{row['Price']:,.2f}</div></td>
+        <td>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
+          {veto_badge(bs, wm)}
+        </td>
+        <td>{action_button(rec)}</td>
+        <td>
+          <div class="rsi-val" style="color:{rsic};font-size:13px">{row['RSI']:.0f}</div>
+          <div style="font-size:10px;color:#8899aa">{row['RSI_Signal']}</div>
+        </td>
+        <td><span class="{mcdcls}" style="font-size:11px">{row['MACD']}</span></td>
+        <td>{sma_trend}</td>
+        <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
+        <td><div style="font-size:12px;color:#00d4ff">₹{row['Target_1']:,.2f}</div></td>
+        <td><div style="font-size:12px;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div></td>
+        <td><span class="rr-val" style="color:{rr_color(rr)};font-size:12px">{rr:.1f}×</span></td>
+        <td><span class="upside-val {upcls}" style="font-size:12px">{row['Upside']:+.1f}%</span></td>
+        <td><span style="font-size:12px;color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
+        <td>{quality_badge(row['Quality'])}</td>
+        <td>{analyst_badge(row.get('Analyst','N/A'))}</td>
+        <td>{sig_pill}</td>
+      </tr>
+"""
+        html += "    </tbody></table></div>\n"
+
         html += f"""
   <div class="disc">
     <strong style="color:var(--red)">⚠ DISCLAIMER:</strong>
@@ -1745,7 +1877,40 @@ function updateClock() {{
 }}
 updateClock();
 setInterval(updateClock, 1000);
+
+// Watchlist filter — shows/hides rows by data-rec attribute
+function filterWL(rec) {{
+  var rows  = document.querySelectorAll('#watchlist-tbl tbody tr');
+  var btns  = document.querySelectorAll('.wl-btn');
+  btns.forEach(function(b) {{ b.style.opacity = '0.45'; b.style.fontWeight = '500'; }});
+  var activeId = 'wlf-' + rec.replace(/ /g,'_');
+  var activeBtn = document.getElementById(activeId);
+  if (activeBtn) {{ activeBtn.style.opacity = '1'; activeBtn.style.fontWeight = '800'; }}
+  rows.forEach(function(r) {{
+    if (rec === 'ALL' || r.getAttribute('data-rec') === rec.replace(/ /g,'_')) {{
+      r.style.display = '';
+    }} else {{
+      r.style.display = 'none';
+    }}
+  }});
+}}
+// Default: show all, highlight ALL button
+window.onload = function() {{ filterWL('ALL'); }};
 </script>
+<style>
+.wl-btn {{
+  padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
+  font-size: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  transition: all .2s; letter-spacing: .3px;
+}}
+.wl-all {{ background:#1a2a3a; color:#aaccee; border:1px solid #2a4a6a; }}
+.wl-sb  {{ background:#004d25; color:#00ff88; border:1px solid #00ff88; }}
+.wl-b   {{ background:#003a4d; color:#00f5ff; border:1px solid #00f5ff; }}
+.wl-h   {{ background:#2a2200; color:#ffab00; border:1px solid #ffab00; }}
+.wl-s   {{ background:#4d0010; color:#ff4466; border:1px solid #ff4466; }}
+.wl-ss  {{ background:#5a0015; color:#ff7788; border:1px solid #ff7788; }}
+.wl-btn:hover {{ opacity: 1 !important; transform: translateY(-1px); }}
+</style>
 </body></html>"""
         return html
 
