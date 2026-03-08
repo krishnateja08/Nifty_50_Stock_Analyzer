@@ -1403,6 +1403,35 @@ footer strong {{ color: #00f5ff; }}
             }
             return f'<span class="badge {cls_map.get(rec, "badge-h")}">{rating_text}</span>'
 
+        def action_button(rec):
+            """Renders the final Action column button.
+            Uses the actual recommendation value — never hardcoded.
+            Each state has its own colour so the eye immediately sees
+            BUY (cyan) / STRONG BUY (green) / HOLD (amber) /
+            SELL (red) / STRONG SELL (deep red).
+            """
+            styles = {
+                'STRONG BUY':  ('background:#004d25;color:#00ff88;border:1px solid #00ff88;', '⭐⭐ STRONG BUY'),
+                'BUY':         ('background:#003a4d;color:#00f5ff;border:1px solid #00f5ff;', '▲ BUY'),
+                'HOLD':        ('background:#2a2200;color:#ffab00;border:1px solid #ffab00;', '◆ HOLD'),
+                'SELL':        ('background:#4d0010;color:#ff4466;border:1px solid #ff4466;', '▼ SELL'),
+                'STRONG SELL': ('background:#5a0015;color:#ff7788;border:1px solid #ff7788;', '⚠ STRONG SELL'),
+            }
+            style, label = styles.get(rec, styles['HOLD'])
+            return (f'<span style="display:inline-block;padding:4px 10px;border-radius:5px;'
+                    f'font-size:11px;font-weight:700;letter-spacing:.4px;{style}">{label}</span>')
+
+        def veto_badge(bearish_signals, weight_mode):
+            """Shows a small warning pill when the Trend Veto Gate fired,
+            so the user can instantly see WHY a score looks high but the
+            action is HOLD — fundamentals were good but trend vetoed it."""
+            if bearish_signals >= 3:
+                return (f'<div style="margin-top:3px;display:inline-block;padding:2px 6px;'
+                        f'border-radius:3px;background:#2a1500;color:#ff8c00;'
+                        f'border:1px solid #ff8c00;font-size:10px;font-weight:700;">'
+                        f'🚫 Trend Veto ({bearish_signals}/5)</div>')
+            return ''
+
         def score_cell(val, color, bar_color):
             pct = min(int(val), 100)
             return (f'<div class="score-wrap">'
@@ -1525,6 +1554,8 @@ footer strong {{ color: #00f5ff; }}
                 divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
                 rr       = row['Risk_Reward']
                 mcdcls   = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
+                bs       = row.get('Bearish_Signals', 0)
+                wm       = row.get('Weight_Mode', '')
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -1537,6 +1568,7 @@ footer strong {{ color: #00f5ff; }}
         <td class="gsep">
           {rating_badge(rec, row['Rating'])}
           {score_cell(row['Combined_Score'], sc_color, sc_bar)}
+          {veto_badge(bs, wm)}
         </td>
         <td><span class="upside-val {upcls}">{row['Upside']:+.1f}%</span></td>
         <td>
@@ -1570,7 +1602,7 @@ footer strong {{ color: #00f5ff; }}
         <td>{quality_badge(row['Quality'])}</td>
         <td class="gsep">{analyst_badge(row.get('Analyst','N/A'))}</td>
         <td><div class="earn-date">{row.get('Earnings_Date','N/A')}</div></td>
-        <td>{rating_badge(rec, 'BUY' if rec=='BUY' else 'STRONG BUY')}</td>
+        <td>{action_button(rec)}</td>
       </tr>
 """
             html += "    </tbody></table></div>\n"
@@ -1674,7 +1706,7 @@ footer strong {{ color: #00f5ff; }}
         <td>{quality_badge(row['Quality'])}</td>
         <td class="gsep">{analyst_badge(row.get('Analyst','N/A'))}</td>
         <td><div class="earn-date">{row.get('Earnings_Date','N/A')}</div></td>
-        <td>{rating_badge(rec, 'SELL' if rec=='SELL' else 'STRONG SELL')}</td>
+        <td>{action_button(rec)}</td>
       </tr>
 """
             html += "    </tbody></table></div>\n"
