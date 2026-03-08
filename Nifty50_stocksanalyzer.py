@@ -231,6 +231,57 @@ class Nifty100CompleteAnalyzer:
         rs    = gain / loss
         return (100 - (100 / (1 + rs))).iloc[-1]
 
+    def calculate_rsi_slope(self, prices, period=14, lookback=5):
+        """
+        Returns the RSI slope direction and strength.
+
+        Instead of just asking "what is RSI now?", this asks:
+        "Which direction is RSI MOVING?" — because:
+          · RSI rising from 35 → 50 = momentum building    → GOOD
+          · RSI falling from 65 → 46 = momentum fading     → BAD (Power Grid case)
+          · RSI flat at 50           = no signal            → NEUTRAL
+
+        Parameters:
+          lookback = how many bars back to compare RSI (default 5 = 1 trading week)
+
+        Returns dict:
+          'slope'     : float  (RSI today minus RSI 5 bars ago)
+          'direction' : 'Rising' | 'Falling' | 'Flat'
+          'strong'    : bool   (|slope| > 8 = strong move)
+          'rsi_5bar'  : float  (RSI value 5 bars ago, for display)
+        """
+        try:
+            delta    = prices.diff()
+            gain     = delta.where(delta > 0, 0).rolling(period).mean()
+            loss     = (-delta.where(delta < 0, 0)).rolling(period).mean()
+            rsi_ser  = 100 - (100 / (1 + gain / loss))
+            rsi_ser  = rsi_ser.dropna()
+
+            if len(rsi_ser) < lookback + 2:
+                return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': rsi_ser.iloc[-1]}
+
+            rsi_now   = rsi_ser.iloc[-1]
+            rsi_prev  = rsi_ser.iloc[-(lookback + 1)]
+            slope     = round(rsi_now - rsi_prev, 2)
+
+            if slope > 3:
+                direction = 'Rising'
+            elif slope < -3:
+                direction = 'Falling'
+            else:
+                direction = 'Flat'
+
+            strong = abs(slope) > 8   # sharp move — e.g. 71 → 46 in Power Grid
+
+            return {
+                'slope':     slope,
+                'direction': direction,
+                'strong':    strong,
+                'rsi_5bar':  round(rsi_prev, 1),
+            }
+        except Exception:
+            return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': 50}
+
     # == NEW-1: RSI Divergence helper =========================================
     def detect_rsi_divergence(self, prices, window=14):
         """
@@ -645,6 +696,16 @@ class Nifty100CompleteAnalyzer:
             # NEW-1: RSI Divergence detection
             rsi_divergence = self.detect_rsi_divergence(df['Close'])
 
+            # V55-RSI-SLOPE: RSI direction — rising vs falling
+            # Power Grid case: RSI was 71, now 46 = sharply falling = bearish
+            # This is separate from RSI value — a falling RSI at 55 is worse
+            # than a rising RSI at 45. Direction matters more than level.
+            rsi_slope_data = self.calculate_rsi_slope(df['Close'])
+            rsi_slope      = rsi_slope_data['slope']
+            rsi_direction  = rsi_slope_data['direction']   # 'Rising'|'Falling'|'Flat'
+            rsi_slope_strong = rsi_slope_data['strong']    # True if |slope| > 8
+            rsi_5bar       = rsi_slope_data['rsi_5bar']    # RSI 5 bars ago
+
             high_52w = df['High'].tail(252).max()
             low_52w  = df['Low'].tail(252).min()
 
@@ -700,35 +761,68 @@ class Nifty100CompleteAnalyzer:
                 tech_score -= 1
 
             # FIX-3: RSI context-aware + V52-2: weak-momentum zone
+            # V55: RSI slope now integrated — direction matters as much as value
             if rsi < 30:
                 if current_price > sma_200:
                     tech_score += 2
-                    rsi_signal = "Oversold"
+                    rsi_signal = "Oversold ↑" if rsi_direction == 'Rising' else "Oversold"
                 else:
                     tech_score -= 1
                     rsi_signal = "Oversold (Downtrend)"
             elif rsi > 70:
-                # NEW-1: Apply divergence logic inside overbought zone
                 if rsi_divergence == 'Bearish Divergence':
                     tech_score -= 3
                     rsi_signal = "Bearish Divergence ⚠"
+                elif rsi_direction == 'Falling' and rsi_slope_strong:
+                    # Power Grid case: RSI was >70, now sharply falling
+                    # This is the most dangerous signal — overbought AND rolling over
+                    tech_score -= 3
+                    rsi_signal = f"Topping Out ⚠ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_direction == 'Falling':
+                    # RSI falling from overbought — early warning
+                    tech_score -= 2
+                    rsi_signal = f"Fading ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
                 else:
                     tech_score -= 1
                     rsi_signal = "Overbought"
             elif 30 <= rsi <= 45:
-                # V52-2: Weak-momentum zone - RSI between 30 and 45 signals
-                # fading momentum, often seen in stocks rolling over from peaks.
-                # SBIN fell from RSI 68 -> 33, landing here with zero penalty
-                # before. Now correctly flagged and penalised.
-                tech_score -= 1
-                rsi_signal = "Weak Momentum ⚠"
+                if rsi_direction == 'Falling':
+                    # Weak zone AND still falling — double trouble
+                    tech_score -= 2
+                    rsi_signal = f"Weak & Falling ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                else:
+                    tech_score -= 1
+                    rsi_signal = "Weak Momentum ⚠"
+            elif 45 < rsi <= 55:
+                # Neutral zone — direction is the only signal here
+                if rsi_direction == 'Rising':
+                    tech_score += 1
+                    rsi_signal = f"Building ↑ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_direction == 'Falling' and rsi_slope_strong:
+                    # RSI falling sharply through neutral — Power Grid mid-fall
+                    tech_score -= 2
+                    rsi_signal = f"Falling Fast ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_direction == 'Falling':
+                    tech_score -= 1
+                    rsi_signal = f"Fading ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                else:
+                    rsi_signal = "Neutral →"
             else:
-                # NEW-1: Bullish divergence in neutral zone = bonus
-                if rsi_divergence == 'Bullish Divergence':
+                # RSI 55-70: healthy zone — reward rising, penalise falling
+                if rsi_direction == 'Rising':
+                    tech_score = min(tech_score + 1, 6)
+                    rsi_signal = f"Momentum ↑ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_direction == 'Falling' and rsi_slope_strong:
+                    tech_score -= 2
+                    rsi_signal = f"Rolling Over ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_direction == 'Falling':
+                    tech_score -= 1
+                    rsi_signal = f"Softening ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_divergence == 'Bullish Divergence':
                     tech_score = min(tech_score + 1, 6)
                     rsi_signal = "Bullish Divergence ✅"
                 else:
-                    rsi_signal = "Neutral"
+                    rsi_signal = f"Healthy ({rsi:.0f})"
 
             if macd > signal:
                 tech_score += 1;  macd_signal = "Bullish"
@@ -796,6 +890,7 @@ class Nifty100CompleteAnalyzer:
                 bool(macd < signal),                             # MACD bearish crossover
                 bool(rsi < 50),                                  # momentum lost
                 bool(current_price < sma_50),                   # below medium trend
+                bool(rsi_direction == 'Falling' and rsi_slope_strong),  # V55: RSI falling fast (Power Grid case)
             ])
             # V54-4 threshold: 2+ signals → shift to 50/50 weights
             # (was 3, lowered because in current bear market most BUY candidates
@@ -949,6 +1044,9 @@ class Nifty100CompleteAnalyzer:
                 'Sector':            sector,
                 'RSI':               round(rsi, 2),
                 'RSI_Signal':        rsi_signal,
+                'RSI_Direction':     rsi_direction,            # 'Rising'|'Falling'|'Flat'
+                'RSI_Slope':         rsi_slope,                # numeric: e.g. -25 for Power Grid
+                'RSI_5Bar':          rsi_5bar,                 # RSI 5 bars ago
                 'RSI_Divergence':    rsi_divergence,          # shown in buy table + watchlist
                 'MACD':              macd_signal,
                 'ADX':               adx,
@@ -1574,6 +1672,15 @@ footer strong {{ color: #00f5ff; }}
                 mcdcls   = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
                 bs       = row.get('Bearish_Signals', 0)
                 wm       = row.get('Weight_Mode', '')
+                rsi_dir_b = row.get('RSI_Direction', 'Flat')
+                rsi_slp_b = row.get('RSI_Slope', 0)
+                if rsi_dir_b == 'Rising':
+                    rsi_slope_html = f'<span style="color:#00e676;font-size:10px">↑ +{rsi_slp_b:.0f}</span>'
+                elif rsi_dir_b == 'Falling':
+                    slp_clr = '#ff4466' if abs(rsi_slp_b) > 8 else '#ffab00'
+                    rsi_slope_html = f'<span style="color:{slp_clr};font-size:10px">↓ {rsi_slp_b:.0f}</span>'
+                else:
+                    rsi_slope_html = '<span style="color:#4a6080;font-size:10px">→</span>'
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -1608,6 +1715,7 @@ footer strong {{ color: #00f5ff; }}
           <div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div>
           <div class="rsi-sig">{row['RSI_Signal']}</div>
           {divergence_badge(row.get('RSI_Divergence','None'))}
+          {rsi_slope_html}
         </td>
         <td>{adx_cell(row.get('ADX', 0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
@@ -1835,6 +1943,18 @@ footer strong {{ color: #00f5ff; }}
             fund_sc   = row.get('Fund_Score', 0)
             tech_sc   = row.get('Tech_Score', 0)
             veto      = row.get('Veto_Fired', False)
+            rsi_dir   = row.get('RSI_Direction', 'Flat')
+            rsi_slp   = row.get('RSI_Slope', 0)
+            rsi_5b    = row.get('RSI_5Bar', row['RSI'])
+
+            # RSI direction arrow + slope for display
+            if rsi_dir == 'Rising':
+                rsi_dir_html = f'<span style="color:#00e676;font-size:10px">↑ +{rsi_slp:.0f}</span>'
+            elif rsi_dir == 'Falling':
+                clr = '#ff4466' if abs(rsi_slp) > 8 else '#ffab00'
+                rsi_dir_html = f'<span style="color:{clr};font-size:10px">↓ {rsi_slp:.0f}</span>'
+            else:
+                rsi_dir_html = '<span style="color:#4a6080;font-size:10px">→ flat</span>'
 
             # F/T split pill: shows fund score / tech score
             tech_col  = '#00e676' if tech_sc >= 3 else ('#ffab00' if tech_sc >= 0 else '#ff4466')
@@ -1875,6 +1995,7 @@ footer strong {{ color: #00f5ff; }}
         <td>
           <div class="rsi-val" style="color:{rsic};font-size:13px">{row['RSI']:.0f}</div>
           <div style="font-size:10px;color:#8899aa">{row['RSI_Signal']}</div>
+          {rsi_dir_html}
         </td>
         <td>{rsi_div_cell}</td>
         <td><span class="{mcdcls}" style="font-size:11px">{row['MACD']}</span></td>
