@@ -897,9 +897,10 @@ class Nifty100CompleteAnalyzer:
                 bool(current_price < sma_50),                   # below medium trend
                 bool(rsi_direction == 'Falling' and rsi_slope_strong),  # V55: RSI falling fast (Power Grid case)
             ])
-            # V54-4 threshold: 2+ signals → shift to 50/50 weights
-            # (was 3, lowered because in current bear market most BUY candidates
-            #  have at least 2 bearish technicals — we want weight shift earlier)
+            # V54-4: Dynamic weight shift at 2+ signals (lower than veto threshold of 3).
+            # This means the score already shifts to 50/50 before the veto fires,
+            # correctly penalising weakening stocks in the score WITHOUT removing them.
+            # Only at 3+ signals does the veto hard-cap them to HOLD.
             if bearish_signal_count >= 2:
                 tech_weight  = 0.50
                 fund_weight  = 0.50
@@ -939,12 +940,23 @@ class Nifty100CompleteAnalyzer:
                 rating = "⭐ STRONG SELL";         recommendation = "STRONG SELL"
 
             # V54-1: TREND VETO GATE — hard cap BEFORE stop/target calculation.
-            # Threshold: 2+ bearish signals → max rating is HOLD.
-            # Lowered from 3 to 2 because:
-            #   · MACD Bearish + RSI<50 alone = confirmed momentum loss
-            #   · SMA20 declining + death cross = confirmed rollover
-            # Any 2 of these together means the chart disagrees with a BUY signal.
-            veto_fired = bearish_signal_count >= 2 and recommendation in ("STRONG BUY", "BUY")
+            # Threshold: 3+ bearish signals → max rating is HOLD.
+            #
+            # WHY 3 NOT 2:
+            # In a broad market correction (Nifty down 1-2%), almost EVERY stock
+            # will have at least 2 bearish signals (usually MACD bear + RSI<50).
+            # A threshold of 2 was vetoing ALL BUY stocks in bear market conditions,
+            # leaving only 5-6 in the table. That defeats the purpose.
+            #
+            # Threshold of 3 means we need CONFIRMED multi-signal deterioration:
+            # e.g. SMA20 declining + death cross + MACD bearish = real distribution top
+            # e.g. RSI falling fast + MACD bearish + price < SMA50 = confirmed downtrend
+            # Just having RSI<50 + MACD bearish on a down day is NOT enough to veto.
+            #
+            # The 6-signal set (including RSI slope) means a stock can still get
+            # vetoed with 3 of: SMA declining, death cross, MACD bear, RSI<50,
+            # price<SMA50, RSI falling fast — which is a genuine distribution pattern.
+            veto_fired = bearish_signal_count >= 3 and recommendation in ("STRONG BUY", "BUY")
             if veto_fired:
                 recommendation = "HOLD"
                 rating         = "⭐⭐⭐ HOLD (Veto)"
