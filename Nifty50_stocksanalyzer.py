@@ -1,8 +1,42 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER - REDESIGNED UI v5.3
+NIFTY 100 COMPLETE STOCK ANALYZER - REDESIGNED UI v5.4
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
 =======================================================================
+ACCURACY FIXES in v5.4 (resolves fundamentals overriding clear
+downtrend signals - root cause of SBIN still showing BUY in v5.3):
+  Diagnosed: SBIN had good fundamentals (fund_score ~70) which at 65%
+  weight mathematically overwhelmed a negative tech score. Even with
+  SMA20 declining + death cross + MACD bearish, the combined score
+  stayed above 50 → BUY. Four targeted fixes close this gap:
+
+  V54-1  TREND VETO GATE - Hard block before rating is assigned.
+           If 3+ of these bearish signals fire simultaneously:
+             · SMA20 declining
+             · Death cross forming (SMA20 < SMA50)
+             · MACD < Signal (bearish crossover)
+             · RSI < 50 (momentum lost)
+             · Price < SMA50
+           → Maximum rating is capped at HOLD, regardless of combined
+           score. Fundamentals cannot rescue a stock in confirmed
+           technical downtrend. SBIN had all 5 signals → HOLD cap.
+
+  V54-2  SMA200 SLOPE GUARD - SMA200 bonus now requires SMA200
+           itself to be rising (today > 10 bars ago). A rising price
+           above a flat/falling SMA200 (common after a run-up) no
+           longer earns the +2 bonus. SMA200 must confirm uptrend.
+           Flat/falling SMA200 = 0 points instead of +2.
+
+  V54-3  ANALYST BONUS TIGHTENED - Analyst buy bonus now requires
+           tech_score >= 2 (was > 0). A tech score of +1 is borderline
+           and should not unlock the analyst +5 rescue. Requires clear
+           net positive technicals before analyst buy counts.
+
+  V54-4  DYNAMIC WEIGHT SHIFT - When 3+ bearish tech signals fire,
+           weight shifts from 65/35 (fund/tech) to 50/50.
+           Prevents a great balance sheet from hiding an active
+           distribution top. Weight reverts to 65/35 normally.
+
 ACCURACY FIXES in v5.3 (resolves SMA50 lag - stock can be in 6-week
 downtrend and still be "above SMA50" from the prior run-up):
   Diagnosed: SBIN peaked at ₹1,200 Jan 2026. SMA50 still ~₹1,110.
@@ -45,13 +79,13 @@ RETAINED FROM v5 (7 improvements):
   NEW-7  D/E weight +15
 
 RETAINED FROM v4 (8 improvements):
-  FIX-1  Fundamentals 65% / technicals 35%
+  FIX-1  Fundamentals 65% / technicals 35% (dynamic in v5.4)
   FIX-2  ADX weak-trend penalty
   FIX-3  RSI context-aware (oversold in downtrend)
   FIX-4  STRONG BUY requires R:R ≥ 1.5
   FIX-5  Negative growth penalises fund score
   FIX-6  Volume ratio influences tech score
-  FIX-7  Analyst consensus +/-5
+  FIX-7  Analyst consensus +/-5 (tightened gate in v5.4)
   FIX-8  52W high proximity bonus
 =======================================================================
 
@@ -628,11 +662,25 @@ class Nifty100CompleteAnalyzer:
             support_dist_pct = round(
                 ((current_price - nearest_support) / current_price) * 100, 2)
 
+            # V54-2: SMA200 slope guard - SMA200 must itself be rising to earn
+            # the +2 uptrend bonus. A rising price above a flat or falling
+            # SMA200 (common after a big run-up that has since peaked) no longer
+            # earns the full bonus. Flat/falling SMA200 = 0 pts, not +2.
+            sma_200_series   = df['Close'].rolling(200).mean()
+            sma_200_10bar_ago = sma_200_series.iloc[-11] if len(sma_200_series) >= 11 else sma_200
+            sma_200_rising   = sma_200 > sma_200_10bar_ago
+
             # == TECHNICAL SCORE ===============================================
             tech_score = 0
             tech_score += 1 if current_price > sma_20  else -1
             tech_score += 1 if current_price > sma_50  else -1
-            tech_score += 2 if current_price > sma_200 else -2
+            # V54-2: +2 only when price above SMA200 AND SMA200 itself rising
+            if current_price > sma_200 and sma_200_rising:
+                tech_score += 2   # confirmed long-term uptrend
+            elif current_price > sma_200 and not sma_200_rising:
+                tech_score += 0   # above SMA200 but trend flattening - no bonus
+            else:
+                tech_score -= 2   # below SMA200 - penalise
 
             # V52-3: Double SMA penalty - price below BOTH SMA20 and SMA50
             # simultaneously confirms active short-term downtrend.
@@ -741,19 +789,41 @@ class Nifty100CompleteAnalyzer:
 
             fund_score = self.get_fundamental_score(info, sector)
 
-            # FIX-1: Fundamentals 65%, technicals 35%
-            tech_score_normalized = ((tech_score + 6) / 12) * 100
-            combined_score        = (tech_score_normalized * 0.35) + (fund_score * 0.65)
+            # V54-4: Dynamic weight shift.
+            # Count how many confirmed bearish technical signals are active RIGHT NOW.
+            # If 3 or more fire, shift weights to 50/50 so that a great balance
+            # sheet cannot mathematically hide an active distribution top.
+            # Normal market = 65% fundamentals / 35% technicals (unchanged from v4).
+            bearish_signal_count = sum([
+                bool(sma_20_declining),                          # SMA20 rolling over
+                bool(death_cross_forming),                       # SMA20 < SMA50
+                bool(macd < signal),                             # MACD bearish crossover
+                bool(rsi < 50),                                  # momentum lost
+                bool(current_price < sma_50),                   # below medium trend
+            ])
+            if bearish_signal_count >= 3:
+                # Confirmed downtrend: balance weights equally
+                tech_weight  = 0.50
+                fund_weight  = 0.50
+                weight_label = "50/50 (Downtrend Override)"
+            else:
+                # Normal: fundamentals-led scoring
+                tech_weight  = 0.35
+                fund_weight  = 0.65
+                weight_label = "35/65 (Normal)"
 
-            # FIX-7 + V53-3: Analyst consensus +/-5, but buy bonus is
-            # conditional on tech score >= 0. If price is below SMA20,
-            # SMA50, RSI is weak and MACD bearish, analyst "Buy" ratings
-            # (which lag price action by weeks) should not rescue the score.
-            # Analyst sell/strongSell penalty always applies regardless.
+            # FIX-1: Combined score with dynamic weights
+            tech_score_normalized = ((tech_score + 6) / 12) * 100
+            combined_score        = (tech_score_normalized * tech_weight) + (fund_score * fund_weight)
+
+            # FIX-7 + V53-3 + V54-3: Analyst consensus +/-5.
+            # V54-3 tightens the buy gate: tech_score must be >= 2 (was > 0).
+            # A score of +1 is borderline and should NOT rescue a weak chart.
+            # Sell/strongSell penalty always applies unconditionally.
             if analyst_key in ('strongBuy', 'buy'):
-                if tech_score > 0:   # only reward analyst buy when technicals are net positive
+                if tech_score >= 2:   # V54-3: tightened from > 0 to >= 2
                     combined_score = min(combined_score + 5, 100)
-                # tech_score < 0: analyst buy silently ignored - chart disagrees
+                # tech_score < 2: analyst buy silently ignored - chart disagrees
             elif analyst_key in ('sell', 'strongSell'):
                 combined_score = max(combined_score - 5, 0)
 
@@ -770,6 +840,15 @@ class Nifty100CompleteAnalyzer:
                 rating = "⭐⭐ SELL";              recommendation = "SELL"
             else:
                 rating = "⭐ STRONG SELL";         recommendation = "STRONG SELL"
+
+            # V54-1: TREND VETO GATE — hard cap BEFORE stop/target calculation.
+            # If 3+ confirmed bearish signals are active, the maximum allowed
+            # rating is HOLD. A strong balance sheet is NOT a reason to buy
+            # into an active distribution pattern. This veto is applied after
+            # all scoring so we can still display the raw combined_score.
+            if bearish_signal_count >= 3 and recommendation in ("STRONG BUY", "BUY"):
+                recommendation = "HOLD"
+                rating         = "⭐⭐⭐ HOLD"
 
             stock_beta = beta if beta else 1.0
             if stock_beta < 0.8:
@@ -848,6 +927,9 @@ class Nifty100CompleteAnalyzer:
                 'SMA_200':           round(sma_200, 2),
                 'SMA_20_Declining':  sma_20_declining,
                 'Death_Cross':       death_cross_forming,
+                'SMA_200_Rising':    sma_200_rising,
+                'Bearish_Signals':   bearish_signal_count,
+                'Weight_Mode':       weight_label,
                 'Support':           round(nearest_support, 2),
                 'Resistance':        round(nearest_resistance, 2),
                 'Support_Dist_Pct':  support_dist_pct,
@@ -1269,7 +1351,7 @@ footer strong {{ color: #00f5ff; }}
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · SMA Slope · Death Cross · Direction ADX · v5.3</div>
+        <div class="brand-sub">12M S/R · ATR Stops · Trend Veto · Dynamic Weights · SMA200 Slope · v5.4</div>
       </div>
     </div>
     <div class="idx-strip">
@@ -1611,7 +1693,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · SMA Slope · Death Cross · Direction ADX · Sector PE · v5.3
+  · 12M S/R · Trend Veto · Dynamic Weights · SMA200 Slope · Sector PE · v5.4
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -1659,7 +1741,7 @@ setInterval(updateClock, 1000);
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v5 - {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report v5.4 - {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
             srv.starttls()
@@ -1679,7 +1761,7 @@ setInterval(updateClock, 1000);
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v5 - RSI Divergence · Sector Cap · Data Sanity")
+        print("💎 NIFTY 100 ANALYZER v5.4 - Trend Veto · Dynamic Weights · SMA200 Slope")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
