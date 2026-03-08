@@ -1,80 +1,59 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER — REDESIGNED UI v5.2
+NIFTY 100 COMPLETE STOCK ANALYZER - REDESIGNED UI v5.3
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
 
-═══════════════════════════════════════════════════════════════════════
-ACCURACY FIXES in v5.2 (resolves downtrending stocks appearing as BUY):
-  Diagnosed via SBIN case — strong fundamentals + clear chart downtrend
-  scored BUY/67 due to 4 logic gaps in the technical scoring engine.
+=======================================================================
+ACCURACY FIXES in v5.3 (resolves SMA50 lag - stock can be in 6-week
+downtrend and still be "above SMA50" from the prior run-up):
+  Diagnosed: SBIN peaked at ₹1,200 Jan 2026. SMA50 still ~₹1,110.
+  Price 1143 > SMA50 1110 -> V52-1 and V52-3 from v5.2 both miss.
+  The fix must not rely on SMA50 position alone.
 
-  V52-1  ADX direction-aware: bonus only granted when price > SMA50
-           Reason: ADX measures trend STRENGTH, not direction. A strong
-           downtrend scored the same +1 as a strong uptrend. Now the ADX
-           bonus is conditional on price being above SMA50 (confirms
-           the strong trend is actually an uptrend worth rewarding).
+  V53-1  SMA20 slope penalty - if SMA20 today < SMA20 five bars ago,
+           the short-term trend is actively declining right now.
+           This is real-time and does not wait for SMA50 to lag down.
+           SMA20 declining -> -1 tech score, flagged "SMA Declining".
+           This directly catches a stock rolling over from a peak.
 
-  V52-2  RSI weak-momentum zone penalty (RSI 30–45 = −1 tech score)
-           Reason: RSI=33 falling from 68 is a momentum collapse but
-           fell into the "Neutral" zone with zero penalty. Added a
-           weak-momentum zone: RSI 30–45 scores −1 tech, flagged as
-           "Weak Momentum" so it's visible in the report table.
+  V53-2  Death-cross forming penalty - if SMA20 < SMA50, the short-
+           term average has crossed below the medium-term average.
+           This is the early warning stage of a bearish crossover
+           and adds -1 additional tech score, regardless of where
+           price sits relative to SMA50.
+           Combined with V53-1, SBIN gets -2 more tech points,
+           dropping it cleanly below the BUY threshold.
 
-  V52-3  Double SMA penalty: price < SMA20 AND < SMA50 = extra −1
-           Reason: Being below both short-term SMAs simultaneously
-           confirms an active short-term downtrend but was only counted
-           as two separate −1 penalties without a combined signal.
-           Now adds an additional −1 when both conditions are true.
-
-  V52-4  Sector-adjusted PE thresholds for Financial sector
-           Reason: PSU/private banks always trade at PE 8–15 due to
-           capital intensity and NPA provisions. PE=12.4 for SBIN
-           scored +10 (same as a growth tech stock at PE 22). Banks
-           and Financial Services stocks now use a sector-specific
-           baseline: PE < 15 = +10, 15–20 = +5, > 20 = 0.
+ACCURACY FIXES in v5.2 (downtrending stocks appearing as BUY):
+  V52-1  ADX direction-aware (bonus only when price > SMA50)
+  V52-2  RSI weak-momentum zone 30-45 = -1 tech score
+  V52-3  Double SMA penalty (price < SMA20 AND < SMA50 = extra -1)
+  V52-4  Sector-adjusted PE for Financial sector (banks: PE < 15)
 
 CALIBRATION FIXES in v5.1 (resolves "only 2 stocks" issue):
-  CAL-1  Score thresholds relaxed to match realistic yFinance NSE data
-           STRONG BUY: 75 → 70  |  BUY: 55 → 50
-           Reason: yFinance often returns None for PEG/ROA/CR on NSE
-           stocks, silently zeroing those fields. A perfectly good stock
-           with 3 missing fields can't reach 75 even with best technicals.
-  CAL-2  R:R gate split by rating: STRONG BUY needs 1.5x, BUY needs 1.2x
-           Reason: Large-cap Nifty stocks trade in tight ranges. Their
-           nearest resistance is 3-5% away but ATR stop is 6-8% below.
-           A blanket 1.5x R:R blocks all large caps unfairly.
-  CAL-3  Volume ratio uses 5-day average instead of single last-bar
-           Reason: Single-bar snapshot volume is too noisy. A great stock
-           with a quiet day before the report runs gets blocked even if
-           it's been in a high-volume uptrend all week.
-  CAL-4  Growth penalty capped at -10 total (not -20)
-           Reason: If both revenue AND earnings growth are negative the
-           fund score takes -20, wiping out steel/cement/energy stocks
-           that have temporary negative quarters but are fundamentally
-           sound. Cyclicals represent 30%+ of the Nifty 100 universe.
+  CAL-1  Score thresholds: STRONG BUY 75->70, BUY 55->50
+  CAL-2  R:R gate split: STRONG BUY 1.5x, BUY 1.2x
+  CAL-3  Volume ratio: 5-day avg instead of single last-bar
+  CAL-4  Growth penalty capped at -10 total
   CAL-5  Partial credit for missing yFinance fields
-           Reason: When PEG, ROA, Current Ratio return None/0 they score
-           0 silently. Added +3 partial credit per missing key metric
-           so missing data doesn't punish valid stocks.
 
-RETAINED FROM v5 (7 Accuracy Improvements):
+RETAINED FROM v5 (7 improvements):
   NEW-1  RSI Divergence detection
-  NEW-2  Volume hard gatekeeper (with 5-day avg — now CAL-3)
+  NEW-2  Volume hard gatekeeper
   NEW-3  Sector diversity cap (max 3 per sector)
-  NEW-4  yFinance data sanity check (>20% single-day move filter)
-  NEW-5  R:R filter (now split by rating — CAL-2)
-  NEW-6  Free Cash Flow weight +15
-  NEW-7  Debt-to-Equity weight +15
+  NEW-4  yFinance data sanity check
+  NEW-6  FCF weight +15
+  NEW-7  D/E weight +15
 
-RETAINED FROM v4 (8 Accuracy Improvements):
+RETAINED FROM v4 (8 improvements):
   FIX-1  Fundamentals 65% / technicals 35%
   FIX-2  ADX weak-trend penalty
   FIX-3  RSI context-aware (oversold in downtrend)
   FIX-4  STRONG BUY requires R:R ≥ 1.5
-  FIX-5  Negative growth penalises fund score (capped at -10 — CAL-4)
+  FIX-5  Negative growth penalises fund score
   FIX-6  Volume ratio influences tech score
-  FIX-7  Analyst consensus ±5 to combined score
+  FIX-7  Analyst consensus +/-5
   FIX-8  52W high proximity bonus
-═══════════════════════════════════════════════════════════════════════
+=======================================================================
 
 Requirements:
     pip install yfinance pandas numpy pytz
@@ -93,14 +72,14 @@ import os
 
 warnings.filterwarnings('ignore')
 
-# ── Sector diversity cap: max picks per sector in Top 20 Buy table ──
+# == Sector diversity cap: max picks per sector in Top 20 Buy table ==
 MAX_PICKS_PER_SECTOR = 3
 
 
 class Nifty100CompleteAnalyzer:
     def __init__(self):
         self.nifty100_stocks = {
-            # ── NIFTY 50 ──────────────────────────────────────────
+            # == NIFTY 50 ==========================================
             'RELIANCE.NS':    'Reliance Industries',
             'TCS.NS':         'TCS',
             'HDFCBANK.NS':    'HDFC Bank',
@@ -153,7 +132,7 @@ class Nifty100CompleteAnalyzer:
             'LTIM.NS':        'LTIMindtree',
             'ADANIENT.NS':    'Adani Enterprises',
             'SIEMENS.NS':     'Siemens India',
-            # ── NIFTY NEXT 50 ─────────────────────────────────────
+            # == NIFTY NEXT 50 =====================================
             'HAVELLS.NS':     'Havells India',
             'PIDILITIND.NS':  'Pidilite Industries',
             'DABUR.NS':       'Dabur India',
@@ -219,7 +198,7 @@ class Nifty100CompleteAnalyzer:
         rs    = gain / loss
         return (100 - (100 / (1 + rs))).iloc[-1]
 
-    # ── NEW-1: RSI Divergence helper ─────────────────────────────────────────
+    # == NEW-1: RSI Divergence helper =========================================
     def detect_rsi_divergence(self, prices, window=14):
         """
         Bearish divergence: price makes a HIGHER high in last 20 bars,
@@ -267,7 +246,7 @@ class Nifty100CompleteAnalyzer:
             return 'None'
         except Exception:
             return 'None'
-    # ─────────────────────────────────────────────────────────────────────────
+    # =========================================================================
 
     def calculate_macd(self, prices):
         ema12  = prices.ewm(span=12, adjust=False).mean()
@@ -311,7 +290,7 @@ class Nifty100CompleteAnalyzer:
 
     def calculate_volume_ratio(self, df):
         # CAL-3: Use 5-day average instead of single last-bar snapshot.
-        # Single-bar volume is too noisy — a great stock with a quiet
+        # Single-bar volume is too noisy - a great stock with a quiet
         # day before the report runs gets blocked despite a strong trend.
         avg_vol    = df['Volume'].tail(20).mean()
         if avg_vol == 0:
@@ -359,7 +338,7 @@ class Nifty100CompleteAnalyzer:
                     'cls':   cls,
                 }
             except Exception:
-                result[label] = {'price': 'N/A', 'chg': '—', 'cls': ''}
+                result[label] = {'price': 'N/A', 'chg': '-', 'cls': ''}
         return result
 
     # =========================================================================
@@ -370,7 +349,7 @@ class Nifty100CompleteAnalyzer:
         """
         Returns (True, '') if data looks valid.
         Returns (False, reason) if a suspicious spike is detected.
-        Checks daily close-to-close % change — any move >20% in a single
+        Checks daily close-to-close % change - any move >20% in a single
         bar without a corresponding volume surge is flagged as dirty data.
         """
         try:
@@ -390,7 +369,7 @@ class Nifty100CompleteAnalyzer:
                 spike_vol = volume.loc[spike_date] if spike_date in volume.index else 0
                 if avg_vol > 0 and spike_vol < avg_vol * 3:
                     # Large price move with normal volume = likely data error
-                    return False, f"Suspicious {spike_val*100:.0f}% move on {spike_date.date()} — possible bad data"
+                    return False, f"Suspicious {spike_val*100:.0f}% move on {spike_date.date()} - possible bad data"
 
             return True, ''
         except Exception:
@@ -491,7 +470,7 @@ class Nifty100CompleteAnalyzer:
                   if target_price and target_price > current_price * 1.005
                   else round(current_price * 1.03, 2))
             t2            = round(t1 * 1.04, 2)
-            target_status = "ATH Zone — Projected"
+            target_status = "ATH Zone - Projected"
         if t1 < min_target:
             t1            = round(min_target, 2)
             t2            = round(t1 * 1.04, 2)
@@ -502,7 +481,7 @@ class Nifty100CompleteAnalyzer:
     #  FUNDAMENTAL SCORE
     #  v5.2: Sector-adjusted PE thresholds for Financial sector (V52-4)
     #  v5.1: CAL-4 growth penalty cap, CAL-5 partial credit for missing fields
-    #  v5:   FCF weight +5→+15, D/E weight +10→+15 (NEW-6, NEW-7)
+    #  v5:   FCF weight +5->+15, D/E weight +10->+15 (NEW-6, NEW-7)
     #  v4:   negative growth penalised (FIX-5)
     # =========================================================================
     def get_fundamental_score(self, info, sector=''):
@@ -510,11 +489,11 @@ class Nifty100CompleteAnalyzer:
 
         # V52-4: Sector-adjusted PE thresholds.
         # Banks and Financial Services always trade at structurally low PE
-        # (8–15) due to capital intensity and NPA provisioning requirements.
+        # (8-15) due to capital intensity and NPA provisioning requirements.
         # Using the same PE < 25 threshold as IT/FMCG stocks rewards PSU
         # banks for being "cheap" when they are merely sector-typical.
-        # Financial sector: PE < 15 = +10, 15–20 = +5, > 20 = 0.
-        # All other sectors: PE < 25 = +10, 25–35 = +5 (unchanged).
+        # Financial sector: PE < 15 = +10, 15-20 = +5, > 20 = 0.
+        # All other sectors: PE < 25 = +10, 25-35 = +5 (unchanged).
         pe  = info.get('trailingPE', info.get('forwardPE', 0))
         pb  = info.get('priceToBook', 0)
         peg = info.get('pegRatio', 0)
@@ -524,7 +503,7 @@ class Nifty100CompleteAnalyzer:
         if is_financial:
             if pe and 0 < pe < 15:      score += 10   # genuinely cheap bank
             elif pe and 15 <= pe < 20:  score += 5    # fair value for a bank
-            # PE > 20 for a bank = expensive for its sector → 0 points
+            # PE > 20 for a bank = expensive for its sector -> 0 points
         else:
             if pe  and 0 < pe  < 25:    score += 10
             elif pe  and 25 <= pe < 35: score += 5
@@ -561,7 +540,7 @@ class Nifty100CompleteAnalyzer:
         elif eg and eg > 0.05:  score += 5
         elif eg and eg < 0:     growth_penalty += 10  # track separately for cap
 
-        # CAL-4: Cap combined growth penalty at 10 — prevents cyclicals
+        # CAL-4: Cap combined growth penalty at 10 - prevents cyclicals
         # (steel, cement, energy) with temporary negative quarters from
         # being wiped out entirely. They score 0 growth points, not -20.
         score -= min(growth_penalty, 10)
@@ -571,7 +550,7 @@ class Nifty100CompleteAnalyzer:
         cr = info.get('currentRatio', 0)
         fc = info.get('freeCashflow', 0)
 
-        # NEW-7: D/E raised from +10 to +15 — high-debt firms collapse in
+        # NEW-7: D/E raised from +10 to +15 - high-debt firms collapse in
         # Indian market volatility (IL&FS, YES Bank, DHFL lessons)
         if de is not None:
             if de < 50:    score += 15   # was +10
@@ -583,11 +562,11 @@ class Nifty100CompleteAnalyzer:
         elif cr and cr > 1.0: score += 5
         else:                  score += 3   # CAL-5: partial credit if CR missing/NA
 
-        # NEW-6: FCF raised from +5 to +15 — Cash is King in Indian markets
+        # NEW-6: FCF raised from +5 to +15 - Cash is King in Indian markets
         # Companies with strong FCF survive rate hikes & FII outflows
         if fc and fc > 0:     score += 15   # was +5
 
-        return min(max(score, 0), 100)   # clamp 0–100
+        return min(max(score, 0), 100)   # clamp 0-100
 
     # =========================================================================
     #  MAIN ANALYSIS
@@ -600,17 +579,28 @@ class Nifty100CompleteAnalyzer:
             if df.empty or len(df) < 200:
                 return None
 
-            # ── NEW-4: Data sanity check — skip stocks with bad yFinance data ──
+            # == NEW-4: Data sanity check - skip stocks with bad yFinance data ==
             data_ok, data_warn = self.is_data_clean(df)
             if not data_ok:
                 print(f"  ⚠ Skipping {symbol}: {data_warn}")
                 return None
-            # ──────────────────────────────────────────────────────────────────
+            # ==================================================================
 
             current_price = df['Close'].iloc[-1]
             sma_20  = df['Close'].rolling(20).mean().iloc[-1]
             sma_50  = df['Close'].rolling(50).mean().iloc[-1]
             sma_200 = df['Close'].rolling(200).mean().iloc[-1]
+
+            # V53-1: SMA20 slope - compare today's SMA20 vs 5 bars ago.
+            # A declining SMA20 means short-term momentum is falling NOW,
+            # not waiting for SMA50 to catch up over weeks.
+            sma_20_series   = df['Close'].rolling(20).mean()
+            sma_20_5bar_ago = sma_20_series.iloc[-6] if len(sma_20_series) >= 6 else sma_20
+            sma_20_declining = sma_20 < sma_20_5bar_ago
+
+            # V53-2: Death-cross forming - SMA20 has crossed below SMA50.
+            # Early warning of sustained bearish momentum shift.
+            death_cross_forming = sma_20 < sma_50
 
             rsi          = self.calculate_rsi(df['Close'])
             macd, signal = self.calculate_macd(df['Close'])
@@ -638,17 +628,29 @@ class Nifty100CompleteAnalyzer:
             support_dist_pct = round(
                 ((current_price - nearest_support) / current_price) * 100, 2)
 
-            # ── TECHNICAL SCORE ───────────────────────────────────────────────
+            # == TECHNICAL SCORE ===============================================
             tech_score = 0
             tech_score += 1 if current_price > sma_20  else -1
             tech_score += 1 if current_price > sma_50  else -1
             tech_score += 2 if current_price > sma_200 else -2
 
-            # V52-3: Double SMA penalty — price below BOTH SMA20 and SMA50
+            # V52-3: Double SMA penalty - price below BOTH SMA20 and SMA50
             # simultaneously confirms active short-term downtrend.
-            # Each SMA already gave -1 above; this adds a combined signal -1.
             if current_price < sma_20 and current_price < sma_50:
                 tech_score -= 1   # confirmed short-term downtrend
+
+            # V53-1: SMA20 slope penalty - SMA20 actively declining right now.
+            # Catches stocks rolling over from a peak BEFORE SMA50 catches up.
+            # This is the fix that correctly identifies SBIN's situation:
+            # price still above SMA50 (lag) but SMA20 has been falling for weeks.
+            if sma_20_declining:
+                tech_score -= 1
+
+            # V53-2: Death-cross forming - SMA20 has crossed below SMA50.
+            # Early confirmed signal of sustained medium-term trend reversal.
+            # Works alongside V53-1: if both fire, that's -2 together.
+            if death_cross_forming:
+                tech_score -= 1
 
             # FIX-3: RSI context-aware + V52-2: weak-momentum zone
             if rsi < 30:
@@ -667,9 +669,9 @@ class Nifty100CompleteAnalyzer:
                     tech_score -= 1
                     rsi_signal = "Overbought"
             elif 30 <= rsi <= 45:
-                # V52-2: Weak-momentum zone — RSI between 30 and 45 signals
+                # V52-2: Weak-momentum zone - RSI between 30 and 45 signals
                 # fading momentum, often seen in stocks rolling over from peaks.
-                # SBIN fell from RSI 68 → 33, landing here with zero penalty
+                # SBIN fell from RSI 68 -> 33, landing here with zero penalty
                 # before. Now correctly flagged and penalised.
                 tech_score -= 1
                 rsi_signal = "Weak Momentum ⚠"
@@ -686,14 +688,14 @@ class Nifty100CompleteAnalyzer:
             else:
                 tech_score -= 1;  macd_signal = "Bearish"
 
-            # FIX-2 + V52-1: ADX trend strength — now direction-aware.
+            # FIX-2 + V52-1: ADX trend strength - now direction-aware.
             # ADX bonus only when price > SMA50 (confirms uptrend direction).
             # A strong downtrend has high ADX but should NOT be rewarded.
             if adx > 25:
                 if current_price > sma_50:
                     tech_score = min(tech_score + 1, 6)   # strong uptrend ✅
                 else:
-                    tech_score -= 1   # strong downtrend — penalise, not reward
+                    tech_score -= 1   # strong downtrend - penalise, not reward
             elif adx < 20:
                 tech_score -= 1   # FIX-2: weak/no trend penalty retained
 
@@ -707,7 +709,7 @@ class Nifty100CompleteAnalyzer:
             pct_from_52w_high = ((current_price - high_52w) / high_52w) * 100
             if pct_from_52w_high >= -5 and current_price > sma_200:
                 tech_score = min(tech_score + 1, 6)
-            # ─────────────────────────────────────────────────────────────────
+            # =================================================================
 
             pe_ratio         = info.get('trailingPE', info.get('forwardPE', 0))
             pb_ratio         = info.get('priceToBook', 0)
@@ -743,15 +745,21 @@ class Nifty100CompleteAnalyzer:
             tech_score_normalized = ((tech_score + 6) / 12) * 100
             combined_score        = (tech_score_normalized * 0.35) + (fund_score * 0.65)
 
-            # FIX-7: Analyst consensus ±5
+            # FIX-7 + V53-3: Analyst consensus +/-5, but buy bonus is
+            # conditional on tech score >= 0. If price is below SMA20,
+            # SMA50, RSI is weak and MACD bearish, analyst "Buy" ratings
+            # (which lag price action by weeks) should not rescue the score.
+            # Analyst sell/strongSell penalty always applies regardless.
             if analyst_key in ('strongBuy', 'buy'):
-                combined_score = min(combined_score + 5, 100)
+                if tech_score > 0:   # only reward analyst buy when technicals are net positive
+                    combined_score = min(combined_score + 5, 100)
+                # tech_score < 0: analyst buy silently ignored - chart disagrees
             elif analyst_key in ('sell', 'strongSell'):
                 combined_score = max(combined_score - 5, 0)
 
             # CAL-1: Thresholds relaxed to account for missing yFinance fields
             # on NSE stocks (PEG/ROA/CR often return None, silently scoring 0).
-            # STRONG BUY: 75→70  |  BUY: 55→50
+            # STRONG BUY: 75->70  |  BUY: 55->50
             if combined_score >= 70:
                 rating = "⭐⭐⭐⭐⭐ STRONG BUY";  recommendation = "STRONG BUY"
             elif combined_score >= 50:
@@ -838,6 +846,8 @@ class Nifty100CompleteAnalyzer:
                 'SMA_20':            round(sma_20, 2),
                 'SMA_50':            round(sma_50, 2),
                 'SMA_200':           round(sma_200, 2),
+                'SMA_20_Declining':  sma_20_declining,
+                'Death_Cross':       death_cross_forming,
                 'Support':           round(nearest_support, 2),
                 'Resistance':        round(nearest_resistance, 2),
                 'Support_Dist_Pct':  support_dist_pct,
@@ -906,14 +916,14 @@ class Nifty100CompleteAnalyzer:
     def get_top_recommendations(self):
         df = pd.DataFrame(self.results)
 
-        # ── BUY side ──────────────────────────────────────────────────────────
+        # == BUY side ==========================================================
         all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
         f1 = all_buys[all_buys['Upside'] > 0.5]
         f2 = f1[f1['Target_1'] > f1['Price']]
 
         # CAL-2: R:R gate split by rating tier.
         # STRONG BUY keeps strict 1.5x (high conviction only).
-        # Plain BUY relaxed to 1.2x — large-cap Nifty stocks trade in
+        # Plain BUY relaxed to 1.2x - large-cap Nifty stocks trade in
         # tight ranges where a blanket 1.5x blocks all heavyweights.
         strong_buys = f2[
             (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.5)
@@ -929,7 +939,7 @@ class Nifty100CompleteAnalyzer:
         filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
         sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
 
-        # NEW-3: Sector diversity cap — max MAX_PICKS_PER_SECTOR per sector
+        # NEW-3: Sector diversity cap - max MAX_PICKS_PER_SECTOR per sector
         top_buys_rows = []
         sector_counts = {}
         for _, row in sorted_buys.iterrows():
@@ -942,7 +952,7 @@ class Nifty100CompleteAnalyzer:
                 break
         top_buys = pd.DataFrame(top_buys_rows)
 
-        # ── SELL side ─────────────────────────────────────────────────────────
+        # == SELL side =========================================================
         all_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])]
         s1 = all_sells[all_sells['Upside'] > 0.5]
         s2 = s1[s1['Risk_Reward'] >= 1.2]     # CAL-2: aligned with BUY gate
@@ -952,7 +962,7 @@ class Nifty100CompleteAnalyzer:
         return top_buys, top_sells
 
     # =========================================================================
-    #  HTML — v5: Divergence column added to Buy table
+    #  HTML - v5: Divergence column added to Buy table
     # =========================================================================
     def generate_html(self):
         df = pd.DataFrame(self.results)
@@ -995,7 +1005,7 @@ class Nifty100CompleteAnalyzer:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>NIFTY 100 Market Influencers — {time_of_day} Report · {now.strftime('%d %b %Y')}</title>
+<title>NIFTY 100 Market Influencers - {time_of_day} Report · {now.strftime('%d %b %Y')}</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root {{
@@ -1259,7 +1269,7 @@ footer strong {{ color: #00f5ff; }}
       <div class="brand-gem">💎</div>
       <div>
         <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · RSI Divergence · Direction-Aware ADX · v5.2</div>
+        <div class="brand-sub">12M S/R · ATR Stops · SMA Slope · Death Cross · Direction ADX · v5.3</div>
       </div>
     </div>
     <div class="idx-strip">
@@ -1302,7 +1312,7 @@ footer strong {{ color: #00f5ff; }}
 <div class="main">
 """
 
-        # ── helper functions ──────────────────────────────────────────────────
+        # == helper functions ==================================================
         def rating_badge(rec, rating_text):
             cls_map = {
                 'STRONG BUY':  'badge-sb', 'BUY': 'badge-b',
@@ -1330,7 +1340,7 @@ footer strong {{ color: #00f5ff; }}
             elif div == 'Bullish Divergence':
                 return '<span class="div-badge div-bull">✅ Bull Div</span>'
             else:
-                return '<span class="div-badge div-none">—</span>'
+                return '<span class="div-badge div-none">-</span>'
 
         def adx_cell(v):
             if v >= 30:   cls, lbl = 'adx-strong', 'Strong'
@@ -1374,11 +1384,11 @@ footer strong {{ color: #00f5ff; }}
         def beta_color(v):
             return '#ff3d57' if v > 1.5 else ('#ffab00' if v > 1.0 else '#00e676')
 
-        # ── BUY TABLE ─────────────────────────────────────────────────────────
+        # == BUY TABLE =========================================================
         if not top_buys.empty:
             html += """
   <div class="section-hdr">
-    <div class="section-pill pill-buy">▲ Top Buy Recommendations — Sector Diversified</div>
+    <div class="section-pill pill-buy">▲ Top Buy Recommendations - Sector Diversified</div>
     <div class="section-line"></div>
     <div class="section-note">STOCK INFO · TRADE SETUP · TECHNICALS · FUNDAMENTALS · META</div>
   </div>
@@ -1429,7 +1439,7 @@ footer strong {{ color: #00f5ff; }}
                 st       = row.get('Stop_Type', 'ATR Stop')
                 scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
                 slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
-                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '—'
+                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '-'
                 divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
                 rr       = row['Risk_Reward']
                 mcdcls   = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
@@ -1483,7 +1493,7 @@ footer strong {{ color: #00f5ff; }}
 """
             html += "    </tbody></table></div>\n"
 
-        # ── SELL TABLE ────────────────────────────────────────────────────────
+        # == SELL TABLE ========================================================
         if not top_sells.empty:
             html += """
   <div class="section-hdr">
@@ -1536,7 +1546,7 @@ footer strong {{ color: #00f5ff; }}
                 st       = row.get('Stop_Type', 'ATR Stop')
                 scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
                 slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
-                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '—'
+                div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '-'
                 divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
                 rr       = row['Risk_Reward']
 
@@ -1601,7 +1611,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · ATR Stops · Direction-Aware ADX · Sector PE · v5.2
+  · 12M S/R · SMA Slope · Death Cross · Direction ADX · Sector PE · v5.3
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -1649,7 +1659,7 @@ setInterval(updateClock, 1000);
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v5 — {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report v5 - {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
             srv.starttls()
@@ -1669,7 +1679,7 @@ setInterval(updateClock, 1000);
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v5 — RSI Divergence · Sector Cap · Data Sanity")
+        print("💎 NIFTY 100 ANALYZER v5 - RSI Divergence · Sector Cap · Data Sanity")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
