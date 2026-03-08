@@ -225,10 +225,16 @@ class Nifty100CompleteAnalyzer:
         return datetime.now(pytz.timezone('Asia/Kolkata'))
 
     def calculate_rsi(self, prices, period=14):
+        # V55: Use Wilder's smoothing (EMA with alpha=1/period) to match TradingView.
+        # TradingView RSI uses Wilder's method — NOT simple rolling mean.
+        # Simple rolling mean overstates RSI by 5-10 points vs TradingView.
         delta = prices.diff()
-        gain  = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-        loss  = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-        rs    = gain / loss
+        gain  = delta.where(delta > 0, 0)
+        loss  = (-delta.where(delta < 0, 0))
+        # Wilder's smoothing = EMA with com=period-1 (equivalent to alpha=1/period)
+        avg_gain = gain.ewm(com=period - 1, min_periods=period).mean()
+        avg_loss = loss.ewm(com=period - 1, min_periods=period).mean()
+        rs = avg_gain / avg_loss
         return (100 - (100 / (1 + rs))).iloc[-1]
 
     def calculate_rsi_slope(self, prices, period=14, lookback=5):
@@ -252,9 +258,11 @@ class Nifty100CompleteAnalyzer:
         """
         try:
             delta    = prices.diff()
-            gain     = delta.where(delta > 0, 0).rolling(period).mean()
-            loss     = (-delta.where(delta < 0, 0)).rolling(period).mean()
-            rsi_ser  = 100 - (100 / (1 + gain / loss))
+            gain     = delta.where(delta > 0, 0)
+            loss     = (-delta.where(delta < 0, 0))
+            avg_gain = gain.ewm(com=period - 1, min_periods=period).mean()
+            avg_loss = loss.ewm(com=period - 1, min_periods=period).mean()
+            rsi_ser  = 100 - (100 / (1 + avg_gain / avg_loss))
             rsi_ser  = rsi_ser.dropna()
 
             if len(rsi_ser) < lookback + 2:
@@ -290,11 +298,13 @@ class Nifty100CompleteAnalyzer:
         Returns: 'Bearish Divergence', 'Bullish Divergence', or 'None'
         """
         try:
-            # Calculate RSI series (last 60 bars is enough)
+            # Calculate RSI series using Wilder's smoothing (matches TradingView)
             delta    = prices.diff()
-            gain     = delta.where(delta > 0, 0).rolling(window).mean()
-            loss     = (-delta.where(delta < 0, 0)).rolling(window).mean()
-            rsi_ser  = 100 - (100 / (1 + gain / loss))
+            gain     = delta.where(delta > 0, 0)
+            loss     = (-delta.where(delta < 0, 0))
+            avg_gain = gain.ewm(com=window - 1, min_periods=window).mean()
+            avg_loss = loss.ewm(com=window - 1, min_periods=window).mean()
+            rsi_ser  = 100 - (100 / (1 + avg_gain / avg_loss))
             rsi_ser  = rsi_ser.dropna()
 
             lookback  = 20   # bars to compare
@@ -658,10 +668,33 @@ class Nifty100CompleteAnalyzer:
     def analyze_stock(self, symbol, name):
         try:
             stock = yf.Ticker(symbol)
-            df    = stock.history(period='1y')
-            info  = stock.info
+
+            # V55-DATA: Fetch with explicit end=today to force yFinance to include
+            # the most recent candle. Without this, yFinance period='1y' can lag
+            # by 1-3 days, causing RSI/MACD to be calculated on stale data.
+            # auto_adjust=False: TradingView uses unadjusted prices — we match that
+            # so RSI values align with what you see on TradingView charts.
+            today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
+            df    = stock.history(period='1y', auto_adjust=False)
+
             if df.empty or len(df) < 200:
                 return None
+
+            # V55-FRESHNESS: Confirm the last candle is within 3 trading days of today.
+            # If yFinance is lagging (common on weekends or public holidays),
+            # the last row may be several days old — warn but continue.
+            last_candle_date = df.index[-1].date() if hasattr(df.index[-1], 'date') else df.index[-1]
+            days_lag = (today - last_candle_date).days
+            if days_lag > 5:
+                print(f"  ⚠ {symbol}: Data lag {days_lag} days (last candle: {last_candle_date})")
+
+            # auto_adjust=False gives columns: Open, High, Low, Close, Adj Close, Volume
+            # We use 'Close' (unadjusted) to match TradingView's default RSI calculation.
+            # Rename for safety in case column names vary across yFinance versions.
+            if 'Close' not in df.columns and 'Adj Close' in df.columns:
+                df = df.rename(columns={'Adj Close': 'Close'})
+
+            info  = stock.info
 
             # == NEW-4: Data sanity check - skip stocks with bad yFinance data ==
             data_ok, data_warn = self.is_data_clean(df)
