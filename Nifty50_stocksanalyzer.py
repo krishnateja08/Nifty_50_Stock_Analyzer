@@ -843,12 +843,14 @@ class Nifty100CompleteAnalyzer:
 
             # V54-1: TREND VETO GATE — hard cap BEFORE stop/target calculation.
             # If 3+ confirmed bearish signals are active, the maximum allowed
-            # rating is HOLD. A strong balance sheet is NOT a reason to buy
-            # into an active distribution pattern. This veto is applied after
-            # all scoring so we can still display the raw combined_score.
-            if bearish_signal_count >= 3 and recommendation in ("STRONG BUY", "BUY"):
+            # rating is HOLD regardless of combined_score.
+            # We store the raw score-based rating separately so we can still
+            # show it in the UI (score badge), but recommendation + Rating are
+            # both updated so EVERY downstream consumer sees HOLD.
+            veto_fired = bearish_signal_count >= 3 and recommendation in ("STRONG BUY", "BUY")
+            if veto_fired:
                 recommendation = "HOLD"
-                rating         = "⭐⭐⭐ HOLD"
+                rating         = "⭐⭐⭐ HOLD (Veto)"
 
             stock_beta = beta if beta else 1.0
             if stock_beta < 0.8:
@@ -861,6 +863,7 @@ class Nifty100CompleteAnalyzer:
                 atr_multiplier = 2.0;  max_sl_pct = 12.0
 
             if recommendation in ["STRONG BUY", "BUY"]:
+                # ── LONG setup: stop below support, targets at resistance ──
                 atr_stop       = nearest_support - (atr * atr_multiplier)
                 min_allowed_sl = current_price * (1 - max_sl_pct / 100)
                 stop_loss      = max(atr_stop, min_allowed_sl)
@@ -874,7 +877,38 @@ class Nifty100CompleteAnalyzer:
                 if target_1 <= current_price * 1.005:
                     recommendation = "HOLD"; rating = "⭐⭐⭐ HOLD"
                 upside = ((target_1 - current_price) / current_price) * 100
+
+            elif recommendation == "HOLD":
+                # ── HOLD setup: neutral — nearest support as soft floor,
+                #    nearest resistance as soft ceiling. No directional bias.
+                #    Stop = ATR below nearest support (risk management).
+                #    Target = nearest resistance above price.
+                #    Upside shown as % to resistance so user can judge entry.
+                atr_stop      = nearest_support - (atr * atr_multiplier)
+                min_allowed_sl = current_price * (1 - max_sl_pct / 100)
+                stop_loss     = max(atr_stop, min_allowed_sl)
+                sl_percentage = ((current_price - stop_loss) / current_price) * 100
+                stop_type     = "ATR Stop" if atr_stop >= min_allowed_sl else "Beta Cap"
+
+                # Target: nearest resistance above price (or project +3%)
+                valid_res = [r['level'] for r in resistance_levels
+                             if r['level'] > current_price * 1.005]
+                if len(valid_res) >= 2:
+                    target_1, target_2 = valid_res[0], valid_res[1]
+                    target_status = "Hold S/R Levels"
+                elif len(valid_res) == 1:
+                    target_1      = valid_res[0]
+                    target_2      = round(target_1 * 1.03, 2)
+                    target_status = "Hold Partial S/R"
+                else:
+                    target_1      = round(current_price * 1.03, 2)
+                    target_2      = round(current_price * 1.06, 2)
+                    target_status = "Hold Projected"
+                targets_hit   = 0
+                upside        = ((target_1 - current_price) / current_price) * 100
+
             else:
+                # ── SHORT/SELL setup: stop above resistance, targets at support ──
                 atr_stop       = nearest_resistance + (atr * atr_multiplier)
                 max_allowed_sl = current_price * (1 + max_sl_pct / 100)
                 stop_loss      = min(atr_stop, max_allowed_sl)
@@ -901,7 +935,7 @@ class Nifty100CompleteAnalyzer:
             reward      = abs(target_1 - current_price)
             risk_reward = round(reward / risk, 2) if risk > 0 else 0
 
-            # FIX-4: STRONG BUY needs R:R ≥ 1.5
+            # FIX-4: STRONG BUY needs R:R ≥ 1.5 (only applies to non-vetoed buys)
             if recommendation == "STRONG BUY" and risk_reward < 1.5:
                 recommendation = "BUY"
                 rating         = "⭐⭐⭐⭐ BUY"
@@ -930,6 +964,7 @@ class Nifty100CompleteAnalyzer:
                 'SMA_200_Rising':    sma_200_rising,
                 'Bearish_Signals':   bearish_signal_count,
                 'Weight_Mode':       weight_label,
+                'Veto_Fired':        veto_fired,
                 'Support':           round(nearest_support, 2),
                 'Resistance':        round(nearest_resistance, 2),
                 'Support_Dist_Pct':  support_dist_pct,
@@ -1566,7 +1601,7 @@ footer strong {{ color: #00f5ff; }}
         </td>
         <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
         <td class="gsep">
-          {rating_badge(rec, row['Rating'])}
+          {rating_badge(rec, {'STRONG BUY':'⭐⭐⭐⭐⭐ STRONG BUY','BUY':'⭐⭐⭐⭐ BUY','HOLD':'⭐⭐⭐ HOLD','SELL':'⭐⭐ SELL','STRONG SELL':'⭐ STRONG SELL'}.get(rec, rec))}
           {score_cell(row['Combined_Score'], sc_color, sc_bar)}
           {veto_badge(bs, wm)}
         </td>
@@ -1673,7 +1708,7 @@ footer strong {{ color: #00f5ff; }}
         </td>
         <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
         <td class="gsep">
-          {rating_badge(rec, row['Rating'])}
+          {rating_badge(rec, {'STRONG BUY':'⭐⭐⭐⭐⭐ STRONG BUY','BUY':'⭐⭐⭐⭐ BUY','HOLD':'⭐⭐⭐ HOLD','SELL':'⭐⭐ SELL','STRONG SELL':'⭐ STRONG SELL'}.get(rec, rec))}
           {score_cell(row['Combined_Score'], '#ff3d57', '#c62828')}
         </td>
         <td><span class="upside-val {dncls}">{row['Upside']:+.1f}%</span></td>
