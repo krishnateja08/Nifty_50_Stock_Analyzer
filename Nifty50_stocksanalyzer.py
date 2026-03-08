@@ -1177,9 +1177,49 @@ class Nifty100CompleteAnalyzer:
         # == SELL side =========================================================
         all_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])]
         s1 = all_sells[all_sells['Upside'] > 0.5]
-        s2 = s1[s1['Risk_Reward'] >= 1.2]     # CAL-2: aligned with BUY gate
+        s2 = s1[s1['Risk_Reward'] >= 1.2]
         s3 = s2[s2['Target_1'] < s2['Price']]
-        top_sells = s3.nsmallest(20, 'Combined_Score')
+
+        # V55-SELL-GATE: Mirror of RSI buy gate — remove false sells.
+        #
+        # Problem 1 — OVERSOLD stocks in sell table (TCS RSI 31, Persistent RSI 28):
+        #   RSI < 35 = stock is already heavily sold. Recommending SELL here means
+        #   you're shorting at the bottom = maximum bounce risk. Remove these.
+        #   The stock may still be fundamentally weak (low score) but technically
+        #   it's not a safe short entry right now. Wait for RSI to recover to 45+
+        #   before a fresh short setup forms.
+        #
+        # Problem 2 — Bullish MACD with healthy RSI (Divi's Lab RSI 62, MACD Bullish):
+        #   If RSI is above 50 AND MACD is Bullish, the chart is saying the stock
+        #   still has upward momentum. A low combined score means poor fundamentals,
+        #   but that alone is not a sell signal while price action is rising.
+        #   These belong in HOLD, not SELL table.
+        #
+        # Problem 3 — RSI rising fast from oversold:
+        #   If RSI slope is strongly positive (rising > 8 points in 5 bars),
+        #   the stock is recovering. Don't short a recovering stock.
+
+        def sell_is_valid(row):
+            rsi_val = row.get('RSI', 50)
+            rsi_dir = row.get('RSI_Direction', 'Flat')
+            rsi_slp = row.get('RSI_Slope', 0)
+            macd    = row.get('MACD', 'Bearish')
+
+            # Block 1: Oversold — bounce risk, not a short entry
+            if rsi_val < 35:
+                return False
+
+            # Block 2: RSI healthy (>50) AND MACD Bullish — chart says uptrend
+            if rsi_val > 50 and macd == 'Bullish':
+                return False
+
+            # Block 3: RSI rising fast from a low base — recovery in progress
+            if rsi_val < 45 and rsi_dir == 'Rising' and rsi_slp > 8:
+                return False
+
+            return True
+
+        top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
