@@ -1165,45 +1165,75 @@ class Nifty100CompleteAnalyzer:
 
         # == BUY side ==========================================================
         all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
-        f1 = all_buys[all_buys['Upside'] > 0]          # any positive upside
-        f2 = f1[f1['Target_1'] > f1['Price']]           # target must be above price
+        f1 = all_buys[all_buys['Upside'] > 0]
+        f2 = f1[f1['Target_1'] > f1['Price']]
 
-        # V55-RSI-GATE: Block overbought and topping-out stocks from Buy table.
-        # Rule 1: RSI > 70 = overbought → block entirely (statistically high reversal risk)
-        # Rule 2: RSI 65-70 AND Falling → near overbought AND already rolling over → block
-        # Rule 3: RSI 60-70 AND falling fast (slope < -8) → already topping → block
-        # Stocks that pass: RSI < 65 rising/flat, or RSI 65-70 flat/rising (still has room)
+        # ── DEBUG: show exactly why each BUY stock passes or fails each filter ──
+        print(f"\n{'─'*75}")
+        print(f"  BUY FILTER DEBUG  ({len(all_buys)} BUY-rated stocks → target: show all that qualify)")
+        print(f"{'─'*75}")
+        print(f"  {'Stock':<18} {'RSI':>5} {'Dir':<8} {'Slp':>5} {'RR':>5} {'Vol':>5}  {'Result'}")
+        print(f"  {'─'*70}")
+        for _, row in all_buys.sort_values('Combined_Score', ascending=False).iterrows():
+            rsi_val = row.get('RSI', 50)
+            rsi_dir = row.get('RSI_Direction', 'Flat')
+            rsi_slp = row.get('RSI_Slope', 0)
+            rr      = row.get('Risk_Reward', 0)
+            vol     = row.get('Vol_Ratio', 0)
+            upside  = row.get('Upside', 0)
+            t1      = row.get('Target_1', 0)
+            price   = row.get('Price', 0)
+
+            fail = None
+            if upside <= 0:               fail = f"Upside ≤0 ({upside:.1f}%)"
+            elif t1 <= price:             fail = f"T1≤Price (T1={t1:.0f} P={price:.0f})"
+            elif rsi_val > 70:            fail = f"RSI overbought ({rsi_val:.0f})"
+            elif rsi_val > 65 and rsi_dir == 'Falling': fail = f"RSI {rsi_val:.0f} near-OB + falling"
+            elif rsi_val > 60 and rsi_slp < -8: fail = f"RSI {rsi_val:.0f} topping (slope {rsi_slp:.0f})"
+            elif rr < 0.8:                fail = f"R:R too low ({rr:.2f}x)"
+            elif vol < 0.7:               fail = f"Vol too low ({vol:.1f}x)"
+            else:                         fail = None
+
+            status = f"❌ BLOCKED — {fail}" if fail else "✅ PASS"
+            print(f"  {row['Symbol']:<18} {rsi_val:>5.0f} {rsi_dir:<8} {rsi_slp:>+5.0f} {rr:>5.2f} {vol:>5.1f}  {status}")
+        print(f"{'─'*75}\n")
+        # ── END DEBUG ──────────────────────────────────────────────────────────
+
+        # V55-RSI-GATE
         def rsi_is_safe_to_buy(row):
             rsi_val = row.get('RSI', 50)
             rsi_dir = row.get('RSI_Direction', 'Flat')
             rsi_slp = row.get('RSI_Slope', 0)
-            if rsi_val > 70:
-                return False                              # overbought — never buy
-            if rsi_val > 65 and rsi_dir == 'Falling':
-                return False                              # near overbought and already rolling
-            if rsi_val > 60 and rsi_slp < -8:
-                return False                              # topping out fast — e.g. 80→63
+            if rsi_val > 70:                              return False
+            if rsi_val > 65 and rsi_dir == 'Falling':    return False
+            if rsi_val > 60 and rsi_slp < -8:            return False
             return True
 
         f2 = f2[f2.apply(rsi_is_safe_to_buy, axis=1)]
 
-        # R:R gate: STRONG BUY ≥ 1.2x, plain BUY ≥ 0.8x
-        # Relaxed from 1.5/1.2 — large-cap Nifty stocks trade in tight ranges,
-        # a blanket 1.5x in a bear market blocks almost everything.
+        # R:R gate: STRONG BUY ≥ 1.2x, plain BUY ≥ 0.6x
+        # In a broad bear market, support levels are compressed — R:R naturally lower.
+        # 0.6x minimum still ensures reward > half the risk (not a bad trade).
+        # The RSI gate above already removed the dangerous high-RSI stocks,
+        # so remaining stocks genuinely need room to run — just tight ranges.
         strong_buys = f2[
             (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.2)
         ]
         plain_buys = f2[
-            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 0.8)
+            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 0.6)
         ]
 
-        # Volume gate: minimum 0.7x (was 1.5x/0.9x) — broad market weakness
-        # means even good stocks have below-average volume on quiet days.
-        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 0.7]
-        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.7]
+        # Volume gate: minimum 0.6x — further relaxed for thin bear-market days
+        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 0.6]
+        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.6]
 
         filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
         sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
+
+        print(f"  Filter summary: {len(all_buys)} BUY rated → "
+              f"{len(f2)} after RSI gate → "
+              f"{len(filtered_buys)} after R:R+Vol gate → "
+              f"sector cap applies next\n")
 
         # Sector diversity cap: max 4 per sector (was 3)
         # With only ~21 buys total, a cap of 3 was cutting too many
