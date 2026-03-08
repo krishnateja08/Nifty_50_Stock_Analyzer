@@ -2247,7 +2247,7 @@ window.onload = function() {{ filterWL('ALL'); }};
             msg = MIMEMultipart('alternative')
             msg['From']    = from_email
             msg['To']      = to_email
-            msg['Subject'] = f"💎 NIFTY 100 Report v5.4 - {tod} {now.strftime('%d %b %Y')}"
+            msg['Subject'] = f"💎 NIFTY 100 Report - {tod} {now.strftime('%d %b %Y')}"
             msg.attach(MIMEText(self.generate_html(), 'html'))
             srv = smtplib.SMTP('smtp.gmail.com', 587)
             srv.starttls()
