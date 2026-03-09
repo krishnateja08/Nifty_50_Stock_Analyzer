@@ -1369,7 +1369,7 @@ class Nifty100CompleteAnalyzer:
 body {{
   background: #04080f; color: #ddeeff;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px; min-height: 100vh;
+  font-size: 15px; min-height: 100vh;
 }}
 header {{
   background: #060d18; border-bottom: 2px solid #00f5ff;
@@ -1391,11 +1391,11 @@ header {{
   box-shadow: 0 0 20px rgba(0,212,255,0.3);
 }}
 .brand-name {{
-  font-family: 'Syne', sans-serif; font-size: 18px;
+  font-family: 'Syne', sans-serif; font-size: 20px;
   font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
 }}
 .brand-sub {{
-  font-size: 10px; color: #aaddff; letter-spacing: 2px;
+  font-size: 12px; color: #aaddff; letter-spacing: 2px;
   text-transform: uppercase; margin-top: 2px; font-weight: 700;
 }}
 .idx-strip {{
@@ -1409,19 +1409,19 @@ header {{
   padding: 6px 20px; border-right: 1px solid var(--border); gap: 2px;
 }}
 .idx-item:last-child {{ border-right: none; }}
-.idx-name  {{ font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #aaddff; text-transform: uppercase; }}
-.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; color: #ffffff; }}
-.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 800; }}
+.idx-name  {{ font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #aaddff; text-transform: uppercase; }}
+.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 800; color: #ffffff; }}
+.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
 .idx-chg.up {{ color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
 .idx-chg.dn {{ color: #ff4466; text-shadow: 0 0 8px rgba(255,68,102,0.6); }}
 .clock-box {{ display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }}
 .clock-time {{
-  font-family: 'IBM Plex Mono', monospace; font-size: 22px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 24px;
   font-weight: 800; color: #00ff88;
   text-shadow: 0 0 16px rgba(0,255,136,0.8); letter-spacing: 1px;
 }}
-.clock-meta {{ font-size: 12px; color: #ffffff; letter-spacing: 1px; font-weight: 700; }}
-.clock-next {{ font-size: 11px; color: #aaddff; margin-top: 2px; font-weight: 700; }}
+.clock-meta {{ font-size: 14px; color: #ffffff; letter-spacing: 1px; font-weight: 700; }}
+.clock-next {{ font-size: 13px; color: #aaddff; margin-top: 2px; font-weight: 700; }}
 .ticker {{
   background: rgba(0,0,0,0.6); border-top: 1px solid var(--border); overflow: hidden;
 }}
@@ -1436,7 +1436,7 @@ header {{
 .tick {{
   display: inline-flex; align-items: center; gap: 6px;
   padding: 0 18px; border-right: 1px solid #1e3a5a;
-  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 14px;
 }}
 .tick-sym {{ color: #00f5ff; font-weight: 800; }}
 .tick-px  {{ color: #ffffff; font-weight: 600; }}
@@ -1451,21 +1451,21 @@ header {{
   padding: 16px 24px; border-right: 1px solid #1e3a5a; flex: 1;
 }}
 .kpi-item:last-child {{ border-right: none; }}
-.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }}
-.kpi-label {{ font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aaddff; margin-top: 5px; }}
+.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; }}
+.kpi-label {{ font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aaddff; margin-top: 5px; }}
 .kpi-bar   {{ height: 3px; width: 50px; border-radius: 2px; margin-top: 8px; }}
-.kpi-sub   {{ font-size: 10px; color: #6699bb; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }}
+.kpi-sub   {{ font-size: 12px; color: #6699bb; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }}
 .main {{ padding: 20px; }}
 .section-hdr {{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }}
 .section-pill {{
   display: flex; align-items: center; gap: 8px;
   padding: 8px 20px; border-radius: 100px;
-  font-size: 13px; font-weight: 800; letter-spacing: 0.5px;
+  font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
 }}
 .pill-buy  {{ background: #004d25; color: #00ff88; border: 2px solid #00cc66; }}
 .pill-sell {{ background: #4d0010; color: #ff4466; border: 2px solid #cc0033; }}
 .section-line {{ flex: 1; height: 1px; background: #1e3a5a; }}
-.section-note {{ font-size: 11px; color: #88aacc; letter-spacing: 1.5px; white-space: nowrap; font-weight: 800; text-transform: uppercase; }}
+.section-note {{ font-size: 13px; color: #88aacc; letter-spacing: 1.5px; white-space: nowrap; font-weight: 800; text-transform: uppercase; }}
 .tbl-wrap {{
   width: 100%; overflow-x: auto;
   border: 1px solid #1e3a5a; border-radius: 12px;
@@ -1474,7 +1474,7 @@ header {{
 }}
 table {{ width: 100%; border-collapse: collapse; min-width: 1600px; }}
 .grp-row th {{
-  font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+  font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
   padding: 9px 10px; text-align: center;
   border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap;
 }}
@@ -1484,7 +1484,7 @@ table {{ width: 100%; border-collapse: collapse; min-width: 1600px; }}
 .grp-fund  {{ background: #3a2a00; color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.6); }}
 .grp-meta  {{ background: #28124a; color: #cc99ff; text-shadow: 0 0 8px rgba(204,153,255,0.6); }}
 .col-row th {{
-  font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
   padding: 9px 10px; color: #ffffff; background: #0c1a2e;
   border-bottom: 3px solid #1e3a5a; white-space: nowrap; text-align: left;
 }}
@@ -1501,13 +1501,13 @@ td {{
 tr:last-child td {{ border-bottom: none; }}
 tr:nth-child(even) td {{ background: rgba(255,255,255,0.025); }}
 tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }}
-.stock-name {{ font-size: 13px; font-weight: 700; color: #ffffff; }}
-.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #00f5ff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
-.stock-sec  {{ font-size: 10px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
-.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #ffcc00; }}
+.stock-name {{ font-size: 15px; font-weight: 700; color: #ffffff; }}
+.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00f5ff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
+.stock-sec  {{ font-size: 12px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
+.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: #ffcc00; }}
 .badge {{
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 800; padding: 5px 10px;
+  font-size: 12px; font-weight: 800; padding: 5px 10px;
   border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;
 }}
 .badge-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
@@ -1516,80 +1516,80 @@ tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }
 .badge-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
 .badge-ss {{ background: #5a0015; color: #ff7788; border: 1px solid #ff7788; }}
 .score-wrap {{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 6px; }}
-.score-num  {{ font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }}
+.score-num  {{ font-family: 'Syne', sans-serif; font-size: 27px; font-weight: 800; line-height: 1; }}
 .score-track {{ width: 44px; height: 4px; background: #1a2a3a; border-radius: 2px; }}
 .score-fill  {{ height: 100%; border-radius: 2px; transition: width 0.5s ease; }}
 .target-badge {{
-  font-size: 9px; font-weight: 800; padding: 3px 7px;
+  font-size: 11px; font-weight: 800; padding: 3px 7px;
   border-radius: 4px; letter-spacing: 0.5px; display: block; margin-bottom: 4px;
 }}
 .tb-real    {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
 .tb-partial {{ background: #4d3300; color: #ffcc00; border: 1px solid #ffcc00; }}
 .tb-ath     {{ background: #003a4d; color: #00f5ff; border: 1px solid #00f5ff; }}
-.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: #ffffff; }}
-.t2-val {{ font-size: 11px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: #ff4466; }}
-.sl-pct {{ font-size: 11px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.sl-type {{ font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }}
+.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; color: #ffffff; }}
+.t2-val {{ font-size: 13px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; color: #ff4466; }}
+.sl-pct {{ font-size: 13px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.sl-type {{ font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }}
 .slt-atr  {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .slt-beta {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
-.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; }}
+.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 800; }}
 .upside-val.up {{ color: #00ff88; }}
 .upside-val.dn {{ color: #ff4466; }}
-.rr-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
-.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: #00f5ff; }}
-.atr-sub {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
-.rsi-sig {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.div-badge {{ font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }}
+.rr-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; }}
+.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #00f5ff; }}
+.atr-sub {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
+.rsi-sig {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.div-badge {{ font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }}
 .div-bear {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
 .div-bull {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
 .div-none {{ background: #1a2a3a; color: #88aacc; border: 1px solid #334455; }}
-.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
-.adx-lbl {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
+.adx-lbl {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
 .adx-strong {{ color: #00ff88; }}
 .adx-mod    {{ color: #ffcc00; }}
 .adx-weak   {{ color: #aabbcc; }}
-.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
-.vol-lbl {{ font-size: 10px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
+.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
+.vol-lbl {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
 .vol-high {{ color: #00ff88; }}
 .vol-norm {{ color: #ddeeff; }}
 .vol-low  {{ color: #aabbcc; }}
-.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; }}
+.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
 .sdist-close {{ color: #00ff88; }}
 .sdist-mid   {{ color: #ffcc00; }}
 .sdist-far   {{ color: #ff4466; }}
-.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }}
-.qbadge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
+.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; }}
+.qbadge {{ font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
 .qb-ex {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .qb-gd {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
 .qb-av {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
 .qb-po {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-.analyst-badge {{ font-size: 9px; font-weight: 800; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }}
+.analyst-badge {{ font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }}
 .ab-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
 .ab-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
 .ab-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #334455; }}
 .ab-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #00f5ff; font-weight: 700; }}
-.rnum {{ font-size: 12px; color: #88bbdd; font-weight: 700; }}
-.macd-bull {{ color: #00ff88; font-weight: 800; font-size: 12px; }}
-.macd-bear {{ color: #ff4466; font-weight: 800; font-size: 12px; }}
+.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #00f5ff; font-weight: 700; }}
+.rnum {{ font-size: 14px; color: #88bbdd; font-weight: 700; }}
+.macd-bull {{ color: #00ff88; font-weight: 800; font-size: 14px; }}
+.macd-bear {{ color: #ff4466; font-weight: 800; font-size: 14px; }}
 .disc {{
   background: #0c1a2e; border: 1px solid #1e3a5a;
   border-left: 4px solid #ff4466;
   padding: 14px 18px; border-radius: 8px;
-  font-size: 12px; color: #aaccee; line-height: 1.9; margin: 16px 0;
+  font-size: 14px; color: #aaccee; line-height: 1.9; margin: 16px 0;
 }}
 footer {{
   text-align: center; padding: 16px;
   background: #080f1e; border-top: 1px solid #1e3a5a;
-  font-size: 12px; color: #88aacc; letter-spacing: 1px;
+  font-size: 14px; color: #88aacc; letter-spacing: 1px;
 }}
 footer strong {{ color: #00f5ff; }}
 @media(max-width: 900px) {{
   .idx-strip {{ display: none; }}
   .kpi-item  {{ padding: 10px 12px; }}
-  .kpi-num   {{ font-size: 24px; }}
+  .kpi-num   {{ font-size: 27px; }}
 }}
 @media(max-width: 600px) {{
   .h-top  {{ padding: 8px 12px; }}
@@ -1674,7 +1674,7 @@ footer strong {{ color: #00f5ff; }}
             }
             style, label = styles.get(rec, styles['HOLD'])
             return (f'<span style="display:inline-block;padding:4px 10px;border-radius:5px;'
-                    f'font-size:11px;font-weight:700;letter-spacing:.4px;{style}">{label}</span>')
+                    f'font-size:13px;font-weight:700;letter-spacing:.4px;{style}">{label}</span>')
 
         def veto_badge(bearish_signals, weight_mode):
             """Shows a small warning pill when the Trend Veto Gate fired,
@@ -1683,7 +1683,7 @@ footer strong {{ color: #00f5ff; }}
             if bearish_signals >= 3:
                 return (f'<div style="margin-top:3px;display:inline-block;padding:2px 6px;'
                         f'border-radius:3px;background:#2a1500;color:#ff8c00;'
-                        f'border:1px solid #ff8c00;font-size:10px;font-weight:700;">'
+                        f'border:1px solid #ff8c00;font-size:12px;font-weight:700;">'
                         f'🚫 Trend Veto ({bearish_signals}/5)</div>')
             return ''
 
@@ -1814,12 +1814,12 @@ footer strong {{ color: #00f5ff; }}
                 rsi_dir_b = row.get('RSI_Direction', 'Flat')
                 rsi_slp_b = row.get('RSI_Slope', 0)
                 if rsi_dir_b == 'Rising':
-                    rsi_slope_html = f'<span style="color:#00e676;font-size:10px">↑ +{rsi_slp_b:.0f}</span>'
+                    rsi_slope_html = f'<span style="color:#00e676;font-size:12px">↑ +{rsi_slp_b:.0f}</span>'
                 elif rsi_dir_b == 'Falling':
                     slp_clr = '#ff4466' if abs(rsi_slp_b) > 8 else '#ffab00'
-                    rsi_slope_html = f'<span style="color:{slp_clr};font-size:10px">↓ {rsi_slp_b:.0f}</span>'
+                    rsi_slope_html = f'<span style="color:{slp_clr};font-size:12px">↓ {rsi_slp_b:.0f}</span>'
                 else:
-                    rsi_slope_html = '<span style="color:#4a6080;font-size:10px">→</span>'
+                    rsi_slope_html = '<span style="color:#4a6080;font-size:12px">→</span>'
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -1948,7 +1948,7 @@ footer strong {{ color: #00f5ff; }}
           <div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div>
         </td>
         <td>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div>
           <div class="sl-pct">+{row['SL_Percentage']:.1f}%</div>
           <span class="sl-type {scls}">{slbl}</span>
         </td>
@@ -2051,23 +2051,23 @@ footer strong {{ color: #00f5ff; }}
             death_cross   = row.get('Death_Cross', False)
             sma200_rising = row.get('SMA_200_Rising', True)
             if sma_declining and death_cross:
-                sma_trend = '<span style="color:#ff4466;font-size:11px">↓ Declining</span>'
+                sma_trend = '<span style="color:#ff4466;font-size:13px">↓ Declining</span>'
             elif sma_declining or death_cross:
-                sma_trend = '<span style="color:#ffab00;font-size:11px">⚠ Weakening</span>'
+                sma_trend = '<span style="color:#ffab00;font-size:13px">⚠ Weakening</span>'
             elif sma200_rising:
-                sma_trend = '<span style="color:#00e676;font-size:11px">↑ Rising</span>'
+                sma_trend = '<span style="color:#00e676;font-size:13px">↑ Rising</span>'
             else:
-                sma_trend = '<span style="color:#60a5fa;font-size:11px">→ Flat</span>'
+                sma_trend = '<span style="color:#60a5fa;font-size:13px">→ Flat</span>'
 
             # Bearish signal count pill
             if bs >= 4:
-                sig_pill = f'<span style="color:#ff4466;font-size:11px">🔴 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#ff4466;font-size:13px">🔴 {bs}/5 Bear</span>'
             elif bs >= 3:
-                sig_pill = f'<span style="color:#ff8c00;font-size:11px">🟠 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#ff8c00;font-size:13px">🟠 {bs}/5 Bear</span>'
             elif bs >= 1:
-                sig_pill = f'<span style="color:#ffab00;font-size:11px">🟡 {bs}/5</span>'
+                sig_pill = f'<span style="color:#ffab00;font-size:13px">🟡 {bs}/5</span>'
             else:
-                sig_pill = f'<span style="color:#00e676;font-size:11px">🟢 0/5</span>'
+                sig_pill = f'<span style="color:#00e676;font-size:13px">🟢 0/5</span>'
 
             # Score colour
             if row['Combined_Score'] >= 70:   sc = '#00ff88'
@@ -2088,42 +2088,42 @@ footer strong {{ color: #00f5ff; }}
 
             # RSI direction arrow + slope for display
             if rsi_dir == 'Rising':
-                rsi_dir_html = f'<span style="color:#00e676;font-size:10px">↑ +{rsi_slp:.0f}</span>'
+                rsi_dir_html = f'<span style="color:#00e676;font-size:12px">↑ +{rsi_slp:.0f}</span>'
             elif rsi_dir == 'Falling':
                 clr = '#ff4466' if abs(rsi_slp) > 8 else '#ffab00'
-                rsi_dir_html = f'<span style="color:{clr};font-size:10px">↓ {rsi_slp:.0f}</span>'
+                rsi_dir_html = f'<span style="color:{clr};font-size:12px">↓ {rsi_slp:.0f}</span>'
             else:
-                rsi_dir_html = '<span style="color:#4a6080;font-size:10px">→ flat</span>'
+                rsi_dir_html = '<span style="color:#4a6080;font-size:12px">→ flat</span>'
 
             # F/T split pill: shows fund score / tech score
             tech_col  = '#00e676' if tech_sc >= 3 else ('#ffab00' if tech_sc >= 0 else '#ff4466')
             fund_col  = '#00e676' if fund_sc >= 70 else ('#ffab00' if fund_sc >= 50 else '#ff4466')
-            ft_cell   = (f'<span style="font-size:11px;color:{fund_col}">F:{fund_sc:.0f}</span>'
-                         f'<span style="color:#4a6080;font-size:10px"> / </span>'
-                         f'<span style="font-size:11px;color:{tech_col}">T:{tech_sc:+d}</span>')
+            ft_cell   = (f'<span style="font-size:13px;color:{fund_col}">F:{fund_sc:.0f}</span>'
+                         f'<span style="color:#4a6080;font-size:12px"> / </span>'
+                         f'<span style="font-size:13px;color:{tech_col}">T:{tech_sc:+d}</span>')
 
             # RSI divergence pill
             if rsi_div == 'Bearish Divergence':
-                rsi_div_cell = '<span style="color:#ff4466;font-size:10px">⚠ Bear Div</span>'
+                rsi_div_cell = '<span style="color:#ff4466;font-size:12px">⚠ Bear Div</span>'
             elif rsi_div == 'Bullish Divergence':
-                rsi_div_cell = '<span style="color:#00e676;font-size:10px">✅ Bull Div</span>'
+                rsi_div_cell = '<span style="color:#00e676;font-size:12px">✅ Bull Div</span>'
             else:
-                rsi_div_cell = '<span style="color:#4a6080;font-size:10px">—</span>'
+                rsi_div_cell = '<span style="color:#4a6080;font-size:12px">—</span>'
 
             # Veto label inside action cell
-            veto_cell = ('<span style="display:block;font-size:9px;color:#ff8c00;margin-top:2px">🚫 Veto</span>'
+            veto_cell = ('<span style="display:block;font-size:11px;color:#ff8c00;margin-top:2px">🚫 Veto</span>'
                          if veto else '')
 
             html += f"""      <tr data-rec="{data_rec}">
         <td><span class="rnum">{i}</span></td>
         <td>
-          <div class="stock-name" style="font-size:12px">{row['Name']}</div>
+          <div class="stock-name" style="font-size:14px">{row['Name']}</div>
           <div class="stock-sym">{row['Symbol']}</div>
         </td>
-        <td><span style="font-size:11px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
-        <td><div class="price-val" style="font-size:13px">₹{row['Price']:,.2f}</div></td>
+        <td><span style="font-size:13px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
+        <td><div class="price-val" style="font-size:15px">₹{row['Price']:,.2f}</div></td>
         <td>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
           {veto_badge(bs, wm)}
         </td>
         <td>{ft_cell}</td>
@@ -2132,19 +2132,19 @@ footer strong {{ color: #00f5ff; }}
           {veto_cell}
         </td>
         <td>
-          <div class="rsi-val" style="color:{rsic};font-size:13px">{row['RSI']:.0f}</div>
-          <div style="font-size:10px;color:#8899aa">{row['RSI_Signal']}</div>
+          <div class="rsi-val" style="color:{rsic};font-size:15px">{row['RSI']:.0f}</div>
+          <div style="font-size:12px;color:#8899aa">{row['RSI_Signal']}</div>
           {rsi_dir_html}
         </td>
         <td>{rsi_div_cell}</td>
-        <td><span class="{mcdcls}" style="font-size:11px">{row['MACD']}</span></td>
+        <td><span class="{mcdcls}" style="font-size:13px">{row['MACD']}</span></td>
         <td>{sma_trend}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td><div style="font-size:12px;color:#00d4ff">₹{row['Target_1']:,.2f}</div></td>
-        <td><div style="font-size:12px;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div></td>
-        <td><span class="rr-val" style="color:{rr_color(rr)};font-size:12px">{rr:.1f}×</span></td>
-        <td><span class="upside-val {upcls}" style="font-size:12px">{row['Upside']:+.1f}%</span></td>
-        <td><span style="font-size:12px;color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
+        <td><div style="font-size:14px;color:#00d4ff">₹{row['Target_1']:,.2f}</div></td>
+        <td><div style="font-size:14px;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div></td>
+        <td><span class="rr-val" style="color:{rr_color(rr)};font-size:14px">{rr:.1f}×</span></td>
+        <td><span class="upside-val {upcls}" style="font-size:14px">{row['Upside']:+.1f}%</span></td>
+        <td><span style="font-size:14px;color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
         <td>{quality_badge(row['Quality'])}</td>
         <td>{analyst_badge(row.get('Analyst','N/A'))}</td>
         <td>{sig_pill}</td>
@@ -2209,7 +2209,7 @@ window.onload = function() {{ filterWL('ALL'); }};
 <style>
 .wl-btn {{
   padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
-  font-size: 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 500;
   transition: all .2s; letter-spacing: .3px;
 }}
 .wl-all {{ background:#1a2a3a; color:#aaccee; border:1px solid #2a4a6a; }}
