@@ -1,6 +1,25 @@
 """
-NIFTY 100 COMPLETE STOCK ANALYZER - REDESIGNED UI v5.4
+NIFTY 100 COMPLETE STOCK ANALYZER - REDESIGNED UI v5.6
 Technical + Fundamental Analysis with Email Delivery + GitHub Pages
+
+=======================================================================
+ACCURACY FIXES in v5.6 (resolves Lupin/post-overbought stocks showing BUY
+despite MACD bearish + RSI fading from 80):
+
+  V56-1  R:R FLOOR FOR BUY - A BUY rating now requires R:R ≥ 1.0.
+           Previously only STRONG BUY had an R:R gate (1.5x). BUY had
+           no floor — a trade with 0.9x R:R (reward < risk) was still
+           flagged as actionable. Now: R:R < 1.0 on a BUY → capped to
+           HOLD (R:R < 1.0). Lupin had R:R 0.9x → correctly becomes HOLD.
+
+  V56-2  RSI POST-OVERBOUGHT PULLBACK SIGNAL - Added as a 7th bearish
+           veto signal. Detects stocks where RSI peaked above 70 within
+           the last 15 bars but is now falling. This is the classic
+           distribution top pattern: overbought → profit-taking → unwinding.
+           Combined with MACD bearish + RSI falling fast, Lupin now hits
+           3 veto signals → capped to HOLD via V54-1 Trend Veto Gate.
+           Prevents fundamentally strong stocks from being flagged BUY
+           during active pullbacks from overbought extremes.
 
 =======================================================================
 ACCURACY FIXES in v5.4 (resolves fundamentals overriding clear
@@ -922,6 +941,27 @@ class Nifty100CompleteAnalyzer:
 
             # V54-4: Dynamic weight shift.
             # Count how many confirmed bearish technical signals are active RIGHT NOW.
+
+            # V56-2: RSI POST-OVERBOUGHT PULLBACK signal.
+            # Detects the Lupin pattern: RSI peaked above 70 recently (within 15 bars)
+            # and has now started falling. This is a classic distribution/exit signal.
+            # A stock that was overbought and is now fading carries more downside risk
+            # than a stock that was never overbought — the unwinding is not yet complete.
+            rsi_series_raw  = df['Close'].ewm(com=13, min_periods=14).mean()  # rough proxy
+            try:
+                delta_s    = df['Close'].diff()
+                gain_s     = delta_s.where(delta_s > 0, 0)
+                loss_s     = (-delta_s.where(delta_s < 0, 0))
+                ag_s       = gain_s.ewm(com=13, min_periods=14).mean()
+                al_s       = loss_s.ewm(com=13, min_periods=14).mean()
+                rsi_full   = 100 - (100 / (1 + ag_s / al_s))
+                rsi_full   = rsi_full.dropna()
+                # Was RSI above 70 at any point in the last 15 bars?
+                rsi_recent_peak = rsi_full.iloc[-16:-1].max() if len(rsi_full) >= 16 else rsi_full.max()
+                rsi_post_ob_pullback = (rsi_recent_peak > 70 and rsi_direction == 'Falling')
+            except Exception:
+                rsi_post_ob_pullback = False
+
             bearish_signal_count = sum([
                 bool(sma_20_declining),                          # SMA20 rolling over
                 bool(death_cross_forming),                       # SMA20 < SMA50
@@ -929,6 +969,7 @@ class Nifty100CompleteAnalyzer:
                 bool(rsi < 50),                                  # momentum lost
                 bool(current_price < sma_50),                   # below medium trend
                 bool(rsi_direction == 'Falling' and rsi_slope_strong),  # V55: RSI falling fast (Power Grid case)
+                bool(rsi_post_ob_pullback),                      # V56-2: RSI came from overbought and falling (Lupin case)
             ])
             # V54-4: Dynamic weight shift at 2+ signals (lower than veto threshold of 3).
             # This means the score already shifts to 50/50 before the veto fires,
@@ -1081,6 +1122,15 @@ class Nifty100CompleteAnalyzer:
             if recommendation == "STRONG BUY" and risk_reward < 1.5:
                 recommendation = "BUY"
                 rating         = "⭐⭐⭐⭐ BUY"
+
+            # V56-1: R:R FLOOR — BUY needs R:R ≥ 1.0.
+            # If reward < risk, the trade setup is unfavourable regardless of score.
+            # Lupin case: R:R 0.9x with MACD bearish + RSI falling = bad entry point.
+            # This is the cleanest filter: a sub-1.0 R:R means stop loss > potential gain.
+            # Cap to HOLD so the stock stays on watchlist but is not flagged as actionable.
+            if recommendation == "BUY" and risk_reward < 1.0:
+                recommendation = "HOLD"
+                rating         = "⭐⭐⭐ HOLD (R:R < 1.0)"
 
             if fund_score >= 80:   quality = "Excellent"
             elif fund_score >= 60: quality = "Good"
