@@ -1349,11 +1349,45 @@ class Nifty100CompleteAnalyzer:
         return top_buys, top_sells
 
     # =========================================================================
+    #  ACCUMULATE ON DIP  — V57
+    #  Stocks scoring 42-49: just below BUY threshold but fundamentally sound.
+    #  Criteria:
+    #    · Combined score 42-49  (just missed BUY cutoff of 50)
+    #    · Fund score >= 50       (decent fundamentals — not junk)
+    #    · RSI between 35-65     (not overbought, not in freefall)
+    #    · Quality != 'Poor'
+    #    · Max 15 stocks, max 3 per sector
+    # =========================================================================
+    def get_accumulate_watchlist(self):
+        df = pd.DataFrame(self.results)
+        acc = df[
+            (df['Combined_Score'] >= 42) &
+            (df['Combined_Score'] < 50) &
+            (df['Fund_Score'] >= 50) &
+            (~df['Recommendation'].isin(['STRONG BUY', 'BUY'])) &
+            (df['RSI'] >= 35) &
+            (df['RSI'] <= 65) &
+            (df['Quality'] != 'Poor')
+        ].copy()
+        acc = acc.sort_values(['Fund_Score', 'Combined_Score'], ascending=False)
+        rows, sector_counts = [], {}
+        for _, row in acc.iterrows():
+            sec = row.get('Sector', 'N/A')
+            sector_counts[sec] = sector_counts.get(sec, 0)
+            if sector_counts[sec] < 3:
+                rows.append(row)
+                sector_counts[sec] += 1
+            if len(rows) >= 15:
+                break
+        return pd.DataFrame(rows)
+
+    # =========================================================================
     #  HTML - v5: Divergence column added to Buy table
     # =========================================================================
     def generate_html(self):
         df = pd.DataFrame(self.results)
         top_buys, top_sells = self.get_top_recommendations()
+        accumulate_df        = self.get_accumulate_watchlist()
 
         now         = self.get_ist_time()
         idx_data    = self.fetch_index_data()
@@ -2202,6 +2236,113 @@ footer strong {{ color: #00f5ff; }}
 """
         html += "    </tbody></table></div>\n"
 
+        # =====================================================================
+        #  ACCUMULATE ON DIP SECTION — V57
+        # =====================================================================
+        html += """
+  <div style="margin:32px 0 0 0;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <span style="font-size:22px;font-weight:800;color:#ffcc00;font-family:'Syne',sans-serif;letter-spacing:1px;">
+        ⏳ Accumulate on Dip
+      </span>
+      <span style="font-size:13px;color:#aaccee;background:#1a1a00;border:1px solid #ffcc00;
+                   border-radius:6px;padding:3px 10px;">
+        Score 42–49 · Good Fundamentals · Wait for Signal
+      </span>
+    </div>
+    <p style="font-size:13px;color:#8899aa;margin-bottom:12px;">
+      These stocks just missed the BUY threshold but have solid fundamentals.
+      Watch for RSI to stabilise above 50 or MACD to flip bullish — then they become actionable.
+    </p>
+"""
+        if accumulate_df.empty:
+            html += '<p style="color:#aaccee;padding:12px;">No stocks currently in the accumulate zone.</p>\n'
+        else:
+            html += """
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:#1a1500;color:#ffcc00;text-align:left;">
+          <th style="padding:10px 8px;">#</th>
+          <th style="padding:10px 8px;">Stock / Sector</th>
+          <th style="padding:10px 8px;">Price</th>
+          <th style="padding:10px 8px;">Score</th>
+          <th style="padding:10px 8px;">F / T</th>
+          <th style="padding:10px 8px;">RSI</th>
+          <th style="padding:10px 8px;">MACD</th>
+          <th style="padding:10px 8px;">Quality</th>
+          <th style="padding:10px 8px;">What to Watch For</th>
+        </tr>
+      </thead>
+      <tbody>
+"""
+            for i, (_, row) in enumerate(accumulate_df.iterrows(), 1):
+                rsi_val  = row.get('RSI', 50)
+                rsi_dir  = row.get('RSI_Direction', 'Flat')
+                rsi_slp  = row.get('RSI_Slope', 0)
+                macd_sig = row.get('MACD', 'Bearish')
+                fs       = row.get('Fund_Score', 0)
+                ts       = row.get('Tech_Score', 0)
+                cs       = row.get('Combined_Score', 0)
+                qual     = row.get('Quality', 'Average')
+                price    = row.get('Price', 0)
+
+                # Colour coding
+                rsi_col  = '#ff4466' if rsi_val > 65 else ('#00e676' if rsi_val < 40 else '#60a5fa')
+                macd_col = '#00e676' if macd_sig == 'Bullish' else '#ff6680'
+                qual_col = {'Excellent': '#00ff88', 'Good': '#00d4ff',
+                            'Average': '#ffab00', 'Poor': '#ff4466'}.get(qual, '#aaccee')
+                ts_col   = '#00e676' if ts >= 0 else '#ff4466'
+                fs_col   = '#00e676' if fs >= 70 else ('#ffab00' if fs >= 50 else '#ff4466')
+
+                # Direction arrow
+                if rsi_dir == 'Rising':
+                    dir_html = f'<span style="color:#00e676;font-size:11px">↑+{rsi_slp:.0f}</span>'
+                elif rsi_dir == 'Falling':
+                    dir_html = f'<span style="color:#ffab00;font-size:11px">↓{rsi_slp:.0f}</span>'
+                else:
+                    dir_html = '<span style="color:#4a6080;font-size:11px">→flat</span>'
+
+                # What to watch for — context-aware trigger hint
+                triggers = []
+                if macd_sig == 'Bearish':
+                    triggers.append('MACD flip bullish')
+                if rsi_val < 50:
+                    triggers.append('RSI cross above 50')
+                if rsi_dir == 'Falling':
+                    triggers.append('RSI stabilise')
+                if not triggers:
+                    triggers.append('Volume confirmation')
+                watch_str = ' · '.join(triggers)
+
+                bg = '#0c1005' if i % 2 == 0 else '#090d02'
+                html += f"""        <tr style="background:{bg};border-bottom:1px solid #1e2a10;">
+          <td style="padding:9px 8px;color:#6a8a4a;">{i}</td>
+          <td style="padding:9px 8px;">
+            <div style="font-weight:600;color:#ddeeff;font-size:13px;">{row['Name']}</div>
+            <div style="font-size:11px;color:#6a8a6a;">{row['Symbol']} · {row.get('Sector','N/A')}</div>
+          </td>
+          <td style="padding:9px 8px;color:#aaccee;font-family:'IBM Plex Mono',monospace;">₹{price:,.2f}</td>
+          <td style="padding:9px 8px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#ffcc00;">{cs:.0f}</span>
+          </td>
+          <td style="padding:9px 8px;">
+            <span style="font-size:12px;color:{fs_col}">F:{fs:.0f}</span>
+            <span style="color:#4a6080;font-size:11px"> / </span>
+            <span style="font-size:12px;color:{ts_col}">T:{ts:+d}</span>
+          </td>
+          <td style="padding:9px 8px;">
+            <span style="color:{rsi_col};font-size:13px;font-weight:600;">{rsi_val:.0f}</span>
+            <span style="margin-left:4px;">{dir_html}</span>
+          </td>
+          <td style="padding:9px 8px;color:{macd_col};font-size:12px;">{macd_sig}</td>
+          <td style="padding:9px 8px;color:{qual_col};font-size:12px;">{qual}</td>
+          <td style="padding:9px 8px;color:#ccaa44;font-size:12px;">👁 {watch_str}</td>
+        </tr>
+"""
+            html += "      </tbody></table></div>\n"
+        html += "  </div>\n"
+
         html += f"""
   <div class="disc">
     <strong style="color:var(--red)">⚠ DISCLAIMER:</strong>
@@ -2216,7 +2357,7 @@ footer strong {{ color: #00f5ff; }}
 
 <footer>
   <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · Trend Veto · Dynamic Weights · SMA200 Slope · Sector PE · v5.4
+  · 12M S/R · Trend Veto · Dynamic Weights · SMA200 Slope · Sector PE · v5.7
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
