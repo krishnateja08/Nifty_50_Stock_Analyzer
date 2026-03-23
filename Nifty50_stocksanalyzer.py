@@ -366,11 +366,13 @@ class Nifty100CompleteAnalyzer:
             rsi_ser  = rsi_ser.dropna()
 
             if len(rsi_ser) < lookback + 2:
-                return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': rsi_ser.iloc[-1]}
+                return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': rsi_ser.iloc[-1], 'rsi_15bar': rsi_ser.iloc[-1], 'rsi_peak': rsi_ser.iloc[-1]}
 
-            rsi_now   = rsi_ser.iloc[-1]
-            rsi_prev  = rsi_ser.iloc[-(lookback + 1)]
-            slope     = round(rsi_now - rsi_prev, 2)
+            rsi_now    = rsi_ser.iloc[-1]
+            rsi_prev   = rsi_ser.iloc[-(lookback + 1)]      # 5 bars ago
+            rsi_15bar  = rsi_ser.iloc[-16] if len(rsi_ser) >= 16 else rsi_prev  # 15 bars ago (~3 weeks)
+            rsi_peak   = rsi_ser.iloc[-16:].max() if len(rsi_ser) >= 16 else rsi_now  # highest RSI in last 15 bars
+            slope      = round(rsi_now - rsi_prev, 2)
 
             if slope > 3:
                 direction = 'Rising'
@@ -382,13 +384,15 @@ class Nifty100CompleteAnalyzer:
             strong = abs(slope) > 8   # sharp move — e.g. 71 → 46 in Power Grid
 
             return {
-                'slope':     slope,
-                'direction': direction,
-                'strong':    strong,
-                'rsi_5bar':  round(rsi_prev, 1),
+                'slope':      slope,
+                'direction':  direction,
+                'strong':     strong,
+                'rsi_5bar':   round(rsi_prev, 1),
+                'rsi_15bar':  round(rsi_15bar, 1),   # RSI 3 weeks ago
+                'rsi_peak':   round(rsi_peak, 1),    # highest RSI in last 15 bars
             }
         except Exception:
-            return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': 50}
+            return {'slope': 0, 'direction': 'Flat', 'strong': False, 'rsi_5bar': 50, 'rsi_15bar': 50, 'rsi_peak': 50}
 
     # == NEW-1: RSI Divergence helper =========================================
     def detect_rsi_divergence(self, prices, window=14):
@@ -833,11 +837,13 @@ class Nifty100CompleteAnalyzer:
             # Power Grid case: RSI was 71, now 46 = sharply falling = bearish
             # This is separate from RSI value — a falling RSI at 55 is worse
             # than a rising RSI at 45. Direction matters more than level.
-            rsi_slope_data = self.calculate_rsi_slope(df['Close'])
-            rsi_slope      = rsi_slope_data['slope']
-            rsi_direction  = rsi_slope_data['direction']   # 'Rising'|'Falling'|'Flat'
-            rsi_slope_strong = rsi_slope_data['strong']    # True if |slope| > 8
-            rsi_5bar       = rsi_slope_data['rsi_5bar']    # RSI 5 bars ago
+            rsi_slope_data   = self.calculate_rsi_slope(df['Close'])
+            rsi_slope        = rsi_slope_data['slope']
+            rsi_direction    = rsi_slope_data['direction']    # 'Rising'|'Falling'|'Flat'
+            rsi_slope_strong = rsi_slope_data['strong']       # True if |slope| > 8
+            rsi_5bar         = rsi_slope_data['rsi_5bar']     # RSI 5 bars ago
+            rsi_15bar        = rsi_slope_data['rsi_15bar']    # RSI 15 bars ago (~3 weeks)
+            rsi_peak_15      = rsi_slope_data['rsi_peak']     # highest RSI in last 15 bars
 
             high_52w = df['High'].tail(252).max()
             low_52w  = df['Low'].tail(252).min()
@@ -1265,6 +1271,8 @@ class Nifty100CompleteAnalyzer:
                 'RSI_Direction':     rsi_direction,            # 'Rising'|'Falling'|'Flat'
                 'RSI_Slope':         rsi_slope,                # numeric: e.g. -25 for Power Grid
                 'RSI_5Bar':          rsi_5bar,                 # RSI 5 bars ago
+                'RSI_15Bar':         rsi_15bar,                # RSI 15 bars ago
+                'RSI_Peak_15':       rsi_peak_15,              # highest RSI in last 15 bars — used for post-OB gate
                 'RSI_Divergence':    rsi_divergence,          # shown in buy table + watchlist
                 'MACD':              macd_signal,
                 'ADX':               adx,
@@ -1388,8 +1396,8 @@ class Nifty100CompleteAnalyzer:
             elif rsi_val > 70:            fail = f"RSI overbought ({rsi_val:.0f})"
             elif rsi_val > 65 and rsi_dir == 'Falling': fail = f"RSI {rsi_val:.0f} near-OB + falling"
             elif rsi_val > 60 and rsi_slp < -8: fail = f"RSI {rsi_val:.0f} topping (slope {rsi_slp:.0f})"
-            elif rsi_val < 50 and rsi_dir == 'Falling' and row.get('RSI_5Bar', 50) > 60:
-                fail = f"Post-OB collapse (5bar={row.get('RSI_5Bar',50):.0f}→now {rsi_val:.0f} Falling)"
+            elif rsi_val < 50 and rsi_dir == 'Falling' and row.get('RSI_Peak_15', row.get('RSI_5Bar',50)) > 60:
+                fail = f"Post-OB collapse (peak15={row.get('RSI_Peak_15', row.get('RSI_5Bar',50)):.0f}→now {rsi_val:.0f} Falling)"
             elif rr < 0.8:                fail = f"R:R too low ({rr:.2f}x)"
             elif vol < 0.7:               fail = f"Vol too low ({vol:.1f}x)"
             else:                         fail = None
@@ -1419,12 +1427,14 @@ class Nifty100CompleteAnalyzer:
                 return False
 
             # Gate 4 — V57: Post-overbought collapse gate (the Torrent pattern).
-            # RSI was above 60 just 5 bars ago (RSI_5Bar) but has now dropped
-            # below 50 AND is still falling. This is active distribution from
-            # the recent peak — institutional selling not yet complete.
-            # Catches: Torrent (5bar~65→now 46 Falling), Power Grid (70→48 Falling)
-            # Allows: recovering stocks (5bar 42→now 52 Rising), flat stocks
-            if rsi_val < 50 and rsi_dir == 'Falling' and rsi_5bar > 60:
+            # Uses RSI_Peak_15 = the HIGHEST RSI seen in the last 15 bars (3 weeks).
+            # If that peak was above 60 but RSI is now below 50 and still falling,
+            # the stock is in active distribution from its recent high.
+            # WHY peak not 5-bar: Torrent's RSI peaked ~75 weeks ago; 5 bars ago
+            # RSI was already 50 → the 5-bar check missed it completely.
+            # RSI_Peak_15 catches the actual top regardless of when exactly it occurred.
+            rsi_peak = row.get('RSI_Peak_15', row.get('RSI_5Bar', 50))
+            if rsi_val < 50 and rsi_dir == 'Falling' and rsi_peak > 60:
                 return False
 
             return True
