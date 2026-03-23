@@ -237,6 +237,87 @@ class Nifty100CompleteAnalyzer:
         }
         self.results = []
 
+        # ── FIX-SECTOR: Fallback sector map for NSE stocks ────────────────────
+        # yFinance frequently returns None for sector on NSE-listed stocks.
+        # Without this, every stock whose sector is None lands in the 'N/A'
+        # bucket, which holds up to 4 stocks in the top-20 — crowding out
+        # genuine sector diversity and causing the same names to repeat daily.
+        # This map is the single source of truth; it is used in analyze_stock()
+        # to replace any None/empty sector returned by yFinance.
+        self.sector_fallback = {
+            # Financials
+            'HDFCBANK':   'Financial Services', 'ICICIBANK':  'Financial Services',
+            'KOTAKBANK':  'Financial Services', 'AXISBANK':   'Financial Services',
+            'SBIN':       'Financial Services', 'INDUSINDBK': 'Financial Services',
+            'BAJFINANCE': 'Financial Services', 'BAJAJFINSV': 'Financial Services',
+            'SHRIRAMFIN': 'Financial Services', 'MUTHOOTFIN': 'Financial Services',
+            'CHOLAFIN':   'Financial Services', 'BAJAJHLDNG': 'Financial Services',
+            'SBICARD':    'Financial Services', 'ICICIPRULI': 'Financial Services',
+            'ICICIGI':    'Financial Services', 'HDFCAMC':    'Financial Services',
+            'SBILIFE':    'Financial Services', 'HDFCLIFE':   'Financial Services',
+            'POLICYBZR':  'Financial Services',
+            # IT
+            'TCS':        'Information Technology', 'INFY':    'Information Technology',
+            'WIPRO':      'Information Technology', 'HCLTECH': 'Information Technology',
+            'TECHM':      'Information Technology', 'LTIM':    'Information Technology',
+            'TATAELXSI':  'Information Technology', 'COFORGE': 'Information Technology',
+            'PERSISTENT': 'Information Technology', 'OFSS':    'Information Technology',
+            'LTTS':       'Information Technology', 'NAUKRI':  'Information Technology',
+            # Healthcare / Pharma
+            'SUNPHARMA':  'Healthcare', 'CIPLA':      'Healthcare',
+            'DRREDDY':    'Healthcare', 'DIVISLAB':   'Healthcare',
+            'APOLLOHOSP': 'Healthcare', 'TORNTPHARM': 'Healthcare',
+            'LUPIN':      'Healthcare', 'AUROPHARMA': 'Healthcare',
+            'ALKEM':      'Healthcare', 'MAXHEALTH':  'Healthcare',
+            'FORTIS':     'Healthcare',
+            # FMCG / Consumer
+            'HINDUNILVR': 'FMCG', 'ITC':       'FMCG', 'NESTLEIND':  'FMCG',
+            'BRITANNIA':  'FMCG', 'DABUR':     'FMCG', 'MARICO':     'FMCG',
+            'GODREJCP':   'FMCG', 'COLPAL':    'FMCG', 'TATACONSUM': 'FMCG',
+            'MCDOWELL-N': 'FMCG', 'PAGEIND':   'FMCG',
+            # Auto
+            'MARUTI':     'Automobile', 'M&M':        'Automobile',
+            'TMCV':       'Automobile', 'TMPV':       'Automobile',
+            'HEROMOTOCO': 'Automobile', 'EICHERMOT':  'Automobile',
+            'BAJAJ-AUTO': 'Automobile', 'MOTHERSON':  'Automobile',
+            'BALKRISIND': 'Automobile',
+            # Energy / Oil & Gas
+            'RELIANCE':   'Energy', 'ONGC':       'Energy',
+            'BPCL':       'Energy', 'POWERGRID':  'Energy',
+            'NTPC':       'Energy', 'COALINDIA':  'Energy',
+            'ADANIGREEN': 'Energy',
+            # Metals & Mining
+            'TATASTEEL':  'Metals', 'JSWSTEEL':   'Metals',
+            'HINDALCO':   'Metals', 'VEDL':       'Metals',
+            'SAIL':       'Metals', 'NMDC':       'Metals',
+            'JINDALSTEL': 'Metals',
+            # Cement & Construction
+            'ULTRACEMCO': 'Cement', 'GRASIM':     'Cement',
+            'AMBUJACEM':  'Cement', 'ACC':        'Cement',
+            # Telecom
+            'BHARTIARTL': 'Telecom',
+            # Capital Goods / Industrials
+            'LT':         'Capital Goods', 'SIEMENS':   'Capital Goods',
+            'HAVELLS':    'Capital Goods', 'VOLTAS':    'Capital Goods',
+            'CONCOR':     'Capital Goods', 'RVNL':      'Capital Goods',
+            'ADANIPORTS': 'Capital Goods',
+            # Paints / Chemicals
+            'ASIANPAINT': 'Chemicals', 'BERGEPAINT': 'Chemicals',
+            'PIDILITIND': 'Chemicals',
+            # Consumer Durables / Retail
+            'TITAN':      'Consumer Durables', 'DMART':     'Consumer Durables',
+            # New-age / Internet
+            'ZOMATO':     'Internet', 'NYKAA':     'Internet',
+            'PAYTM':      'Internet',
+            # Diversified
+            'ADANIENT':   'Diversified',
+            # Aviation
+            'INDIGO':     'Aviation',
+            # Finance (PSU)
+            'RECLTD':     'Financial Services', 'PFC':       'Financial Services',
+            'IRCTC':      'Consumer Services',
+        }
+
     # =========================================================================
     #  UTILITY
     # =========================================================================
@@ -925,7 +1006,14 @@ class Nifty100CompleteAnalyzer:
             current_ratio    = info.get('currentRatio', 0)
             beta             = info.get('beta', 1.0)
             target_price     = info.get('targetMeanPrice', None)
-            sector           = info.get('sector', 'N/A')
+            # FIX-SECTOR: Use yFinance sector if available; fall back to our
+            # hardcoded map if yFinance returns None or empty string.
+            # This prevents all 'None-sector' stocks from sharing one 'N/A'
+            # bucket and bypassing the per-sector diversity cap.
+            _yf_sector = info.get('sector', None)
+            sym_key    = symbol.replace('.NS', '')
+            sector     = (_yf_sector if _yf_sector
+                          else self.sector_fallback.get(sym_key, 'N/A'))
 
             analyst_key   = info.get('recommendationKey', 'N/A')
             analyst_map   = {
@@ -947,7 +1035,6 @@ class Nifty100CompleteAnalyzer:
             # and has now started falling. This is a classic distribution/exit signal.
             # A stock that was overbought and is now fading carries more downside risk
             # than a stock that was never overbought — the unwinding is not yet complete.
-            rsi_series_raw  = df['Close'].ewm(com=13, min_periods=14).mean()  # rough proxy
             try:
                 delta_s    = df['Close'].diff()
                 gain_s     = delta_s.where(delta_s > 0, 0)
@@ -998,6 +1085,33 @@ class Nifty100CompleteAnalyzer:
                 # tech_score < 2: analyst buy silently ignored - chart disagrees
             elif analyst_key in ('sell', 'strongSell'):
                 combined_score = max(combined_score - 5, 0)
+
+            # FIX-MOMENTUM: Daily momentum delta component.
+            # Fund score and most tech signals are stable for days/weeks.
+            # Vol_Ratio and RSI_Slope are the two signals that genuinely
+            # change EVERY day — adding a small component based on these
+            # means stocks with improving momentum get a daily boost while
+            # stocks with deteriorating momentum get penalised.
+            # Effect is ±5 points max — big enough to reorder borderline
+            # stocks, small enough not to override fundamental quality.
+            #
+            # Vol_Ratio > 1.5 in uptrend  → +2.5 (real buying interest today)
+            # Vol_Ratio > 1.2 in uptrend  → +1.0 (mild interest)
+            # Vol_Ratio < 0.7             → -1.5 (thin, no conviction)
+            # RSI rising fast (slope>5)   → +2.5 (momentum building)
+            # RSI falling fast (slope<-5) → -2.5 (momentum fading)
+            momentum_delta = 0.0
+            if vol_ratio > 1.5 and current_price > sma_20:
+                momentum_delta += 2.5
+            elif vol_ratio > 1.2 and current_price > sma_20:
+                momentum_delta += 1.0
+            elif vol_ratio < 0.7:
+                momentum_delta -= 1.5
+            if rsi_slope > 5:
+                momentum_delta += 2.5
+            elif rsi_slope < -5:
+                momentum_delta -= 2.5
+            combined_score = round(min(max(combined_score + momentum_delta, 0), 100), 1)
 
             # CAL-1: Thresholds relaxed to account for missing yFinance fields
             # on NSE stocks (PEG/ROA/CR often return None, silently scoring 0).
@@ -1177,6 +1291,7 @@ class Nifty100CompleteAnalyzer:
                 'Fund_Score':        round(fund_score, 1),        # shown in watchlist
                 'Quality':           quality,
                 'Combined_Score':    round(combined_score, 1),
+                'Momentum_Delta':    round(momentum_delta, 1),  # FIX-MOMENTUM: daily change component
                 'Rating':            rating,
                 'Recommendation':    recommendation,
                 'Stop_Loss':         round(stop_loss, 2),
@@ -1261,28 +1376,48 @@ class Nifty100CompleteAnalyzer:
 
         f2 = f2[f2.apply(rsi_is_safe_to_buy, axis=1)]
 
-        # R:R gate: STRONG BUY ≥ 1.2x, plain BUY ≥ 0.6x
-        # In a broad bear market, support levels are compressed — R:R naturally lower.
-        # 0.6x minimum still ensures reward > half the risk (not a bad trade).
-        # The RSI gate above already removed the dangerous high-RSI stocks,
-        # so remaining stocks genuinely need room to run — just tight ranges.
-        strong_buys = f2[
-            (f2['Recommendation'] == 'STRONG BUY') & (f2['Risk_Reward'] >= 1.2)
-        ]
-        plain_buys = f2[
-            (f2['Recommendation'] == 'BUY') & (f2['Risk_Reward'] >= 0.6)
-        ]
+        # FIX-FRESHNESS: Momentum freshness gate.
+        # Stocks whose RSI slope and vol_ratio have barely moved today are
+        # structurally identical to yesterday's list. By preferring stocks
+        # with fresh momentum signals (RSI slope changed meaningfully, or
+        # volume picked up), we naturally rotate the list as market action
+        # shifts — without removing any "always good" stock from the pool.
+        #
+        # How it works: we split the qualified buy pool into two tiers:
+        #   Tier 1 (fresh)  — RSI slope > +2 OR vol_ratio > 1.2 today
+        #   Tier 2 (stable) — everything else that still qualifies
+        # We fill the top-20 from Tier 1 first, then backfill with Tier 2.
+        # This means a stock with fresh momentum is always preferred over
+        # an equally-scored stock with flat signals.
+        def has_fresh_momentum(row):
+            return (row.get('RSI_Slope', 0) > 2 or
+                    row.get('Vol_Ratio', 0) > 1.2)
 
-        # Volume gate: minimum 0.6x — further relaxed for thin bear-market days
-        strong_buys = strong_buys[strong_buys['Vol_Ratio'] >= 0.6]
-        plain_buys  = plain_buys[plain_buys['Vol_Ratio'] >= 0.6]
+        f2_fresh  = f2[f2.apply(has_fresh_momentum, axis=1)]
+        f2_stable = f2[~f2.index.isin(f2_fresh.index)]
 
-        filtered_buys = pd.concat([strong_buys, plain_buys]).drop_duplicates()
-        sorted_buys   = filtered_buys.sort_values('Combined_Score', ascending=False)
+        # R:R gate applied to both tiers independently
+        def apply_rr_vol_gate(pool):
+            sb = pool[(pool['Recommendation'] == 'STRONG BUY') & (pool['Risk_Reward'] >= 1.2)]
+            pb = pool[(pool['Recommendation'] == 'BUY')        & (pool['Risk_Reward'] >= 0.6)]
+            sb = sb[sb['Vol_Ratio'] >= 0.6]
+            pb = pb[pb['Vol_Ratio'] >= 0.6]
+            return pd.concat([sb, pb]).drop_duplicates()
+
+        fresh_buys  = apply_rr_vol_gate(f2_fresh)
+        stable_buys = apply_rr_vol_gate(f2_stable)
+
+        # Sort each tier by Combined_Score descending
+        fresh_buys  = fresh_buys.sort_values('Combined_Score', ascending=False)
+        stable_buys = stable_buys.sort_values('Combined_Score', ascending=False)
+
+        # Merge: Tier 1 first, then backfill with Tier 2, no duplicates
+        filtered_buys = pd.concat([fresh_buys, stable_buys]).drop_duplicates()
+        sorted_buys   = filtered_buys  # already ordered by tier then score
 
         print(f"  Filter summary: {len(all_buys)} BUY rated → "
-              f"{len(f2)} after RSI gate → "
-              f"{len(filtered_buys)} after R:R+Vol gate → "
+              f"{len(f2_fresh)+len(f2_stable)} after RSI gate → "
+              f"fresh tier {len(fresh_buys)} | stable tier {len(stable_buys)} → "
               f"sector cap applies next\n")
 
         # Sector diversity cap: max 4 per sector (was 3)
