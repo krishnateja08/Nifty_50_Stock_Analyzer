@@ -1355,6 +1355,8 @@ class Nifty100CompleteAnalyzer:
             elif rsi_val > 70:            fail = f"RSI overbought ({rsi_val:.0f})"
             elif rsi_val > 65 and rsi_dir == 'Falling': fail = f"RSI {rsi_val:.0f} near-OB + falling"
             elif rsi_val > 60 and rsi_slp < -8: fail = f"RSI {rsi_val:.0f} topping (slope {rsi_slp:.0f})"
+            elif rsi_val < 50 and rsi_dir == 'Falling' and row.get('RSI_5Bar', 50) > 60:
+                fail = f"Post-OB collapse (5bar={row.get('RSI_5Bar',50):.0f}→now {rsi_val:.0f} Falling)"
             elif rr < 0.8:                fail = f"R:R too low ({rr:.2f}x)"
             elif vol < 0.7:               fail = f"Vol too low ({vol:.1f}x)"
             else:                         fail = None
@@ -1364,14 +1366,34 @@ class Nifty100CompleteAnalyzer:
         print(f"{'─'*75}\n")
         # ── END DEBUG ──────────────────────────────────────────────────────────
 
-        # V55-RSI-GATE
+        # V55-RSI-GATE + V57-POST-OB-COLLAPSE
         def rsi_is_safe_to_buy(row):
-            rsi_val = row.get('RSI', 50)
-            rsi_dir = row.get('RSI_Direction', 'Flat')
-            rsi_slp = row.get('RSI_Slope', 0)
-            if rsi_val > 70:                              return False
-            if rsi_val > 65 and rsi_dir == 'Falling':    return False
-            if rsi_val > 60 and rsi_slp < -8:            return False
+            rsi_val  = row.get('RSI', 50)
+            rsi_dir  = row.get('RSI_Direction', 'Flat')
+            rsi_slp  = row.get('RSI_Slope', 0)
+            rsi_5bar = row.get('RSI_5Bar', 50)
+
+            # Gate 1: Currently overbought
+            if rsi_val > 70:
+                return False
+
+            # Gate 2: Near overbought and rolling over
+            if rsi_val > 65 and rsi_dir == 'Falling':
+                return False
+
+            # Gate 3: Sharply falling from elevated RSI
+            if rsi_val > 60 and rsi_slp < -8:
+                return False
+
+            # Gate 4 — V57: Post-overbought collapse gate (the Torrent pattern).
+            # RSI was above 60 just 5 bars ago (RSI_5Bar) but has now dropped
+            # below 50 AND is still falling. This is active distribution from
+            # the recent peak — institutional selling not yet complete.
+            # Catches: Torrent (5bar~65→now 46 Falling), Power Grid (70→48 Falling)
+            # Allows: recovering stocks (5bar 42→now 52 Rising), flat stocks
+            if rsi_val < 50 and rsi_dir == 'Falling' and rsi_5bar > 60:
+                return False
+
             return True
 
         f2 = f2[f2.apply(rsi_is_safe_to_buy, axis=1)]
