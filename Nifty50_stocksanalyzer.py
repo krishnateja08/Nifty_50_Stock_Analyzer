@@ -1366,10 +1366,10 @@ class Nifty100CompleteAnalyzer:
             all_buys  = pd.concat([raw_buys, near_buys]).drop_duplicates()
             print(f"  Market mode: MILD CORRECTION ({buy_pct*100:.0f}% BUY-rated) — including HOLD 46+ as candidates")
         else:
-            # Broad selloff — include near-BUY HOLDs (score 43+)
-            near_buys = df[(df['Recommendation'] == 'HOLD') & (df['Combined_Score'] >= 43)]
+            # Broad selloff — include near-BUY HOLDs (score 40+)
+            near_buys = df[(df['Recommendation'] == 'HOLD') & (df['Combined_Score'] >= 40)]
             all_buys  = pd.concat([raw_buys, near_buys]).drop_duplicates()
-            print(f"  Market mode: BROAD SELLOFF ({buy_pct*100:.0f}% BUY-rated) — including HOLD 43+ as candidates")
+            print(f"  Market mode: BROAD SELLOFF ({buy_pct*100:.0f}% BUY-rated) — including HOLD 40+ as candidates")
 
         f1 = all_buys[all_buys['Upside'] > 0]
         f2 = f1[f1['Target_1'] > f1['Price']]
@@ -1396,7 +1396,7 @@ class Nifty100CompleteAnalyzer:
             elif rsi_val > 70:            fail = f"RSI overbought ({rsi_val:.0f})"
             elif rsi_val > 65 and rsi_dir == 'Falling': fail = f"RSI {rsi_val:.0f} near-OB + falling"
             elif rsi_val > 60 and rsi_slp < -8: fail = f"RSI {rsi_val:.0f} topping (slope {rsi_slp:.0f})"
-            elif rsi_val < 50 and rsi_dir == 'Falling' and row.get('RSI_Peak_15', row.get('RSI_5Bar',50)) > 60:
+            elif rsi_val < 48 and rsi_dir == 'Falling' and row.get('RSI_Peak_15', row.get('RSI_5Bar',50)) > 65:
                 fail = f"Post-OB collapse (peak15={row.get('RSI_Peak_15', row.get('RSI_5Bar',50)):.0f}→now {rsi_val:.0f} Falling)"
             elif rr < 0.8:                fail = f"R:R too low ({rr:.2f}x)"
             elif vol < 0.7:               fail = f"Vol too low ({vol:.1f}x)"
@@ -1433,8 +1433,12 @@ class Nifty100CompleteAnalyzer:
             # WHY peak not 5-bar: Torrent's RSI peaked ~75 weeks ago; 5 bars ago
             # RSI was already 50 → the 5-bar check missed it completely.
             # RSI_Peak_15 catches the actual top regardless of when exactly it occurred.
+            # Only block genuine overbought collapses:
+            # peak must have been 65+ (clearly overbought, not just "elevated")
+            # RSI must now be 48- (not just touching 50 on a minor dip)
+            # This stops blocking stocks like RSI 62→49 which is a normal pullback
             rsi_peak = row.get('RSI_Peak_15', row.get('RSI_5Bar', 50))
-            if rsi_val < 50 and rsi_dir == 'Falling' and rsi_peak > 60:
+            if rsi_val < 48 and rsi_dir == 'Falling' and rsi_peak > 65:
                 return False
 
             return True
@@ -1461,12 +1465,14 @@ class Nifty100CompleteAnalyzer:
         f2_fresh  = f2[f2.apply(has_fresh_momentum, axis=1)]
         f2_stable = f2[~f2.index.isin(f2_fresh.index)]
 
-        # R:R gate applied to both tiers independently
+        # R:R gate applied to both tiers independently.
+        # In correction markets vol is structurally lower — 0.5x is still
+        # liquid enough to trade. R:R floor of 0.5 = reward at least half the risk.
         def apply_rr_vol_gate(pool):
             sb = pool[(pool['Recommendation'] == 'STRONG BUY') & (pool['Risk_Reward'] >= 1.2)]
-            pb = pool[(pool['Recommendation'] == 'BUY')        & (pool['Risk_Reward'] >= 0.6)]
-            sb = sb[sb['Vol_Ratio'] >= 0.6]
-            pb = pb[pb['Vol_Ratio'] >= 0.6]
+            pb = pool[(pool['Recommendation'] == 'BUY')        & (pool['Risk_Reward'] >= 0.5)]
+            sb = sb[sb['Vol_Ratio'] >= 0.5]
+            pb = pb[pb['Vol_Ratio'] >= 0.5]
             return pd.concat([sb, pb]).drop_duplicates()
 
         fresh_buys  = apply_rr_vol_gate(f2_fresh)
@@ -1485,8 +1491,7 @@ class Nifty100CompleteAnalyzer:
               f"fresh tier {len(fresh_buys)} | stable tier {len(stable_buys)} → "
               f"sector cap applies next\n")
 
-        # Sector diversity cap: max 4 per sector (was 3)
-        # With only ~21 buys total, a cap of 3 was cutting too many
+        # Sector diversity cap: max 4 per sector
         top_buys_rows = []
         sector_counts = {}
         for _, row in sorted_buys.iterrows():
@@ -1498,6 +1503,41 @@ class Nifty100CompleteAnalyzer:
             if len(top_buys_rows) >= 20:
                 break
         top_buys = pd.DataFrame(top_buys_rows)
+
+        # MINIMUM GUARANTEE: Always show at least 10 stocks.
+        # If strict filters leave fewer than 10, backfill with the next-best
+        # HOLDs by ranking_score, skipping any already in the table.
+        # These are labelled differently in the HTML (amber instead of green)
+        # so the user knows they are "watch, not buy" candidates.
+        if len(top_buys) < 10:
+            already_shown = set(top_buys['Symbol'].tolist()) if len(top_buys) > 0 else set()
+            backfill_pool = df[
+                (~df['Symbol'].isin(already_shown)) &
+                (df['Combined_Score'] >= 38) &
+                (df['Recommendation'].isin(['HOLD', 'BUY', 'STRONG BUY'])) &
+                (df['Upside'] > 0) &
+                (df['RSI'] >= 35) &
+                (df['RSI'] <= 68)
+            ].sort_values('Ranking_Score', ascending=False)
+            needed = 10 - len(top_buys)
+            backfill_rows = []
+            bf_sector_counts = dict(sector_counts)
+            for _, row in backfill_pool.iterrows():
+                sec = row.get('Sector', 'N/A')
+                bf_sector_counts[sec] = bf_sector_counts.get(sec, 0)
+                if bf_sector_counts[sec] < 4:
+                    backfill_rows.append(row)
+                    bf_sector_counts[sec] += 1
+                if len(backfill_rows) >= needed:
+                    break
+            if backfill_rows:
+                backfill_df = pd.DataFrame(backfill_rows)
+                backfill_df = backfill_df.copy()
+                backfill_df['Rating']         = backfill_df['Rating'].apply(
+                    lambda r: r + ' [WATCH]' if '[WATCH]' not in str(r) else r)
+                backfill_df['Recommendation'] = 'WATCH'
+                top_buys = pd.concat([top_buys, backfill_df], ignore_index=True)
+                print(f"  Minimum guarantee: added {len(backfill_rows)} WATCH stocks to reach 10 total")
 
         # == SELL side =========================================================
         all_sells = df[df['Recommendation'].isin(['STRONG SELL', 'SELL'])]
