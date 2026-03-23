@@ -1111,7 +1111,11 @@ class Nifty100CompleteAnalyzer:
                 momentum_delta += 2.5
             elif rsi_slope < -5:
                 momentum_delta -= 2.5
-            combined_score = round(min(max(combined_score + momentum_delta, 0), 100), 1)
+            # momentum_delta intentionally NOT applied to combined_score here.
+            # It is applied only to ranking_score so it reorders within a tier
+            # but never demotes a stock from BUY to HOLD on a weak-volume day.
+            combined_score  = round(combined_score, 1)
+            ranking_score   = round(min(max(combined_score + momentum_delta, 0), 100), 1)
 
             # CAL-1: Thresholds relaxed to account for missing yFinance fields
             # on NSE stocks (PEG/ROA/CR often return None, silently scoring 0).
@@ -1291,6 +1295,7 @@ class Nifty100CompleteAnalyzer:
                 'Fund_Score':        round(fund_score, 1),        # shown in watchlist
                 'Quality':           quality,
                 'Combined_Score':    round(combined_score, 1),
+                'Ranking_Score':     round(ranking_score, 1),   # combined_score + momentum_delta (for sorting only)
                 'Momentum_Delta':    round(momentum_delta, 1),  # FIX-MOMENTUM: daily change component
                 'Rating':            rating,
                 'Recommendation':    recommendation,
@@ -1329,7 +1334,35 @@ class Nifty100CompleteAnalyzer:
         df = pd.DataFrame(self.results)
 
         # == BUY side ==========================================================
-        all_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
+        # FIX-ADAPTIVE-POOL: When the market is in a broad correction, many
+        # fundamentally sound stocks score 45-49 (just below the 50pt BUY line)
+        # purely because their RSI is temporarily weak. On those days the BUY
+        # table collapses to 3-4 names. We detect this by checking what % of
+        # all analyzed stocks are rated BUY/STRONG BUY right now:
+        #   >= 25% rated BUY  → normal market, use strict 50pt threshold
+        #   15-24% rated BUY  → mild correction, include HOLD stocks scoring 46+
+        #   < 15%  rated BUY  → broad selloff, include HOLD stocks scoring 43+
+        # This means in bear conditions we pull in near-BUY HOLDs as
+        # "Watchlist Buys" so traders still have 8-12 names to review.
+        total_analyzed = len(df)
+        raw_buys = df[df['Recommendation'].isin(['STRONG BUY', 'BUY'])]
+        buy_pct = len(raw_buys) / max(total_analyzed, 1)
+
+        if buy_pct >= 0.25:
+            # Normal market — strict BUY only
+            all_buys = raw_buys
+            print(f"  Market mode: NORMAL ({buy_pct*100:.0f}% BUY-rated) — strict threshold")
+        elif buy_pct >= 0.15:
+            # Mild correction — include near-BUY HOLDs (score 46+)
+            near_buys = df[(df['Recommendation'] == 'HOLD') & (df['Combined_Score'] >= 46)]
+            all_buys  = pd.concat([raw_buys, near_buys]).drop_duplicates()
+            print(f"  Market mode: MILD CORRECTION ({buy_pct*100:.0f}% BUY-rated) — including HOLD 46+ as candidates")
+        else:
+            # Broad selloff — include near-BUY HOLDs (score 43+)
+            near_buys = df[(df['Recommendation'] == 'HOLD') & (df['Combined_Score'] >= 43)]
+            all_buys  = pd.concat([raw_buys, near_buys]).drop_duplicates()
+            print(f"  Market mode: BROAD SELLOFF ({buy_pct*100:.0f}% BUY-rated) — including HOLD 43+ as candidates")
+
         f1 = all_buys[all_buys['Upside'] > 0]
         f2 = f1[f1['Target_1'] > f1['Price']]
 
@@ -1429,9 +1462,9 @@ class Nifty100CompleteAnalyzer:
         fresh_buys  = apply_rr_vol_gate(f2_fresh)
         stable_buys = apply_rr_vol_gate(f2_stable)
 
-        # Sort each tier by Combined_Score descending
-        fresh_buys  = fresh_buys.sort_values('Combined_Score', ascending=False)
-        stable_buys = stable_buys.sort_values('Combined_Score', ascending=False)
+        # Sort each tier by Ranking_Score (combined + momentum delta) descending
+        fresh_buys  = fresh_buys.sort_values('Ranking_Score', ascending=False)
+        stable_buys = stable_buys.sort_values('Ranking_Score', ascending=False)
 
         # Merge: Tier 1 first, then backfill with Tier 2, no duplicates
         filtered_buys = pd.concat([fresh_buys, stable_buys]).drop_duplicates()
