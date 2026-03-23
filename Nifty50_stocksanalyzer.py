@@ -2327,25 +2327,25 @@ footer strong {{ color: #00f5ff; }}
 
   <div class="tbl-wrap"><table id="watchlist-tbl">
     <thead>
-      <tr class="col-row">
+      <tr class="col-row" id="wl-sort-row">
         <th style="width:22px">#</th>
-        <th>Stock</th>
-        <th>Sector</th>
-        <th>Price</th>
-        <th>Score</th>
+        <th onclick="sortWL('name')"     class="sortable">Stock <span class="sort-icon" id="si-name"></span></th>
+        <th onclick="sortWL('sector')"   class="sortable">Sector <span class="sort-icon" id="si-sector"></span></th>
+        <th onclick="sortWL('price')"    class="sortable">Price <span class="sort-icon" id="si-price"></span></th>
+        <th onclick="sortWL('score')"    class="sortable">Score <span class="sort-icon" id="si-score">▼</span></th>
         <th>F/T Split</th>
-        <th>Action</th>
-        <th>RSI</th>
+        <th onclick="sortWL('action')"   class="sortable">Action <span class="sort-icon" id="si-action"></span></th>
+        <th onclick="sortWL('rsi')"      class="sortable">RSI <span class="sort-icon" id="si-rsi"></span></th>
         <th>RSI Div</th>
-        <th>MACD</th>
-        <th>SMA Trend</th>
-        <th>Vol</th>
-        <th>Target 1</th>
-        <th>Stop Loss</th>
-        <th>R:R</th>
-        <th>Upside</th>
-        <th>P/E</th>
-        <th>Quality</th>
+        <th onclick="sortWL('macd')"     class="sortable">MACD <span class="sort-icon" id="si-macd"></span></th>
+        <th onclick="sortWL('sma')"      class="sortable">SMA Trend <span class="sort-icon" id="si-sma"></span></th>
+        <th onclick="sortWL('vol')"      class="sortable">Vol <span class="sort-icon" id="si-vol"></span></th>
+        <th onclick="sortWL('target')"   class="sortable">Target 1 <span class="sort-icon" id="si-target"></span></th>
+        <th onclick="sortWL('stoploss')" class="sortable">Stop Loss <span class="sort-icon" id="si-stoploss"></span></th>
+        <th onclick="sortWL('rr')"       class="sortable">R:R <span class="sort-icon" id="si-rr"></span></th>
+        <th onclick="sortWL('upside')"   class="sortable">Upside <span class="sort-icon" id="si-upside"></span></th>
+        <th onclick="sortWL('pe')"       class="sortable">P/E <span class="sort-icon" id="si-pe"></span></th>
+        <th onclick="sortWL('quality')"  class="sortable">Quality <span class="sort-icon" id="si-quality"></span></th>
         <th>Analyst</th>
         <th>Signals</th>
       </tr>
@@ -2438,7 +2438,31 @@ footer strong {{ color: #00f5ff; }}
             veto_cell = ('<span style="display:block;font-size:11px;color:#ff8c00;margin-top:2px">🚫 Veto</span>'
                          if veto else '')
 
-            html += f"""      <tr data-rec="{data_rec}">
+            # Sort key for SMA trend (numeric: 3=Rising, 2=Flat, 1=Weakening, 0=Declining)
+            sma_sort_key = 3 if sma200_rising and not sma_declining and not death_cross else                            1 if sma_declining or death_cross else                            2 if sma200_rising else 1
+            # Quality sort key
+            quality_sort = {'Excellent': 4, 'Good': 3, 'Average': 2, 'Poor': 1}.get(row.get('Quality','Average'), 2)
+            # MACD sort key
+            macd_sort = 1 if row['MACD'] == 'Bullish' else 0
+            # Action sort key
+            action_sort = {'STRONG BUY': 5, 'BUY': 4, 'WATCH': 3, 'HOLD': 2, 'SELL': 1, 'STRONG SELL': 0}.get(rec, 2)
+
+            html += f"""      <tr data-rec="{data_rec}"
+          data-name="{row['Name'].lower()}"
+          data-sector="{row.get('Sector','N/A').lower()}"
+          data-price="{row['Price']:.2f}"
+          data-score="{row['Combined_Score']:.1f}"
+          data-rsi="{row['RSI']:.2f}"
+          data-vol="{row.get('Vol_Ratio', 1.0):.3f}"
+          data-target="{row['Target_1']:.2f}"
+          data-stoploss="{row['Stop_Loss']:.2f}"
+          data-rr="{row['Risk_Reward']:.2f}"
+          data-upside="{row['Upside']:.2f}"
+          data-pe="{row['PE_Ratio']:.2f}"
+          data-quality="{quality_sort}"
+          data-sma="{sma_sort_key}"
+          data-macd="{macd_sort}"
+          data-action="{action_sort}">
         <td><span class="rnum">{i}</span></td>
         <td>
           <div class="stock-name" style="font-size:14px">{row['Name']}</div>
@@ -2618,23 +2642,69 @@ function updateClock() {{
 updateClock();
 setInterval(updateClock, 1000);
 
-// Watchlist filter — shows/hides rows by data-rec attribute
+// ── Watchlist filter ────────────────────────────────────────────────────────
+var wlCurrentFilter = 'ALL';
 function filterWL(rec) {{
-  var rows  = document.querySelectorAll('#watchlist-tbl tbody tr');
-  var btns  = document.querySelectorAll('.wl-btn');
+  wlCurrentFilter = rec;
+  var rows = document.querySelectorAll('#watchlist-tbl tbody tr');
+  var btns = document.querySelectorAll('.wl-btn');
   btns.forEach(function(b) {{ b.style.opacity = '0.45'; b.style.fontWeight = '500'; }});
-  var activeId = 'wlf-' + rec.replace(/ /g,'_');
-  var activeBtn = document.getElementById(activeId);
+  var activeBtn = document.getElementById('wlf-' + rec.replace(/ /g,'_'));
   if (activeBtn) {{ activeBtn.style.opacity = '1'; activeBtn.style.fontWeight = '800'; }}
   rows.forEach(function(r) {{
-    if (rec === 'ALL' || r.getAttribute('data-rec') === rec.replace(/ /g,'_')) {{
-      r.style.display = '';
-    }} else {{
-      r.style.display = 'none';
+    r.style.display = (rec === 'ALL' || r.getAttribute('data-rec') === rec.replace(/ /g,'_')) ? '' : 'none';
+  }});
+  renumberVisible();
+}}
+
+// ── Watchlist column sort ────────────────────────────────────────────────────
+var wlSortCol = 'score';
+var wlSortAsc = false;
+var wlSortIcons = {{}};
+
+function sortWL(col) {{
+  if (wlSortCol === col) {{ wlSortAsc = !wlSortAsc; }}
+  else {{ wlSortCol = col; wlSortAsc = (col === 'name' || col === 'sector'); }}
+
+  // Update header icons
+  var allIcons = document.querySelectorAll('.sort-icon');
+  allIcons.forEach(function(ic) {{ ic.textContent = ''; }});
+  var activeIcon = document.getElementById('si-' + col);
+  if (activeIcon) {{ activeIcon.textContent = wlSortAsc ? ' ▲' : ' ▼'; }}
+
+  var tbody = document.querySelector('#watchlist-tbl tbody');
+  var rows  = Array.from(tbody.querySelectorAll('tr'));
+
+  rows.sort(function(a, b) {{
+    var av = a.getAttribute('data-' + col) || '';
+    var bv = b.getAttribute('data-' + col) || '';
+
+    // String columns
+    if (col === 'name' || col === 'sector') {{
+      return wlSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    }}
+    // Numeric columns
+    var an = parseFloat(av), bn = parseFloat(bv);
+    if (isNaN(an)) an = -Infinity;
+    if (isNaN(bn)) bn = -Infinity;
+    return wlSortAsc ? an - bn : bn - an;
+  }});
+
+  rows.forEach(function(r) {{ tbody.appendChild(r); }});
+  filterWL(wlCurrentFilter);
+}}
+
+function renumberVisible() {{
+  var rows = document.querySelectorAll('#watchlist-tbl tbody tr');
+  var n = 1;
+  rows.forEach(function(r) {{
+    if (r.style.display !== 'none') {{
+      var rnum = r.querySelector('.rnum');
+      if (rnum) rnum.textContent = n++;
     }}
   }});
 }}
-// Default: show all, highlight ALL button
+
 window.onload = function() {{ filterWL('ALL'); }};
 </script>
 <style>
@@ -2643,6 +2713,12 @@ window.onload = function() {{ filterWL('ALL'); }};
   font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 500;
   transition: all .2s; letter-spacing: .3px;
 }}
+th.sortable {{
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: color .15s;
+}}
+th.sortable:hover {{ color: #00f5ff !important; }}
+.sort-icon {{ font-size: 10px; opacity: 0.8; color: #00f5ff; }}
 .wl-all {{ background:#1a2a3a; color:#aaccee; border:1px solid #2a4a6a; }}
 .wl-sb  {{ background:#004d25; color:#00ff88; border:1px solid #00ff88; }}
 .wl-b   {{ background:#003a4d; color:#00f5ff; border:1px solid #00f5ff; }}
