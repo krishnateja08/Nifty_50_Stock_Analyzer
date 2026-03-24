@@ -258,28 +258,13 @@ footer strong { color: #00f5ff; }
   .kpi-band { flex-wrap: wrap; }
   .kpi-item { flex: 0 0 50%; border-bottom: 1px solid var(--border); }
 }
-.mode-toggle {
-  display: flex; align-items: center; gap: 0;
-  background: #0a1628; border: 2px solid #1e3a5a; border-radius: 100px;
-  padding: 3px;
-}
-.mode-btn {
-  padding: 9px 24px; border-radius: 100px; border: none; cursor: pointer;
-  font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-  letter-spacing: 0.5px; transition: all .25s ease; white-space: nowrap;
-  background: transparent; color: #556688;
-}
-.mode-btn:hover { color: #aaccee; }
-.mode-btn.active.tf-active {
-  background: linear-gradient(135deg, #00f5ff, #00cc66);
-  color: #000; box-shadow: 0 0 20px rgba(0,245,255,0.3);
-}
-.mode-btn.active.t-active {
-  background: linear-gradient(135deg, #cc99ff, #7c4dff);
-  color: #fff; box-shadow: 0 0 20px rgba(124,77,255,0.3);
-}
-.buy-section { display: block; }
-.buy-section.hidden { display: none; }
+.mode-toggle { display:flex;align-items:center;gap:0;background:#0a1628;border:2px solid #1e3a5a;border-radius:100px;padding:3px; }
+.mode-btn { padding:9px 24px;border-radius:100px;border:none;cursor:pointer;font-size:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.5px;transition:all .25s;white-space:nowrap;background:transparent;color:#556688; }
+.mode-btn:hover { color:#aaccee; }
+.mode-btn.active.tf-a { background:linear-gradient(135deg,#00f5ff,#00cc66);color:#000;box-shadow:0 0 20px rgba(0,245,255,0.3); }
+.mode-btn.active.t-a { background:linear-gradient(135deg,#cc99ff,#7c4dff);color:#fff;box-shadow:0 0 20px rgba(124,77,255,0.3); }
+.mode-sec { display:block; }
+.mode-sec.hidden { display:none; }
 </style>
 </head>
 <body>
@@ -312,7 +297,7 @@ footer strong { color: #00f5ff; }
     <div class="clock-box">
       <div class="clock-time" id="liveClock">--:-- --</div>
       <div class="clock-meta" id="liveDate">25 Mar 2026 · IST</div>
-      <div class="clock-next">Report: 25 Mar 2026 03:16 AM IST</div>
+      <div class="clock-next">Report: 25 Mar 2026 03:26 AM IST</div>
       <div class="clock-next">Next Update: <strong style="color:var(--accent2)">4:30 PM</strong></div>
     </div>
   </div>
@@ -334,14 +319,14 @@ footer strong { color: #00f5ff; }
   <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
     <span style="font-size:13px;color:#88aacc;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
     <div class="mode-toggle">
-      <button class="mode-btn tf-active active" id="btn-tf" onclick="switchMode('technofunc')">📊 TechnoFunc</button>
-      <button class="mode-btn t-active" id="btn-t" onclick="switchMode('technical')">📈 Technical</button>
+      <button class="mode-btn tf-a active" id="btn-tf" onclick="switchMode('tf')">📊 TechnoFunc</button>
+      <button class="mode-btn t-a" id="btn-t" onclick="switchMode('t')">📈 Technical</button>
     </div>
     <span id="mode-desc" style="font-size:13px;color:#00f5ff;font-weight:600;">
-      Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate
+      Fundamentals 65%% + Technicals 35%% · Trend Veto · R:R Gate
     </span>
   </div>
-<div id="sec-technofunc" class="buy-section">
+<div id="sec-tf" class="mode-sec">
 
   <div class="section-hdr">
     <div class="section-pill pill-buy">▲ Top Buy Recommendations - Sector Diversified</div>
@@ -864,437 +849,6 @@ footer strong { color: #00f5ff; }
         <td><span style="display:inline-block;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:.4px;background:#2a2200;color:#ffab00;border:1px solid #ffab00;">◆ HOLD</span></td>
       </tr>
     </tbody></table></div>
-</div><!-- /sec-technofunc -->
-<div id="sec-technical" class="buy-section hidden">
-
-  <div class="section-hdr">
-    <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">
-      📈 Top 10 Technical Buy Picks — 100%% Chart Analysis
-    </div>
-    <div class="section-line"></div>
-    <div class="section-note">ALL 100 STOCKS EVALUATED · RSI + MACD + SMA + ADX + VOLUME · ZERO FUNDAMENTALS</div>
-  </div>
-  <div class="tbl-wrap"><table>
-    <thead>
-      <tr class="grp-row">
-        <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
-        <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
-        <th class="grp-trade gsep" colspan="5">TRADE SETUP (BUY SIDE)</th>
-      </tr>
-      <tr class="col-row">
-        <th class="ch-stock" style="width:26px">#</th>
-        <th class="ch-stock">Stock / Sector</th>
-        <th class="ch-stock">Price</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Tech Score</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Signal</th>
-        <th class="ch-tech gsep">RSI / Slope</th>
-        <th class="ch-tech">MACD</th>
-        <th class="ch-tech">SMA 20</th>
-        <th class="ch-tech">SMA 50</th>
-        <th class="ch-tech">SMA 200</th>
-        <th class="ch-tech">ADX</th>
-        <th class="ch-tech">Vol / Avg</th>
-        <th class="ch-trade gsep">Target 1 / T2</th>
-        <th class="ch-trade">Stop Loss</th>
-        <th class="ch-trade">R : R</th>
-        <th class="ch-trade">Upside</th>
-        <th class="ch-trade">ATR</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="rnum">1</span></td>
-        <td>
-          <div class="stock-name">Reliance Industries</div>
-          <div class="stock-sym">RELIANCE</div>
-          <div class="stock-sec">Energy</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: SELL (38)</div>
-        </td>
-        <td><div class="price-val">₹1,411.80</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div>
-        </td>
-        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">51</div>
-          <div class="rsi-sig">Building ↑ (47→51)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.1%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.3%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.5%</span></td>
-        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,431.85</div>
-          <div class="t2-val">T2: ₹1,489.12</div>
-        </td>
-        <td>
-          <div class="sl-val">₹1,370.91</div>
-          <div class="sl-pct">-2.9%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.5×</span></td>
-        <td><span class="upside-val up">+1.4%</span></td>
-        <td>
-          <div class="atr-val">₹31.36</div>
-          <div class="atr-sub">2.2%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">2</span></td>
-        <td>
-          <div class="stock-name">Page Industries</div>
-          <div class="stock-sym">PAGEIND</div>
-          <div class="stock-sec">Consumer Cyclical</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (26)</div>
-        </td>
-        <td><div class="price-val">₹32,170.00</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div>
-        </td>
-        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">51</div>
-          <div class="rsi-sig">Building ↑ (33→51)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +18</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.1%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.0%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.0%</span></td>
-        <td><div class="adx-val adx-strong">36</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹36,295.00</div>
-          <div class="t2-val">T2: ₹37,746.80</div>
-        </td>
-        <td>
-          <div class="sl-val">₹30,891.70</div>
-          <div class="sl-pct">-4.0%</div>
-        </td>
-        <td><span class="rr-val" style="color:#00e676">3.2×</span></td>
-        <td><span class="upside-val up">+12.8%</span></td>
-        <td>
-          <div class="atr-val">₹848.30</div>
-          <div class="atr-sub">2.6%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">3</span></td>
-        <td>
-          <div class="stock-name">Oracle Financial Services</div>
-          <div class="stock-sym">OFSS</div>
-          <div class="stock-sec">Technology</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (46)</div>
-        </td>
-        <td><div class="price-val">₹6,605.50</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">51</div><div class="score-track"><div class="score-fill" style="width:51%;background:#7c4dff"></div></div></div>
-        </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">46</div>
-          <div class="rsi-sig">Building ↑ (30→46)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +16</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.6%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -7.1%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -19.5%</span></td>
-        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹6,990.25</div>
-          <div class="t2-val">T2: ₹7,269.86</div>
-        </td>
-        <td>
-          <div class="sl-val">₹6,183.33</div>
-          <div class="sl-pct">-6.4%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
-        <td><span class="upside-val up">+5.8%</span></td>
-        <td>
-          <div class="atr-val">₹216.42</div>
-          <div class="atr-sub">3.3%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">4</span></td>
-        <td>
-          <div class="stock-name">LTIMindtree</div>
-          <div class="stock-sym">LTIM</div>
-          <div class="stock-sec">Technology</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (27)</div>
-        </td>
-        <td><div class="price-val">₹4,105.60</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">50</div><div class="score-track"><div class="score-fill" style="width:50%;background:#7c4dff"></div></div></div>
-        </td>
-        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#00e676">28</div>
-          <div class="rsi-sig">Oversold (Downtrend)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +8</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.7%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.5%</span></td>
-        <td><div class="adx-val adx-strong">70</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹4,605.60</div>
-          <div class="t2-val">T2: ₹4,789.82</div>
-        </td>
-        <td>
-          <div class="sl-val">₹3,695.04</div>
-          <div class="sl-pct">-10.0%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
-        <td><span class="upside-val up">+12.2%</span></td>
-        <td>
-          <div class="atr-val">₹169.88</div>
-          <div class="atr-sub">4.1%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">5</span></td>
-        <td>
-          <div class="stock-name">Tech Mahindra</div>
-          <div class="stock-sym">TECHM</div>
-          <div class="stock-sec">Technology</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: SELL (36)</div>
-        </td>
-        <td><div class="price-val">₹1,432.70</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">47</div><div class="score-track"><div class="score-fill" style="width:47%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum + MACD</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">54</div>
-          <div class="rsi-sig">Building ↑ (29→54)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +25</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +5.8%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.2%</span></td>
-        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,483.65</div>
-          <div class="t2-val">T2: ₹1,543.00</div>
-        </td>
-        <td>
-          <div class="sl-val">₹1,373.04</div>
-          <div class="sl-pct">-4.2%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
-        <td><span class="upside-val up">+3.6%</span></td>
-        <td>
-          <div class="atr-val">₹46.06</div>
-          <div class="atr-sub">3.2%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">6</span></td>
-        <td>
-          <div class="stock-name">ITC</div>
-          <div class="stock-sym">ITC</div>
-          <div class="stock-sec">Consumer Defensive</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (7)</div>
-        </td>
-        <td><div class="price-val">₹291.25</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">44</div><div class="score-track"><div class="score-fill" style="width:44%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#00e676;font-weight:700">⬇ Deep Oversold</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#00e676">30</div>
-          <div class="rsi-sig">Oversold (Downtrend)</div>
-          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.3%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.2%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.2%</span></td>
-        <td><div class="adx-val adx-strong">61</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹328.70</div>
-          <div class="t2-val">T2: ₹341.85</div>
-        </td>
-        <td>
-          <div class="sl-val">₹282.01</div>
-          <div class="sl-pct">-3.2%</div>
-        </td>
-        <td><span class="rr-val" style="color:#00e676">4.0×</span></td>
-        <td><span class="upside-val up">+12.9%</span></td>
-        <td>
-          <div class="atr-val">₹6.74</div>
-          <div class="atr-sub">2.3%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">7</span></td>
-        <td>
-          <div class="stock-name">Info Edge (Naukri)</div>
-          <div class="stock-sym">NAUKRI</div>
-          <div class="stock-sec">Communication Services</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (18)</div>
-        </td>
-        <td><div class="price-val">₹987.40</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#00e676;font-weight:700">↗ Recovery Setup</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">39</div>
-          <div class="rsi-sig">Weak Momentum ⚠</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +12</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.1%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -12.5%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
-        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,037.40</div>
-          <div class="t2-val">T2: ₹1,078.90</div>
-        </td>
-        <td>
-          <div class="sl-val">₹899.73</div>
-          <div class="sl-pct">-8.9%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.6×</span></td>
-        <td><span class="upside-val up">+5.1%</span></td>
-        <td>
-          <div class="atr-val">₹34.22</div>
-          <div class="atr-sub">3.5%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">8</span></td>
-        <td>
-          <div class="stock-name">Aurobindo Pharma</div>
-          <div class="stock-sym">AUROPHARMA</div>
-          <div class="stock-sec">Healthcare</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: BUY (76)</div>
-        </td>
-        <td><div class="price-val">₹1,281.60</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">58</div>
-          <div class="rsi-sig">Softening ↓ (63→58)</div>
-          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.3%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +6.7%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +11.3%</span></td>
-        <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,319.80</div>
-          <div class="t2-val">T2: ₹1,372.59</div>
-        </td>
-        <td>
-          <div class="sl-val">₹1,153.44</div>
-          <div class="sl-pct">-10.0%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
-        <td><span class="upside-val up">+3.0%</span></td>
-        <td>
-          <div class="atr-val">₹38.24</div>
-          <div class="atr-sub">3.0%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">9</span></td>
-        <td>
-          <div class="stock-name">Lupin</div>
-          <div class="stock-sym">LUPIN</div>
-          <div class="stock-sec">Healthcare</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (78)</div>
-        </td>
-        <td><div class="price-val">₹2,331.80</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">57</div>
-          <div class="rsi-sig">Healthy (57)</div>
-          <span style="color:#4a6080;font-size:12px">→ flat</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +0.9%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +13.6%</span></td>
-        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹2,377.60</div>
-          <div class="t2-val">T2: ₹2,472.70</div>
-        </td>
-        <td>
-          <div class="sl-val">₹2,108.79</div>
-          <div class="sl-pct">-9.6%</div>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
-        <td><span class="upside-val up">+2.0%</span></td>
-        <td>
-          <div class="atr-val">₹51.21</div>
-          <div class="atr-sub">2.2%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">10</span></td>
-        <td>
-          <div class="stock-name">ACC</div>
-          <div class="stock-sym">ACC</div>
-          <div class="stock-sec">Basic Materials</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (5)</div>
-        </td>
-        <td><div class="price-val">₹1,334.30</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">41</div><div class="score-track"><div class="score-fill" style="width:41%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#00e676">25</div>
-          <div class="rsi-sig">Oversold (Downtrend)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.9%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -16.3%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
-        <td><div class="adx-val adx-strong">75</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,713.50</div>
-          <div class="t2-val">T2: ₹1,782.04</div>
-        </td>
-        <td>
-          <div class="sl-val">₹1,281.25</div>
-          <div class="sl-pct">-4.0%</div>
-        </td>
-        <td><span class="rr-val" style="color:#00e676">7.2×</span></td>
-        <td><span class="upside-val up">+28.4%</span></td>
-        <td>
-          <div class="atr-val">₹38.25</div>
-          <div class="atr-sub">2.9%</div>
-        </td>
-      </tr>
-    </tbody></table></div>
-</div><!-- /sec-technical -->
 
   <div class="section-hdr">
     <div class="section-pill pill-sell">▼ Top 20 Sell Recommendations</div>
@@ -6553,6 +6107,1797 @@ footer strong { color: #00f5ff; }
         </tr>
       </tbody></table></div>
   </div>
+</div><!-- END sec-tf (TechnoFunc mode) -->
+<div id="sec-t" class="mode-sec hidden">
+
+  <div class="section-hdr">
+    <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">📈 Top 10 Technical Buy — 100%% Chart Analysis</div>
+    <div class="section-line"></div>
+    <div class="section-note">ALL 100 STOCKS · RSI + MACD + SMA + ADX + VOLUME · ZERO FUNDAMENTALS</div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead>
+      <tr class="grp-row">
+        <th class="grp-stock" colspan="3">STOCK INFO</th>
+        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
+        <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
+        <th class="grp-trade gsep" colspan="5">TRADE SETUP (BUY SIDE)</th>
+      </tr>
+      <tr class="col-row">
+        <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
+        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Score</th>
+        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Signal</th>
+        <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
+        <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Upside</th><th class="ch-trade">ATR</th>
+      </tr>
+    </thead><tbody>
+      <tr>
+        <td><span class="rnum">1</span></td>
+        <td><div class="stock-name">Reliance Industries</div><div class="stock-sym">RELIANCE</div><div class="stock-sec">Energy</div></td>
+        <td><div class="price-val">₹1,411.80</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div></td>
+        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">51</div><div class="rsi-sig">Building ↑ (47→51)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.5%</span></td>
+        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,431.85</div><div class="t2-val">T2: ₹1,489.12</div></td>
+        <td><div class="sl-val">₹1,370.91</div><div class="sl-pct">-2.9%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.5×</span></td>
+        <td><span class="upside-val up">+1.4%</span></td>
+        <td><div class="atr-val">₹31.36</div><div class="atr-sub">2.2%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">2</span></td>
+        <td><div class="stock-name">Page Industries</div><div class="stock-sym">PAGEIND</div><div class="stock-sec">Consumer Cyclical</div></td>
+        <td><div class="price-val">₹32,170.00</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div></td>
+        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">51</div><div class="rsi-sig">Building ↑ (33→51)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +18</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.0%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.0%</span></td>
+        <td><div class="adx-val adx-strong">36</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹36,295.00</div><div class="t2-val">T2: ₹37,746.80</div></td>
+        <td><div class="sl-val">₹30,891.70</div><div class="sl-pct">-4.0%</div></td>
+        <td><span class="rr-val" style="color:#00e676">3.2×</span></td>
+        <td><span class="upside-val up">+12.8%</span></td>
+        <td><div class="atr-val">₹848.30</div><div class="atr-sub">2.6%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">3</span></td>
+        <td><div class="stock-name">Oracle Financial Services</div><div class="stock-sym">OFSS</div><div class="stock-sec">Technology</div></td>
+        <td><div class="price-val">₹6,605.50</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#cc99ff">51</div><div class="score-track"><div class="score-fill" style="width:51%;background:#7c4dff"></div></div></div></td>
+        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">46</div><div class="rsi-sig">Building ↑ (30→46)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +16</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -7.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -19.5%</span></td>
+        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹6,990.25</div><div class="t2-val">T2: ₹7,269.86</div></td>
+        <td><div class="sl-val">₹6,183.33</div><div class="sl-pct">-6.4%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
+        <td><span class="upside-val up">+5.8%</span></td>
+        <td><div class="atr-val">₹216.42</div><div class="atr-sub">3.3%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">4</span></td>
+        <td><div class="stock-name">LTIMindtree</div><div class="stock-sym">LTIM</div><div class="stock-sec">Technology</div></td>
+        <td><div class="price-val">₹4,105.60</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#cc99ff">50</div><div class="score-track"><div class="score-fill" style="width:50%;background:#7c4dff"></div></div></div></td>
+        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#00e676">28</div><div class="rsi-sig">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +8</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.7%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.5%</span></td>
+        <td><div class="adx-val adx-strong">70</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹4,605.60</div><div class="t2-val">T2: ₹4,789.82</div></td>
+        <td><div class="sl-val">₹3,695.04</div><div class="sl-pct">-10.0%</div></td>
+        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
+        <td><span class="upside-val up">+12.2%</span></td>
+        <td><div class="atr-val">₹169.88</div><div class="atr-sub">4.1%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">5</span></td>
+        <td><div class="stock-name">Tech Mahindra</div><div class="stock-sym">TECHM</div><div class="stock-sec">Technology</div></td>
+        <td><div class="price-val">₹1,432.70</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">47</div><div class="score-track"><div class="score-fill" style="width:47%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">54</div><div class="rsi-sig">Building ↑ (29→54)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +25</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +5.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.2%</span></td>
+        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,483.65</div><div class="t2-val">T2: ₹1,543.00</div></td>
+        <td><div class="sl-val">₹1,373.04</div><div class="sl-pct">-4.2%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
+        <td><span class="upside-val up">+3.6%</span></td>
+        <td><div class="atr-val">₹46.06</div><div class="atr-sub">3.2%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">6</span></td>
+        <td><div class="stock-name">ITC</div><div class="stock-sym">ITC</div><div class="stock-sec">Consumer Defensive</div></td>
+        <td><div class="price-val">₹291.25</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">44</div><div class="score-track"><div class="score-fill" style="width:44%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#00e676;font-weight:700">⬇ Deep Oversold</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#00e676">30</div><div class="rsi-sig">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.2%</span></td>
+        <td><div class="adx-val adx-strong">61</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹328.70</div><div class="t2-val">T2: ₹341.85</div></td>
+        <td><div class="sl-val">₹282.01</div><div class="sl-pct">-3.2%</div></td>
+        <td><span class="rr-val" style="color:#00e676">4.0×</span></td>
+        <td><span class="upside-val up">+12.9%</span></td>
+        <td><div class="atr-val">₹6.74</div><div class="atr-sub">2.3%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">7</span></td>
+        <td><div class="stock-name">Info Edge (Naukri)</div><div class="stock-sym">NAUKRI</div><div class="stock-sec">Communication Services</div></td>
+        <td><div class="price-val">₹987.40</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#00e676;font-weight:700">↗ Recovery Setup</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">39</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +12</span></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -12.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,037.40</div><div class="t2-val">T2: ₹1,078.90</div></td>
+        <td><div class="sl-val">₹899.73</div><div class="sl-pct">-8.9%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.6×</span></td>
+        <td><span class="upside-val up">+5.1%</span></td>
+        <td><div class="atr-val">₹34.22</div><div class="atr-sub">3.5%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">8</span></td>
+        <td><div class="stock-name">Aurobindo Pharma</div><div class="stock-sym">AUROPHARMA</div><div class="stock-sec">Healthcare</div></td>
+        <td><div class="price-val">₹1,281.60</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">58</div><div class="rsi-sig">Softening ↓ (63→58)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +6.7%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +11.3%</span></td>
+        <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,319.80</div><div class="t2-val">T2: ₹1,372.59</div></td>
+        <td><div class="sl-val">₹1,153.44</div><div class="sl-pct">-10.0%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val up">+3.0%</span></td>
+        <td><div class="atr-val">₹38.24</div><div class="atr-sub">3.0%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">9</span></td>
+        <td><div class="stock-name">Lupin</div><div class="stock-sym">LUPIN</div><div class="stock-sec">Healthcare</div></td>
+        <td><div class="price-val">₹2,331.80</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">57</div><div class="rsi-sig">Healthy (57)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +0.9%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +13.6%</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹2,377.60</div><div class="t2-val">T2: ₹2,472.70</div></td>
+        <td><div class="sl-val">₹2,108.79</div><div class="sl-pct">-9.6%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
+        <td><span class="upside-val up">+2.0%</span></td>
+        <td><div class="atr-val">₹51.21</div><div class="atr-sub">2.2%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">10</span></td>
+        <td><div class="stock-name">ACC</div><div class="stock-sym">ACC</div><div class="stock-sec">Basic Materials</div></td>
+        <td><div class="price-val">₹1,334.30</div></td>
+        <td class="gsep"><div class="score-wrap"><div class="score-num" style="color:#00f5ff">41</div><div class="score-track"><div class="score-fill" style="width:41%;background:#0099cc"></div></div></div></td>
+        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#00e676">25</div><div class="rsi-sig">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.9%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -16.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
+        <td><div class="adx-val adx-strong">75</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,713.50</div><div class="t2-val">T2: ₹1,782.04</div></td>
+        <td><div class="sl-val">₹1,281.25</div><div class="sl-pct">-4.0%</div></td>
+        <td><span class="rr-val" style="color:#00e676">7.2×</span></td>
+        <td><span class="upside-val up">+28.4%</span></td>
+        <td><div class="atr-val">₹38.25</div><div class="atr-sub">2.9%</div></td>
+      </tr>
+    </tbody></table></div>
+
+  <div class="section-hdr">
+    <div class="section-pill pill-sell">▼ Top 10 Technical Sell — Weakest Charts</div>
+    <div class="section-line"></div>
+    <div class="section-note">LOWEST TECH SCORE + BEARISH MACD · SELL-SIDE TARGETS</div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead>
+      <tr class="grp-row">
+        <th class="grp-stock" colspan="3">STOCK INFO</th>
+        <th style="background:#4d0010;color:#ff4466;text-shadow:0 0 8px rgba(255,68,102,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="1">TECH SCORE</th>
+        <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
+        <th class="grp-trade gsep" colspan="5">TRADE SETUP (SELL SIDE)</th>
+      </tr>
+      <tr class="col-row">
+        <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
+        <th style="border-top:3px solid #ff4466;color:#ffb0b0;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Score</th>
+        <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
+        <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Downside</th><th class="ch-trade">ATR</th>
+      </tr>
+    </thead><tbody>
+      <tr>
+        <td><span class="rnum">1</span></td>
+        <td><div class="stock-name">Bajaj Auto</div><div class="stock-sym">BAJAJ-AUTO</div><div class="stock-sec">Consumer Cyclical</div></td>
+        <td><div class="price-val">₹8,898.00</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">13</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">40</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.8%</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹8,738.75</div><div class="t2-val">T2: ₹8,389.20</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹9,275.77</div><div class="sl-pct">+4.2%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.4×</span></td>
+        <td><span class="upside-val dn">+1.8%</span></td>
+        <td><div class="atr-val">₹268.77</div><div class="atr-sub">3.0%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">2</span></td>
+        <td><div class="stock-name">Divi's Lab</div><div class="stock-sym">DIVISLAB</div><div class="stock-sec">Healthcare</div></td>
+        <td><div class="price-val">₹6,026.00</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">13</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">41</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -3.4%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.3%</span></td>
+        <td><div class="adx-val adx-strong">41</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹5,910.71</div><div class="t2-val">T2: ₹5,674.28</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹6,457.99</div><div class="sl-pct">+7.2%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val dn">+1.9%</span></td>
+        <td><div class="atr-val">₹156.11</div><div class="atr-sub">2.6%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">3</span></td>
+        <td><div class="stock-name">Axis Bank</div><div class="stock-sym">AXISBANK</div><div class="stock-sec">Financial Services</div></td>
+        <td><div class="price-val">₹1,192.70</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">14</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">36</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -7.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.0%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.7%</span></td>
+        <td><div class="adx-val adx-strong">47</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,177.50</div><div class="t2-val">T2: ₹1,130.40</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹1,267.66</div><div class="sl-pct">+6.3%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
+        <td><span class="upside-val dn">+1.3%</span></td>
+        <td><div class="atr-val">₹34.28</div><div class="atr-sub">2.9%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">4</span></td>
+        <td><div class="stock-name">Voltas</div><div class="stock-sym">VOLTAS</div><div class="stock-sec">Consumer Cyclical</div></td>
+        <td><div class="price-val">₹1,302.10</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">14</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">35</div><div class="rsi-sig">Weak & Falling ↓ (43→35)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.9%</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,288.60</div><div class="t2-val">T2: ₹1,237.06</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹1,383.58</div><div class="sl-pct">+6.3%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
+        <td><span class="upside-val dn">+1.0%</span></td>
+        <td><div class="atr-val">₹55.58</div><div class="atr-sub">4.3%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">5</span></td>
+        <td><div class="stock-name">Avenue Supermarts (DMart)</div><div class="stock-sym">DMART</div><div class="stock-sec">Consumer Defensive</div></td>
+        <td><div class="price-val">₹3,756.50</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">18</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">44</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.7%</span></td>
+        <td><div class="adx-val adx-mod">25</div><div class="adx-lbl">Moderate</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹3,734.53</div><div class="t2-val">T2: ₹3,585.15</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹4,041.78</div><div class="sl-pct">+7.6%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.1×</span></td>
+        <td><span class="upside-val dn">+0.6%</span></td>
+        <td><div class="atr-val">₹109.58</div><div class="atr-sub">2.9%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">6</span></td>
+        <td><div class="stock-name">Alkem Laboratories</div><div class="stock-sym">ALKEM</div><div class="stock-sec">Healthcare</div></td>
+        <td><div class="price-val">₹5,297.00</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">18</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">43</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.8%</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹5,204.50</div><div class="t2-val">T2: ₹4,996.32</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹5,616.38</div><div class="sl-pct">+6.0%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val dn">+1.8%</span></td>
+        <td><div class="atr-val">₹137.38</div><div class="atr-sub">2.6%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">7</span></td>
+        <td><div class="stock-name">Britannia</div><div class="stock-sym">BRITANNIA</div><div class="stock-sec">Consumer Defensive</div></td>
+        <td><div class="price-val">₹5,513.50</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">19</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">30</div><div class="rsi-sig">Weak & Falling ↓ (44→30)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -13</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.0%</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹5,427.17</div><div class="t2-val">T2: ₹5,210.08</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹5,814.31</div><div class="sl-pct">+5.5%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val dn">+1.6%</span></td>
+        <td><div class="atr-val">₹135.39</div><div class="atr-sub">2.5%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">8</span></td>
+        <td><div class="stock-name">Hindustan Unilever</div><div class="stock-sym">HINDUNILVR</div><div class="stock-sec">Consumer Defensive</div></td>
+        <td><div class="price-val">₹2,085.00</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">19</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">31</div><div class="rsi-sig">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -13.8%</span></td>
+        <td><div class="adx-val adx-strong">64</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹2,033.30</div><div class="t2-val">T2: ₹1,951.97</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹2,293.50</div><div class="sl-pct">+10.0%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
+        <td><span class="upside-val dn">+2.5%</span></td>
+        <td><div class="atr-val">₹50.63</div><div class="atr-sub">2.4%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">9</span></td>
+        <td><div class="stock-name">Siemens India</div><div class="stock-sym">SIEMENS</div><div class="stock-sec">Industrials</div></td>
+        <td><div class="price-val">₹3,001.80</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">19</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">40</div><div class="rsi-sig">Weak & Falling ↓ (47→40)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.9%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -4.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.0%</span></td>
+        <td><div class="adx-val adx-strong">50</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹2,925.00</div><div class="t2-val">T2: ₹2,808.00</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹3,282.93</div><div class="sl-pct">+9.4%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val dn">+2.6%</span></td>
+        <td><div class="atr-val">₹118.40</div><div class="atr-sub">3.9%</div></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">10</span></td>
+        <td><div class="stock-name">SBI Life</div><div class="stock-sym">SBILIFE</div><div class="stock-sec">Financial Services</div></td>
+        <td><div class="price-val">₹1,836.00</div></td>
+        <td class="gsep"><span class="score-num" style="color:#ff4466">19</span></td>
+        <td class="gsep"><div class="rsi-val" style="color:#60a5fa">32</div><div class="rsi-sig">Weak & Falling ↓ (41→32)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -9</span></td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.0%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -4.2%</span></td>
+        <td><div class="adx-val adx-strong">38</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep"><div class="t1-val">₹1,773.45</div><div class="t2-val">T2: ₹1,702.51</div></td>
+        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹1,908.40</div><div class="sl-pct">+3.9%</div></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
+        <td><span class="upside-val dn">+3.4%</span></td>
+        <td><div class="atr-val">₹49.30</div><div class="atr-sub">2.7%</div></td>
+      </tr>
+    </tbody></table></div>
+
+  <div class="section-hdr" style="margin-top:32px">
+    <div class="section-pill" style="background:linear-gradient(90deg,#1a1a3a,#0c0c2e);color:#cc99ff;border:1px solid #7c4dff;">
+      📋 Technical Watchlist — All 97 Stocks · Sorted by Tech Score
+    </div>
+    <div class="section-line"></div>
+    <div class="section-note">100% CHART ANALYSIS · YOU DECIDE THE ACTION</div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr class="col-row">
+      <th style="width:22px">#</th><th>Stock</th><th>Sector</th><th>Price</th>
+      <th>Tech Score</th><th>RSI / Slope</th><th>MACD</th><th>SMA Trend</th>
+      <th>ADX</th><th>Vol</th><th>RSI Div</th><th>Signals</th>
+    </tr></thead><tbody>
+      <tr>
+        <td><span class="rnum">1</span></td>
+        <td><div class="stock-name" style="font-size:14px">Reliance Industries</div><div class="stock-sym">RELIANCE</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Energy</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,411.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#cc99ff">53</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">51</div><div style="font-size:12px;color:#8899aa">Building ↑ (47→51)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">2</span></td>
+        <td><div class="stock-name" style="font-size:14px">Page Industries</div><div class="stock-sym">PAGEIND</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹32,170.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#cc99ff">53</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">51</div><div style="font-size:12px;color:#8899aa">Building ↑ (33→51)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +18</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">36</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">3</span></td>
+        <td><div class="stock-name" style="font-size:14px">Oracle Financial Services</div><div class="stock-sym">OFSS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹6,605.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#cc99ff">51</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">46</div><div style="font-size:12px;color:#8899aa">Building ↑ (30→46)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +16</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">4</span></td>
+        <td><div class="stock-name" style="font-size:14px">LTIMindtree</div><div class="stock-sym">LTIM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹4,105.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#cc99ff">50</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">28</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +8</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">70</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">5</span></td>
+        <td><div class="stock-name" style="font-size:14px">Tech Mahindra</div><div class="stock-sym">TECHM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,432.70</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">47</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">54</div><div style="font-size:12px;color:#8899aa">Building ↑ (29→54)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +25</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">6</span></td>
+        <td><div class="stock-name" style="font-size:14px">Tata Elxsi</div><div class="stock-sym">TATAELXSI</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹4,180.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">47</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +15</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">40</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">7</span></td>
+        <td><div class="stock-name" style="font-size:14px">TCS</div><div class="stock-sym">TCS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,398.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">46</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +12</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">8</span></td>
+        <td><div class="stock-name" style="font-size:14px">ITC</div><div class="stock-sym">ITC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹291.25</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">44</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">61</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">9</span></td>
+        <td><div class="stock-name" style="font-size:14px">Infosys</div><div class="stock-sym">INFY</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,278.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">42</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +20</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">53</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">10</span></td>
+        <td><div class="stock-name" style="font-size:14px">HCL Tech</div><div class="stock-sym">HCLTECH</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,373.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">45</div><div style="font-size:12px;color:#8899aa">Building ↑ (26→45)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +19</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">11</span></td>
+        <td><div class="stock-name" style="font-size:14px">Persistent Systems</div><div class="stock-sym">PERSISTENT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹4,913.70</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">48</div><div style="font-size:12px;color:#8899aa">Building ↑ (26→48)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +23</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">12</span></td>
+        <td><div class="stock-name" style="font-size:14px">Info Edge (Naukri)</div><div class="stock-sym">NAUKRI</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Communication Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹987.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">39</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +12</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">13</span></td>
+        <td><div class="stock-name" style="font-size:14px">Coforge</div><div class="stock-sym">COFORGE</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,110.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">31</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +16</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">74</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">14</span></td>
+        <td><div class="stock-name" style="font-size:14px">Wipro</div><div class="stock-sym">WIPRO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹188.74</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">43</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +6</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">53</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">15</span></td>
+        <td><div class="stock-name" style="font-size:14px">Lupin</div><div class="stock-sym">LUPIN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,331.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">42</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">57</div><div style="font-size:12px;color:#8899aa">Healthy (57)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ffab00;font-size:13px">🟡 1/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">16</span></td>
+        <td><div class="stock-name" style="font-size:14px">Aurobindo Pharma</div><div class="stock-sym">AUROPHARMA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,281.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">42</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">58</div><div style="font-size:12px;color:#8899aa">Softening ↓ (63→58)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
+        <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ffab00;font-size:13px">🟡 2/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">17</span></td>
+        <td><div class="stock-name" style="font-size:14px">ACC</div><div class="stock-sym">ACC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,334.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">41</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">25</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">75</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">18</span></td>
+        <td><div class="stock-name" style="font-size:14px">Maruti Suzuki</div><div class="stock-sym">MARUTI</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹12,464.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">40</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">65</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">19</span></td>
+        <td><div class="stock-name" style="font-size:14px">Berger Paints</div><div class="stock-sym">BERGEPAINT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹413.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">40</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +6</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">89</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">20</span></td>
+        <td><div class="stock-name" style="font-size:14px">FSN E-Commerce (Nykaa)</div><div class="stock-sym">NYKAA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹240.05</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">38</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">41</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">37</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">21</span></td>
+        <td><div class="stock-name" style="font-size:14px">NTPC</div><div class="stock-sym">NTPC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Utilities</span></td>
+        <td><div class="price-val" style="font-size:15px">₹375.55</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">38</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">51</div><div style="font-size:12px;color:#8899aa">Fading ↓ (58→51)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
+        <td><div class="adx-val adx-strong">44</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ffab00;font-size:13px">🟡 1/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">22</span></td>
+        <td><div class="stock-name" style="font-size:14px">Asian Paints</div><div class="stock-sym">ASIANPAINT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,217.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">37</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">41</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +7</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">68</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">23</span></td>
+        <td><div class="stock-name" style="font-size:14px">PB Fintech (PolicyBazaar)</div><div class="stock-sym">POLICYBZR</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,461.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">37</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">45</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (49→45)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">49</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">24</span></td>
+        <td><div class="stock-name" style="font-size:14px">One97 Communications (Paytm)</div><div class="stock-sym">PAYTM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,035.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">37</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">44</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +8</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">61</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">25</span></td>
+        <td><div class="stock-name" style="font-size:14px">Bajaj Finance</div><div class="stock-sym">BAJFINANCE</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹849.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">36</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">45</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-high">1.5×</div><div class="vol-lbl">High Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">26</span></td>
+        <td><div class="stock-name" style="font-size:14px">Cipla</div><div class="stock-sym">CIPLA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,219.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00f5ff">35</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">26</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">69</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">27</span></td>
+        <td><div class="stock-name" style="font-size:14px">HDFC AMC</div><div class="stock-sym">HDFCAMC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,351.70</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">39</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">28</span></td>
+        <td><div class="stock-name" style="font-size:14px">ONGC</div><div class="stock-sym">ONGC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Energy</span></td>
+        <td><div class="price-val" style="font-size:15px">₹268.05</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">50</div><div style="font-size:12px;color:#8899aa">Building ↑ (46→50)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-mod">24</div><div class="adx-lbl">Moderate</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">29</span></td>
+        <td><div class="stock-name" style="font-size:14px">M&M</div><div class="stock-sym">M&M</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,031.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">56</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">30</span></td>
+        <td><div class="stock-name" style="font-size:14px">SBI Cards</div><div class="stock-sym">SBICARD</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹673.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">33</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +9</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">53</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">31</span></td>
+        <td><div class="stock-name" style="font-size:14px">Shriram Finance</div><div class="stock-sym">SHRIRAMFIN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹903.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (46→36)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -10</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-high">1.5×</div><div class="vol-lbl">High Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">32</span></td>
+        <td><div class="stock-name" style="font-size:14px">Rail Vikas Nigam</div><div class="stock-sym">RVNL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹258.45</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">34</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">34</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">37</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">33</span></td>
+        <td><div class="stock-name" style="font-size:14px">IndusInd Bank</div><div class="stock-sym">INDUSINDBK</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹797.25</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">33</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">34</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +3</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">47</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.5×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">34</span></td>
+        <td><div class="stock-name" style="font-size:14px">Power Grid</div><div class="stock-sym">POWERGRID</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Utilities</span></td>
+        <td><div class="price-val" style="font-size:15px">₹299.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">33</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">54</div><div style="font-size:12px;color:#8899aa">Neutral →</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ffab00;font-size:13px">🟡 2/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">35</span></td>
+        <td><div class="stock-name" style="font-size:14px">Sun Pharma</div><div class="stock-sym">SUNPHARMA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,753.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">33</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">48</div><div style="font-size:12px;color:#8899aa">Falling Fast ↓ (59→48)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -11</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
+        <td><div class="adx-val adx-strong">35</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">36</span></td>
+        <td><div class="stock-name" style="font-size:14px">Container Corporation of India</div><div class="stock-sym">CONCOR</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹433.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">33</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">32</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">63</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">37</span></td>
+        <td><div class="stock-name" style="font-size:14px">HDFC Bank</div><div class="stock-sym">HDFCBANK</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹764.90</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">32</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">28</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -9</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">64</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-high">1.7×</div><div class="vol-lbl">High Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">38</span></td>
+        <td><div class="stock-name" style="font-size:14px">Adani Enterprises</div><div class="stock-sym">ADANIENT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Energy</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,817.90</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">32</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">27</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -9</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">63</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-high">1.8×</div><div class="vol-lbl">High Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">39</span></td>
+        <td><div class="stock-name" style="font-size:14px">BPCL</div><div class="stock-sym">BPCL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Energy</span></td>
+        <td><div class="price-val" style="font-size:15px">₹282.25</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">32</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">26</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">68</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">40</span></td>
+        <td><div class="stock-name" style="font-size:14px">IRCTC</div><div class="stock-sym">IRCTC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹515.15</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">31</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +3</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-low">0.5×</div><div class="vol-lbl">Low Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">41</span></td>
+        <td><div class="stock-name" style="font-size:14px">Titan Company</div><div class="stock-sym">TITAN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,899.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">31</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (42→36)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">67</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">42</span></td>
+        <td><div class="stock-name" style="font-size:14px">Coal India</div><div class="stock-sym">COALINDIA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Energy</span></td>
+        <td><div class="price-val" style="font-size:15px">₹442.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">30</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">49</div><div style="font-size:12px;color:#8899aa">Falling Fast ↓ (63→49)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -14</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
+        <td><div class="adx-val adx-mod">28</div><div class="adx-lbl">Moderate</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">43</span></td>
+        <td><div class="stock-name" style="font-size:14px">Bharti Airtel</div><div class="stock-sym">BHARTIARTL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Communication Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,802.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">30</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">75</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-low">0.7×</div><div class="vol-lbl">Low Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">44</span></td>
+        <td><div class="stock-name" style="font-size:14px">Torrent Pharmaceuticals</div><div class="stock-sym">TORNTPHARM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹4,256.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">30</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">49</div><div style="font-size:12px;color:#8899aa">Fading ↓ (53→49)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -3</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.7×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">45</span></td>
+        <td><div class="stock-name" style="font-size:14px">Max Healthcare</div><div class="stock-sym">MAXHEALTH</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹969.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">46</span></td>
+        <td><div class="stock-name" style="font-size:14px">Adani Ports</div><div class="stock-sym">ADANIPORTS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,344.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">39</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">43</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">47</span></td>
+        <td><div class="stock-name" style="font-size:14px">Dabur India</div><div class="stock-sym">DABUR</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹421.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">25</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">63</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.5×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">48</span></td>
+        <td><div class="stock-name" style="font-size:14px">Kotak Mahindra Bank</div><div class="stock-sym">KOTAKBANK</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹366.85</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">34</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +3</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">63</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">49</span></td>
+        <td><div class="stock-name" style="font-size:14px">L&T</div><div class="stock-sym">LT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,516.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">38</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">65</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">50</span></td>
+        <td><div class="stock-name" style="font-size:14px">Pidilite Industries</div><div class="stock-sym">PIDILITIND</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,332.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">39</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">40</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">51</span></td>
+        <td><div class="stock-name" style="font-size:14px">Fortis Healthcare</div><div class="stock-sym">FORTIS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹811.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">52</span></td>
+        <td><div class="stock-name" style="font-size:14px">Havells India</div><div class="stock-sym">HAVELLS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,234.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">32</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (41→32)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -9</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">49</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">53</span></td>
+        <td><div class="stock-name" style="font-size:14px">ICICI Lombard General Insurance</div><div class="stock-sym">ICICIGI</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,730.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">29</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">27</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -12</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">54</span></td>
+        <td><div class="stock-name" style="font-size:14px">Muthoot Finance</div><div class="stock-sym">MUTHOOTFIN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,155.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">28</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">38</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (48→38)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -10</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">55</span></td>
+        <td><div class="stock-name" style="font-size:14px">Grasim</div><div class="stock-sym">GRASIM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,549.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">28</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (43→36)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -7</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">74</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">56</span></td>
+        <td><div class="stock-name" style="font-size:14px">Hero MotoCorp</div><div class="stock-sym">HEROMOTOCO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹5,253.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">28</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">44</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#00e676;font-size:12px">✅ Bull</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">57</span></td>
+        <td><div class="stock-name" style="font-size:14px">Vedanta</div><div class="stock-sym">VEDL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹651.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">27</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (51→40)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -11</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">32</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">58</span></td>
+        <td><div class="stock-name" style="font-size:14px">State Bank of India</div><div class="stock-sym">SBIN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,030.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">27</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">32</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (36→32)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">59</span></td>
+        <td><div class="stock-name" style="font-size:14px">Hindalco</div><div class="stock-sym">HINDALCO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹854.65</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">27</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (50→37)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -13</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">50</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">60</span></td>
+        <td><div class="stock-name" style="font-size:14px">NMDC</div><div class="stock-sym">NMDC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹76.77</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">26</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">44</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (47→44)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">43</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">61</span></td>
+        <td><div class="stock-name" style="font-size:14px">Steel Authority of India</div><div class="stock-sym">SAIL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹145.73</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">26</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">42</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (49→42)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -7</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">76</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">62</span></td>
+        <td><div class="stock-name" style="font-size:14px">Eicher Motors</div><div class="stock-sym">EICHERMOT</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹6,871.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">26</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">41</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">60</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">63</span></td>
+        <td><div class="stock-name" style="font-size:14px">Power Finance Corporation</div><div class="stock-sym">PFC</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹398.75</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">46</div><div style="font-size:12px;color:#8899aa">Falling Fast ↓ (56→46)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -10</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">30</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">64</span></td>
+        <td><div class="stock-name" style="font-size:14px">Balkrishna Industries</div><div class="stock-sym">BALKRISIND</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,057.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">29</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">35</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">65</span></td>
+        <td><div class="stock-name" style="font-size:14px">Ambuja Cements</div><div class="stock-sym">AMBUJACEM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹407.55</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">28</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">67</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">66</span></td>
+        <td><div class="stock-name" style="font-size:14px">Godrej Consumer Products</div><div class="stock-sym">GODREJCP</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,006.90</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">28</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">71</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">67</span></td>
+        <td><div class="stock-name" style="font-size:14px">HDFC Life</div><div class="stock-sym">HDFCLIFE</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹603.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">27</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">62</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">68</span></td>
+        <td><div class="stock-name" style="font-size:14px">Dr Reddy</div><div class="stock-sym">DRREDDY</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,259.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">45</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (50→45)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -5</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">53</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">69</span></td>
+        <td><div class="stock-name" style="font-size:14px">Apollo Hospital</div><div class="stock-sym">APOLLOHOSP</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹7,413.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">47</div><div style="font-size:12px;color:#8899aa">Neutral →</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff8c00;font-size:13px">🟠 3/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">70</span></td>
+        <td><div class="stock-name" style="font-size:14px">Cholamandalam Investment</div><div class="stock-sym">CHOLAFIN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,418.90</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">81</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">71</span></td>
+        <td><div class="stock-name" style="font-size:14px">ICICI Prudential Life</div><div class="stock-sym">ICICIPRULI</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹537.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">25</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">22</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -10</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">67</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">72</span></td>
+        <td><div class="stock-name" style="font-size:14px">Tata Consumer</div><div class="stock-sym">TATACONSUM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,053.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">38</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">73</span></td>
+        <td><div class="stock-name" style="font-size:14px">ICICI Bank</div><div class="stock-sym">ICICIBANK</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,251.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">66</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">74</span></td>
+        <td><div class="stock-name" style="font-size:14px">Adani Green Energy</div><div class="stock-sym">ADANIGREEN</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Utilities</span></td>
+        <td><div class="price-val" style="font-size:15px">₹839.55</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">75</span></td>
+        <td><div class="stock-name" style="font-size:14px">REC Limited</div><div class="stock-sym">RECLTD</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹320.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (45→40)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -6</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">76</span></td>
+        <td><div class="stock-name" style="font-size:14px">IndiGo (InterGlobe Aviation)</div><div class="stock-sym">INDIGO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹4,150.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">39</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">57</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">77</span></td>
+        <td><div class="stock-name" style="font-size:14px">L&T Technology Services</div><div class="stock-sym">LTTS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Technology</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,153.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">24</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (46→40)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -5</span></td>
+        <td><span class="macd-bull" style="font-size:13px">Bullish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">50</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-low">0.5×</div><div class="vol-lbl">Low Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">78</span></td>
+        <td><div class="stock-name" style="font-size:14px">Bajaj Finserv</div><div class="stock-sym">BAJAJFINSV</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,704.40</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">23</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">73</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">79</span></td>
+        <td><div class="stock-name" style="font-size:14px">Samvardhana Motherson</div><div class="stock-sym">MOTHERSON</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹111.13</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">22</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">80</span></td>
+        <td><div class="stock-name" style="font-size:14px">Colgate-Palmolive India</div><div class="stock-sym">COLPAL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,877.30</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">22</span></td>
+        <td><div class="rsi-val" style="color:#00e676;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Oversold (Downtrend)</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">60</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-low">0.7×</div><div class="vol-lbl">Low Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">81</span></td>
+        <td><div class="stock-name" style="font-size:14px">Tata Steel</div><div class="stock-sym">TATASTEEL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹190.79</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">21</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">46</div><div style="font-size:12px;color:#8899aa">Neutral →</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">32</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">82</span></td>
+        <td><div class="stock-name" style="font-size:14px">JSW Steel</div><div class="stock-sym">JSWSTEEL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,133.70</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">21</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">42</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">83</span></td>
+        <td><div class="stock-name" style="font-size:14px">Jindal Steel & Power</div><div class="stock-sym">JINDALSTEL</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,120.60</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">21</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">44</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">43</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">84</span></td>
+        <td><div class="stock-name" style="font-size:14px">Marico</div><div class="stock-sym">MARICO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹739.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ffab00">21</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">41</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">56</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">85</span></td>
+        <td><div class="stock-name" style="font-size:14px">Nestle India</div><div class="stock-sym">NESTLEIND</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,183.20</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">33</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">86</span></td>
+        <td><div class="stock-name" style="font-size:14px">SBI Life</div><div class="stock-sym">SBILIFE</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,836.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">32</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (41→32)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -9</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">38</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">87</span></td>
+        <td><div class="stock-name" style="font-size:14px">UltraTech Cement</div><div class="stock-sym">ULTRACEMCO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Basic Materials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹10,764.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">37</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">74</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">88</span></td>
+        <td><div class="stock-name" style="font-size:14px">Hindustan Unilever</div><div class="stock-sym">HINDUNILVR</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹2,085.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">31</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">64</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">89</span></td>
+        <td><div class="stock-name" style="font-size:14px">Britannia</div><div class="stock-sym">BRITANNIA</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹5,513.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (44→30)</div><span style="color:#ff4466;font-size:12px;font-weight:700">↓ -13</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 6/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">90</span></td>
+        <td><div class="stock-name" style="font-size:14px">Bajaj Holdings</div><div class="stock-sym">BAJAJHLDNG</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹9,337.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">30</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">57</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">91</span></td>
+        <td><div class="stock-name" style="font-size:14px">Siemens India</div><div class="stock-sym">SIEMENS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Industrials</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,001.80</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">19</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (47→40)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">50</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">92</span></td>
+        <td><div class="stock-name" style="font-size:14px">Alkem Laboratories</div><div class="stock-sym">ALKEM</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹5,297.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">18</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">43</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">93</span></td>
+        <td><div class="stock-name" style="font-size:14px">Avenue Supermarts (DMart)</div><div class="stock-sym">DMART</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Defensive</span></td>
+        <td><div class="price-val" style="font-size:15px">₹3,756.50</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">18</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">44</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-mod">25</div><div class="adx-lbl">Moderate</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">94</span></td>
+        <td><div class="stock-name" style="font-size:14px">Axis Bank</div><div class="stock-sym">AXISBANK</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Financial Services</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,192.70</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">14</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">36</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">47</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">95</span></td>
+        <td><div class="stock-name" style="font-size:14px">Voltas</div><div class="stock-sym">VOLTAS</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹1,302.10</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">14</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">35</div><div style="font-size:12px;color:#8899aa">Weak & Falling ↓ (43→35)</div><span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">48</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-size:12px">⚠ Bear</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">96</span></td>
+        <td><div class="stock-name" style="font-size:14px">Divi's Lab</div><div class="stock-sym">DIVISLAB</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Healthcare</span></td>
+        <td><div class="price-val" style="font-size:15px">₹6,026.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">13</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">41</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
+        <td><div class="adx-val adx-strong">41</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 4/7</span></td>
+      </tr>
+      <tr>
+        <td><span class="rnum">97</span></td>
+        <td><div class="stock-name" style="font-size:14px">Bajaj Auto</div><div class="stock-sym">BAJAJ-AUTO</div></td>
+        <td><span style="font-size:13px;color:#8899aa">Consumer Cyclical</span></td>
+        <td><div class="price-val" style="font-size:15px">₹8,898.00</div></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#ff4466">13</span></td>
+        <td><div class="rsi-val" style="color:#60a5fa;font-size:15px">40</div><div style="font-size:12px;color:#8899aa">Weak Momentum ⚠</div><span style="color:#4a6080;font-size:12px">→</span></td>
+        <td><span class="macd-bear" style="font-size:13px">Bearish</span></td>
+        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
+        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#4a6080;font-size:12px">—</span></td>
+        <td><span style="color:#ff4466;font-size:13px">🔴 5/7</span></td>
+      </tr>
+    </tbody></table></div>
+</div><!-- END sec-t (Technical mode) -->
 
   <div class="disc">
     <strong style="color:var(--red)">⚠ DISCLAIMER:</strong>
@@ -6653,22 +7998,20 @@ function renumberVisible() {
 
 window.onload = function() { filterWL('ALL'); };
 
-function switchMode(mode) {
-  var sTF = document.getElementById('sec-technofunc');
-  var sT  = document.getElementById('sec-technical');
-  var bTF = document.getElementById('btn-tf');
-  var bT  = document.getElementById('btn-t');
-  var d   = document.getElementById('mode-desc');
-  if (mode === 'technical') {
+function switchMode(m) {
+  var sTF=document.getElementById('sec-tf'), sT=document.getElementById('sec-t');
+  var bTF=document.getElementById('btn-tf'), bT=document.getElementById('btn-t');
+  var d=document.getElementById('mode-desc');
+  if(m==='t') {
     sTF.classList.add('hidden');    sT.classList.remove('hidden');
     bTF.classList.remove('active'); bT.classList.add('active');
-    d.innerHTML = '100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks · Top 10';
-    d.style.color = '#cc99ff';
+    d.innerHTML='100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks · Zero Fundamentals';
+    d.style.color='#cc99ff';
   } else {
     sT.classList.add('hidden');     sTF.classList.remove('hidden');
     bT.classList.remove('active');  bTF.classList.add('active');
-    d.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate';
-    d.style.color = '#00f5ff';
+    d.innerHTML='Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate';
+    d.style.color='#00f5ff';
   }
 }
 </script>
