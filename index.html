@@ -258,7 +258,6 @@ footer strong { color: #00f5ff; }
   .kpi-band { flex-wrap: wrap; }
   .kpi-item { flex: 0 0 50%; border-bottom: 1px solid var(--border); }
 }
-/* V58: TechnoFunc / Technical toggle */
 .mode-toggle {
   display: flex; align-items: center; gap: 0;
   background: #0a1628; border: 2px solid #1e3a5a; border-radius: 100px;
@@ -313,7 +312,7 @@ footer strong { color: #00f5ff; }
     <div class="clock-box">
       <div class="clock-time" id="liveClock">--:-- --</div>
       <div class="clock-meta" id="liveDate">25 Mar 2026 · IST</div>
-      <div class="clock-next">Report: 25 Mar 2026 02:57 AM IST</div>
+      <div class="clock-next">Report: 25 Mar 2026 03:16 AM IST</div>
       <div class="clock-next">Next Update: <strong style="color:var(--accent2)">4:30 PM</strong></div>
     </div>
   </div>
@@ -335,18 +334,14 @@ footer strong { color: #00f5ff; }
   <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
     <span style="font-size:13px;color:#88aacc;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
     <div class="mode-toggle">
-      <button class="mode-btn tf-active active" id="btn-technofunc" onclick="switchMode('technofunc')">
-        📊 TechnoFunc
-      </button>
-      <button class="mode-btn t-active" id="btn-technical" onclick="switchMode('technical')">
-        📈 Technical
-      </button>
+      <button class="mode-btn tf-active active" id="btn-tf" onclick="switchMode('technofunc')">📊 TechnoFunc</button>
+      <button class="mode-btn t-active" id="btn-t" onclick="switchMode('technical')">📈 Technical</button>
     </div>
     <span id="mode-desc" style="font-size:13px;color:#00f5ff;font-weight:600;">
-      Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified
+      Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate
     </span>
   </div>
-<div id="technofunc-section" class="buy-section">
+<div id="sec-technofunc" class="buy-section">
 
   <div class="section-hdr">
     <div class="section-pill pill-buy">▲ Top Buy Recommendations - Sector Diversified</div>
@@ -869,15 +864,15 @@ footer strong { color: #00f5ff; }
         <td><span style="display:inline-block;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:.4px;background:#2a2200;color:#ffab00;border:1px solid #ffab00;">◆ HOLD</span></td>
       </tr>
     </tbody></table></div>
-</div><!-- end technofunc-section -->
-<div id="technical-section" class="buy-section hidden">
+</div><!-- /sec-technofunc -->
+<div id="sec-technical" class="buy-section hidden">
 
   <div class="section-hdr">
     <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">
-      📈 Top 10 Technical Buy Picks — 100% Chart Analysis
+      📈 Top 10 Technical Buy Picks — 100%% Chart Analysis
     </div>
     <div class="section-line"></div>
-    <div class="section-note">ALL 100 STOCKS EVALUATED · RSI + MACD + SMA + ADX + VOLUME · NO FUNDAMENTALS</div>
+    <div class="section-note">ALL 100 STOCKS EVALUATED · RSI + MACD + SMA + ADX + VOLUME · ZERO FUNDAMENTALS</div>
   </div>
   <div class="tbl-wrap"><table>
     <thead>
@@ -885,7 +880,7 @@ footer strong { color: #00f5ff; }
         <th class="grp-stock" colspan="3">STOCK INFO</th>
         <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
         <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
-        <th class="grp-trade gsep" colspan="5">TRADE SETUP</th>
+        <th class="grp-trade gsep" colspan="5">TRADE SETUP (BUY SIDE)</th>
       </tr>
       <tr class="col-row">
         <th class="ch-stock" style="width:26px">#</th>
@@ -911,6 +906,84 @@ footer strong { color: #00f5ff; }
       <tr>
         <td><span class="rnum">1</span></td>
         <td>
+          <div class="stock-name">Reliance Industries</div>
+          <div class="stock-sym">RELIANCE</div>
+          <div class="stock-sec">Energy</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: SELL (38)</div>
+        </td>
+        <td><div class="price-val">₹1,411.80</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div>
+        </td>
+        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#60a5fa">51</div>
+          <div class="rsi-sig">Building ↑ (47→51)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span>
+        </td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.5%</span></td>
+        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹1,431.85</div>
+          <div class="t2-val">T2: ₹1,489.12</div>
+        </td>
+        <td>
+          <div class="sl-val">₹1,370.91</div>
+          <div class="sl-pct">-2.9%</div>
+        </td>
+        <td><span class="rr-val" style="color:#ff3d57">0.5×</span></td>
+        <td><span class="upside-val up">+1.4%</span></td>
+        <td>
+          <div class="atr-val">₹31.36</div>
+          <div class="atr-sub">2.2%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">2</span></td>
+        <td>
+          <div class="stock-name">Page Industries</div>
+          <div class="stock-sym">PAGEIND</div>
+          <div class="stock-sec">Consumer Cyclical</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (26)</div>
+        </td>
+        <td><div class="price-val">₹32,170.00</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">53</div><div class="score-track"><div class="score-fill" style="width:53%;background:#7c4dff"></div></div></div>
+        </td>
+        <td><span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#60a5fa">51</div>
+          <div class="rsi-sig">Building ↑ (33→51)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +18</span>
+        </td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -2.0%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.0%</span></td>
+        <td><div class="adx-val adx-strong">36</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹36,295.00</div>
+          <div class="t2-val">T2: ₹37,746.80</div>
+        </td>
+        <td>
+          <div class="sl-val">₹30,891.70</div>
+          <div class="sl-pct">-4.0%</div>
+        </td>
+        <td><span class="rr-val" style="color:#00e676">3.2×</span></td>
+        <td><span class="upside-val up">+12.8%</span></td>
+        <td>
+          <div class="atr-val">₹848.30</div>
+          <div class="atr-sub">2.6%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">3</span></td>
+        <td>
           <div class="stock-name">Oracle Financial Services</div>
           <div class="stock-sym">OFSS</div>
           <div class="stock-sec">Technology</div>
@@ -934,14 +1007,13 @@ footer strong { color: #00f5ff; }
         <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
           <div class="t1-val">₹6,990.25</div>
-          <div class="t2-val">T2: ₹7,105.50</div>
+          <div class="t2-val">T2: ₹7,269.86</div>
         </td>
         <td>
-          <div class="sl-val">₹6,275.22</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹6,183.33</div>
+          <div class="sl-pct">-6.4%</div>
         </td>
-        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
         <td><span class="upside-val up">+5.8%</span></td>
         <td>
           <div class="atr-val">₹216.42</div>
@@ -949,127 +1021,163 @@ footer strong { color: #00f5ff; }
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">2</span></td>
+        <td><span class="rnum">4</span></td>
         <td>
-          <div class="stock-name">HCL Tech</div>
-          <div class="stock-sym">HCLTECH</div>
+          <div class="stock-name">LTIMindtree</div>
+          <div class="stock-sym">LTIM</div>
           <div class="stock-sec">Technology</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (50)</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (27)</div>
         </td>
-        <td><div class="price-val">₹1,373.30</div></td>
+        <td><div class="price-val">₹4,105.60</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">50</div><div class="score-track"><div class="score-fill" style="width:50%;background:#7c4dff"></div></div></div>
         </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
+        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
         <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">45</div>
-          <div class="rsi-sig">Building ↑ (26→45)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +19</span>
+          <div class="rsi-val" style="color:#00e676">28</div>
+          <div class="rsi-sig">Oversold (Downtrend)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +8</span>
         </td>
         <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.5%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.9%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -11.5%</span></td>
-        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -20.7%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.5%</span></td>
+        <td><div class="adx-val adx-strong">70</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="t1-val">₹1,519.65</div>
-          <div class="t2-val">T2: ₹1,559.90</div>
+          <div class="t1-val">₹4,605.60</div>
+          <div class="t2-val">T2: ₹4,789.82</div>
         </td>
         <td>
-          <div class="sl-val">₹1,304.64</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹3,695.04</div>
+          <div class="sl-pct">-10.0%</div>
         </td>
-        <td><span class="rr-val" style="color:#00e676">2.1×</span></td>
-        <td><span class="upside-val up">+10.7%</span></td>
+        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
+        <td><span class="upside-val up">+12.2%</span></td>
         <td>
-          <div class="atr-val">₹40.60</div>
-          <div class="atr-sub">3.0%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">3</span></td>
-        <td>
-          <div class="stock-name">Persistent Systems</div>
-          <div class="stock-sym">PERSISTENT</div>
-          <div class="stock-sec">Technology</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (56)</div>
-        </td>
-        <td><div class="price-val">₹4,913.70</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">48</div>
-          <div class="rsi-sig">Building ↑ (26→48)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +23</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.9%</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -13.5%</span></td>
-        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹5,413.70</div>
-          <div class="t2-val">T2: ₹5,509.50</div>
-        </td>
-        <td>
-          <div class="sl-val">₹4,668.02</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
-        </td>
-        <td><span class="rr-val" style="color:#00e676">2.0×</span></td>
-        <td><span class="upside-val up">+10.2%</span></td>
-        <td>
-          <div class="atr-val">₹200.53</div>
+          <div class="atr-val">₹169.88</div>
           <div class="atr-sub">4.1%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">4</span></td>
+        <td><span class="rnum">5</span></td>
         <td>
-          <div class="stock-name">Lupin</div>
-          <div class="stock-sym">LUPIN</div>
-          <div class="stock-sec">Healthcare</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (78)</div>
+          <div class="stock-name">Tech Mahindra</div>
+          <div class="stock-sym">TECHM</div>
+          <div class="stock-sec">Technology</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: SELL (36)</div>
         </td>
-        <td><div class="price-val">₹2,331.80</div></td>
+        <td><div class="price-val">₹1,432.70</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">47</div><div class="score-track"><div class="score-fill" style="width:47%;background:#0099cc"></div></div></div>
         </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
+        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum + MACD</span></td>
         <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">57</div>
-          <div class="rsi-sig">Healthy (57)</div>
-          <span style="color:#4a6080;font-size:12px">→ flat</span>
+          <div class="rsi-val" style="color:#60a5fa">54</div>
+          <div class="rsi-sig">Building ↑ (29→54)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +25</span>
         </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +0.9%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +13.6%</span></td>
-        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +5.8%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -6.2%</span></td>
+        <td><div class="adx-val adx-strong">51</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="t1-val">₹2,434.22</div>
-          <div class="t2-val">T2: ₹2,531.59</div>
+          <div class="t1-val">₹1,483.65</div>
+          <div class="t2-val">T2: ₹1,543.00</div>
         </td>
         <td>
-          <div class="sl-val">₹2,215.21</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹1,373.04</div>
+          <div class="sl-pct">-4.2%</div>
         </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
-        <td><span class="upside-val up">+4.4%</span></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
+        <td><span class="upside-val up">+3.6%</span></td>
         <td>
-          <div class="atr-val">₹51.21</div>
-          <div class="atr-sub">2.2%</div>
+          <div class="atr-val">₹46.06</div>
+          <div class="atr-sub">3.2%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">5</span></td>
+        <td><span class="rnum">6</span></td>
+        <td>
+          <div class="stock-name">ITC</div>
+          <div class="stock-sym">ITC</div>
+          <div class="stock-sec">Consumer Defensive</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (7)</div>
+        </td>
+        <td><div class="price-val">₹291.25</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">44</div><div class="score-track"><div class="score-fill" style="width:44%;background:#0099cc"></div></div></div>
+        </td>
+        <td><span style="color:#00e676;font-weight:700">⬇ Deep Oversold</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#00e676">30</div>
+          <div class="rsi-sig">Oversold (Downtrend)</div>
+          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span>
+        </td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -5.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.2%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -24.2%</span></td>
+        <td><div class="adx-val adx-strong">61</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.4×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹328.70</div>
+          <div class="t2-val">T2: ₹341.85</div>
+        </td>
+        <td>
+          <div class="sl-val">₹282.01</div>
+          <div class="sl-pct">-3.2%</div>
+        </td>
+        <td><span class="rr-val" style="color:#00e676">4.0×</span></td>
+        <td><span class="upside-val up">+12.9%</span></td>
+        <td>
+          <div class="atr-val">₹6.74</div>
+          <div class="atr-sub">2.3%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">7</span></td>
+        <td>
+          <div class="stock-name">Info Edge (Naukri)</div>
+          <div class="stock-sym">NAUKRI</div>
+          <div class="stock-sec">Communication Services</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (18)</div>
+        </td>
+        <td><div class="price-val">₹987.40</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
+        </td>
+        <td><span style="color:#00e676;font-weight:700">↗ Recovery Setup</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#60a5fa">39</div>
+          <div class="rsi-sig">Weak Momentum ⚠</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +12</span>
+        </td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -12.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
+        <td><div class="adx-val adx-strong">55</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹1,037.40</div>
+          <div class="t2-val">T2: ₹1,078.90</div>
+        </td>
+        <td>
+          <div class="sl-val">₹899.73</div>
+          <div class="sl-pct">-8.9%</div>
+        </td>
+        <td><span class="rr-val" style="color:#ff3d57">0.6×</span></td>
+        <td><span class="upside-val up">+5.1%</span></td>
+        <td>
+          <div class="atr-val">₹34.22</div>
+          <div class="atr-sub">3.5%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">8</span></td>
         <td>
           <div class="stock-name">Aurobindo Pharma</div>
           <div class="stock-sym">AUROPHARMA</div>
@@ -1093,223 +1201,100 @@ footer strong { color: #00f5ff; }
         <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="t1-val">₹1,358.08</div>
-          <div class="t2-val">T2: ₹1,412.40</div>
+          <div class="t1-val">₹1,319.80</div>
+          <div class="t2-val">T2: ₹1,372.59</div>
         </td>
         <td>
-          <div class="sl-val">₹1,217.52</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹1,153.44</div>
+          <div class="sl-pct">-10.0%</div>
         </td>
-        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
-        <td><span class="upside-val up">+6.0%</span></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.3×</span></td>
+        <td><span class="upside-val up">+3.0%</span></td>
         <td>
           <div class="atr-val">₹38.24</div>
           <div class="atr-sub">3.0%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">6</span></td>
-        <td>
-          <div class="stock-name">NTPC</div>
-          <div class="stock-sym">NTPC</div>
-          <div class="stock-sec">Utilities</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (45)</div>
-        </td>
-        <td><div class="price-val">₹375.55</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">38</div><div class="score-track"><div class="score-fill" style="width:38%;background:#0099cc"></div></div></div>
-        </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">51</div>
-          <div class="rsi-sig">Fading ↓ (58→51)</div>
-          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.0%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.8%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +9.9%</span></td>
-        <td><div class="adx-val adx-strong">44</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹388.55</div>
-          <div class="t2-val">T2: ₹394.50</div>
-        </td>
-        <td>
-          <div class="sl-val">₹356.77</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.7×</span></td>
-        <td><span class="upside-val up">+3.5%</span></td>
-        <td>
-          <div class="atr-val">₹9.42</div>
-          <div class="atr-sub">2.5%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">7</span></td>
-        <td>
-          <div class="stock-name">ONGC</div>
-          <div class="stock-sym">ONGC</div>
-          <div class="stock-sec">Energy</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (56)</div>
-        </td>
-        <td><div class="price-val">₹268.05</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">34</div><div class="score-track"><div class="score-fill" style="width:34%;background:#f59e0b"></div></div></div>
-        </td>
-        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">50</div>
-          <div class="rsi-sig">Building ↑ (46→50)</div>
-          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.3%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.2%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +8.2%</span></td>
-        <td><div class="adx-val adx-mod">24</div><div class="adx-lbl">Moderate</div></td>
-        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹279.03</div>
-          <div class="t2-val">T2: ₹293.00</div>
-        </td>
-        <td>
-          <div class="sl-val">₹254.65</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
-        <td><span class="upside-val up">+4.1%</span></td>
-        <td>
-          <div class="atr-val">₹7.93</div>
-          <div class="atr-sub">3.0%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">8</span></td>
-        <td>
-          <div class="stock-name">Sun Pharma</div>
-          <div class="stock-sym">SUNPHARMA</div>
-          <div class="stock-sec">Healthcare</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (50)</div>
-        </td>
-        <td><div class="price-val">₹1,753.30</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">33</div><div class="score-track"><div class="score-fill" style="width:33%;background:#f59e0b"></div></div></div>
-        </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">48</div>
-          <div class="rsi-sig">Falling Fast ↓ (59→48)</div>
-          <span style="color:#ff4466;font-size:12px;font-weight:700">↓ -11</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.4%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.0%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +3.4%</span></td>
-        <td><div class="adx-val adx-strong">35</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td class="gsep">
-          <div class="t1-val">₹1,809.65</div>
-          <div class="t2-val">T2: ₹1,847.73</div>
-        </td>
-        <td>
-          <div class="sl-val">₹1,665.64</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
-        </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.6×</span></td>
-        <td><span class="upside-val up">+3.2%</span></td>
-        <td>
-          <div class="atr-val">₹34.17</div>
-          <div class="atr-sub">1.9%</div>
-        </td>
-      </tr>
-      <tr>
         <td><span class="rnum">9</span></td>
         <td>
-          <div class="stock-name">Power Grid</div>
-          <div class="stock-sym">POWERGRID</div>
-          <div class="stock-sec">Utilities</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: BUY (52)</div>
+          <div class="stock-name">Lupin</div>
+          <div class="stock-sym">LUPIN</div>
+          <div class="stock-sec">Healthcare</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (78)</div>
         </td>
-        <td><div class="price-val">₹299.00</div></td>
+        <td><div class="price-val">₹2,331.80</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">33</div><div class="score-track"><div class="score-fill" style="width:33%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
         <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">54</div>
-          <div class="rsi-sig">Neutral →</div>
+          <div class="rsi-val" style="color:#60a5fa">57</div>
+          <div class="rsi-sig">Healthy (57)</div>
           <span style="color:#4a6080;font-size:12px">→ flat</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.2%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.7%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +5.5%</span></td>
-        <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +0.9%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +13.6%</span></td>
+        <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="t1-val">₹316.22</div>
-          <div class="t2-val">T2: ₹328.87</div>
+          <div class="t1-val">₹2,377.60</div>
+          <div class="t2-val">T2: ₹2,472.70</div>
         </td>
         <td>
-          <div class="sl-val">₹284.05</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹2,108.79</div>
+          <div class="sl-pct">-9.6%</div>
         </td>
-        <td><span class="rr-val" style="color:#ffab00">1.1×</span></td>
-        <td><span class="upside-val up">+5.8%</span></td>
+        <td><span class="rr-val" style="color:#ff3d57">0.2×</span></td>
+        <td><span class="upside-val up">+2.0%</span></td>
         <td>
-          <div class="atr-val">₹8.61</div>
-          <div class="atr-sub">2.9%</div>
+          <div class="atr-val">₹51.21</div>
+          <div class="atr-sub">2.2%</div>
         </td>
       </tr>
       <tr>
         <td><span class="rnum">10</span></td>
         <td>
-          <div class="stock-name">Coal India</div>
-          <div class="stock-sym">COALINDIA</div>
-          <div class="stock-sec">Energy</div>
-          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (44)</div>
+          <div class="stock-name">ACC</div>
+          <div class="stock-sym">ACC</div>
+          <div class="stock-sec">Basic Materials</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: STRONG SELL (5)</div>
         </td>
-        <td><div class="price-val">₹442.10</div></td>
+        <td><div class="price-val">₹1,334.30</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">30</div><div class="score-track"><div class="score-fill" style="width:30%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">41</div><div class="score-track"><div class="score-fill" style="width:41%;background:#0099cc"></div></div></div>
         </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
+        <td><span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span></td>
         <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">49</div>
-          <div class="rsi-sig">Falling Fast ↓ (63→49)</div>
-          <span style="color:#ff4466;font-size:12px;font-weight:700">↓ -14</span>
+          <div class="rsi-val" style="color:#00e676">25</div>
+          <div class="rsi-sig">Oversold (Downtrend)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +5</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
-        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.2%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.6%</span></td>
-        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +10.6%</span></td>
-        <td><div class="adx-val adx-mod">28</div><div class="adx-lbl">Moderate</div></td>
-        <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.9%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -16.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -25.1%</span></td>
+        <td><div class="adx-val adx-strong">75</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">1.3×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="t1-val">₹461.55</div>
-          <div class="t2-val">T2: ₹476.00</div>
+          <div class="t1-val">₹1,713.50</div>
+          <div class="t2-val">T2: ₹1,782.04</div>
         </td>
         <td>
-          <div class="sl-val">₹420.00</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
+          <div class="sl-val">₹1,281.25</div>
+          <div class="sl-pct">-4.0%</div>
         </td>
-        <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
-        <td><span class="upside-val up">+4.4%</span></td>
+        <td><span class="rr-val" style="color:#00e676">7.2×</span></td>
+        <td><span class="upside-val up">+28.4%</span></td>
         <td>
-          <div class="atr-val">₹14.00</div>
-          <div class="atr-sub">3.2%</div>
+          <div class="atr-val">₹38.25</div>
+          <div class="atr-sub">2.9%</div>
         </td>
       </tr>
     </tbody></table></div>
-</div><!-- end technical-section -->
+</div><!-- /sec-technical -->
 
   <div class="section-hdr">
     <div class="section-pill pill-sell">▼ Top 20 Sell Recommendations</div>
@@ -6668,28 +6653,22 @@ function renumberVisible() {
 
 window.onload = function() { filterWL('ALL'); };
 
-// ── V58: TechnoFunc / Technical mode toggle ──────────────────────────────
 function switchMode(mode) {
-  var tfSec  = document.getElementById('technofunc-section');
-  var tSec   = document.getElementById('technical-section');
-  var btnTF  = document.getElementById('btn-technofunc');
-  var btnT   = document.getElementById('btn-technical');
-  var desc   = document.getElementById('mode-desc');
-
+  var sTF = document.getElementById('sec-technofunc');
+  var sT  = document.getElementById('sec-technical');
+  var bTF = document.getElementById('btn-tf');
+  var bT  = document.getElementById('btn-t');
+  var d   = document.getElementById('mode-desc');
   if (mode === 'technical') {
-    tfSec.classList.add('hidden');
-    tSec.classList.remove('hidden');
-    btnTF.classList.remove('active');
-    btnT.classList.add('active');
-    desc.innerHTML = '100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks Evaluated · Top 10';
-    desc.style.color = '#cc99ff';
+    sTF.classList.add('hidden');    sT.classList.remove('hidden');
+    bTF.classList.remove('active'); bT.classList.add('active');
+    d.innerHTML = '100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks · Top 10';
+    d.style.color = '#cc99ff';
   } else {
-    tSec.classList.add('hidden');
-    tfSec.classList.remove('hidden');
-    btnT.classList.remove('active');
-    btnTF.classList.add('active');
-    desc.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified';
-    desc.style.color = '#00f5ff';
+    sT.classList.add('hidden');     sTF.classList.remove('hidden');
+    bT.classList.remove('active');  bTF.classList.add('active');
+    d.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate';
+    d.style.color = '#00f5ff';
   }
 }
 </script>
