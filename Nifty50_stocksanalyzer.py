@@ -997,40 +997,50 @@ class Nifty100CompleteAnalyzer:
             # =================================================================
 
             # =================================================================
-            # V58: TECH-ONLY BUY SCORE — Pure technical ranking.
-            # No fundamentals, no veto, no R:R gate.  This scores how
-            # attractive the CHART SETUP is for a long entry RIGHT NOW.
-            # Used only when the user toggles "Technical" mode.
-            # Max ~100 pts.  Higher = better technical buy setup.
+            # V58: TECH BUY SCORE — 100% pure technical ranking (0-100).
+            # Zero fundamentals. Evaluated for ALL 100 stocks.
+            # Used ONLY when user toggles "Technical" mode.
+            #
+            # Components (max 100):
+            #   RSI zone + direction      : 0-25 pts
+            #   MACD crossover            : 0-20 pts
+            #   SMA structure (20/50/200) : 0-20 pts
+            #   Volume confirmation       : 0-15 pts
+            #   ADX trend strength        : 0-10 pts
+            #   RSI divergence            : 0-10 pts
             # =================================================================
             tech_buy_score = 0
 
-            # ── RSI reversal / momentum (0-30 pts) ────────────────────────
+            # ── RSI reversal / momentum (0-25 pts) ────────────────────────
             if rsi < 30 and rsi_direction == 'Rising':
-                tech_buy_score += 30          # BEST: oversold + turning up
+                tech_buy_score += 25          # BEST: oversold + turning up
             elif rsi < 30:
-                tech_buy_score += 22          # oversold, not yet turning
+                tech_buy_score += 18          # oversold, not yet turning
             elif rsi < 40 and rsi_direction == 'Rising':
-                tech_buy_score += 25          # recovering from weak zone
+                tech_buy_score += 22          # recovering from weak zone
             elif rsi < 40:
-                tech_buy_score += 15          # weak but flat/falling
+                tech_buy_score += 12          # weak but flat/falling
             elif 40 <= rsi <= 55 and rsi_direction == 'Rising':
-                tech_buy_score += 18          # building momentum
+                tech_buy_score += 16          # building momentum
             elif 40 <= rsi <= 55:
-                tech_buy_score += 8           # neutral
+                tech_buy_score += 6           # neutral
             elif rsi <= 65 and rsi_direction == 'Rising':
-                tech_buy_score += 12          # healthy uptrend
+                tech_buy_score += 10          # healthy uptrend
             elif rsi <= 65:
-                tech_buy_score += 5           # healthy but not rising
+                tech_buy_score += 4           # healthy but not rising
             else:
-                tech_buy_score -= 5           # overbought zone
+                tech_buy_score += 0           # overbought zone — no points
 
             # ── MACD crossover (0-20 pts) ─────────────────────────────────
             if macd > signal:
-                tech_buy_score += 20          # bullish crossover
-            elif (macd - signal) > -0.5 * atr:
-                tech_buy_score += 8           # close to crossing, partial credit
-            # else: bearish, no points
+                macd_gap = macd - signal
+                if macd_gap > 0.5 * atr:
+                    tech_buy_score += 20      # strong bullish momentum
+                else:
+                    tech_buy_score += 14      # mild bullish crossover
+            elif abs(macd - signal) < 0.2 * atr:
+                tech_buy_score += 5           # about to cross — partial credit
+            # else: clearly bearish, 0 pts
 
             # ── SMA structure (0-20 pts) ──────────────────────────────────
             if current_price > sma_200:
@@ -1040,31 +1050,32 @@ class Nifty100CompleteAnalyzer:
             if current_price > sma_20:
                 tech_buy_score += 6           # short trend bullish
 
-            # ── Volume confirmation (0-10 pts) ────────────────────────────
+            # ── Volume confirmation (0-15 pts) ────────────────────────────
             if vol_ratio >= 1.5 and current_price > sma_20:
-                tech_buy_score += 10          # strong buying volume
+                tech_buy_score += 15          # strong buying volume in uptrend
+            elif vol_ratio >= 1.5:
+                tech_buy_score += 10          # strong volume even if below SMA
             elif vol_ratio >= 1.2:
-                tech_buy_score += 5           # above-avg volume
-            elif vol_ratio < 0.5:
-                tech_buy_score -= 3           # dead volume
+                tech_buy_score += 7           # above-avg volume
+            elif vol_ratio >= 0.8:
+                tech_buy_score += 3           # normal volume
+            # < 0.8: thin volume, 0 pts
 
             # ── ADX trend strength (0-10 pts) ─────────────────────────────
-            if adx > 25 and current_price > sma_50:
-                tech_buy_score += 10          # strong uptrend confirmed
+            if adx > 30 and current_price > sma_50:
+                tech_buy_score += 10          # strong confirmed uptrend
+            elif adx > 25 and current_price > sma_50:
+                tech_buy_score += 7           # decent uptrend
             elif adx > 20:
-                tech_buy_score += 5           # moderate trend
+                tech_buy_score += 4           # moderate trend present
+            elif adx > 15:
+                tech_buy_score += 2           # weak trend
 
             # ── RSI divergence bonus (0-10 pts) ──────────────────────────
             if rsi_divergence == 'Bullish Divergence':
-                tech_buy_score += 10
+                tech_buy_score += 10          # price lower low + RSI higher low
             elif rsi_divergence == 'Bearish Divergence':
-                tech_buy_score -= 5
-
-            # ── Support proximity bonus — closer = better entry ──────────
-            if support_dist_pct <= 3:
-                tech_buy_score += 5
-            elif support_dist_pct <= 6:
-                tech_buy_score += 2
+                tech_buy_score -= 5           # penalty for bearish div
 
             tech_buy_score = min(max(tech_buy_score, 0), 100)
             # =================================================================
@@ -1697,31 +1708,25 @@ class Nifty100CompleteAnalyzer:
 
     # =========================================================================
     #  V58: TOP 10 TECHNICAL-ONLY BUY PICKS
-    #  Pure chart-based ranking — NO fundamentals, NO veto, NO R:R gate.
-    #  Uses Tech_Buy_Score which rewards:
-    #    · Oversold RSI turning up (mean-reversion setups like Infosys)
-    #    · MACD bullish crossover
-    #    · Healthy SMA alignment
-    #    · Volume confirmation
-    #    · Bullish RSI divergence
-    #    · Proximity to support (good entry point)
-    #  Top 10 stocks by Tech_Buy_Score, max 3 per sector for diversity.
+    #  Reads ALL 100 stocks. Ranks by Tech_Buy_Score (0-100).
+    #  100% pure technical — RSI, MACD, SMA, ADX, Volume.
+    #  NO fundamentals in scoring. NO veto gate. NO R:R gate.
+    #  Top 10 by score, max 3 per sector for diversity.
     # =========================================================================
     def get_top_technical_recommendations(self):
         df = pd.DataFrame(self.results)
         if df.empty:
             return pd.DataFrame()
 
-        # Basic filters — we still want sane trade setups
+        # Minimal sanity filters only — let pure technicals decide
         pool = df[
-            (df['Tech_Buy_Score'] > 20) &          # minimum chart attractiveness
+            (df['Tech_Buy_Score'] > 15) &          # minimum chart signal
+            (df['RSI'] <= 78) &                     # not extremely overbought
             (df['Upside'] > 0) &                    # target above price
-            (df['Target_1'] > df['Price']) &         # sanity check
-            (df['RSI'] <= 75) &                      # not extremely overbought
-            (df['Vol_Ratio'] >= 0.3)                 # not totally dead volume
+            (df['Target_1'] > df['Price'])           # sanity
         ].copy()
 
-        # Sort by Tech_Buy_Score descending
+        # Sort ALL 100 stocks by Tech_Buy_Score descending
         pool = pool.sort_values('Tech_Buy_Score', ascending=False)
 
         # Sector diversity cap: max 3 per sector
@@ -1740,14 +1745,18 @@ class Nifty100CompleteAnalyzer:
 
         # Debug log
         print(f"\n{'─'*75}")
-        print(f"  TECHNICAL-ONLY TOP 10 (V58) — No fundamentals, no veto gate")
+        print(f"  TECHNICAL-ONLY TOP 10 (V58)")
+        print(f"  100% Technical · RSI + MACD + SMA + ADX + Volume · No Fundamentals")
         print(f"{'─'*75}")
         if not result.empty:
             for i, (_, r) in enumerate(result.iterrows(), 1):
-                print(f"  {i:>2}. {r['Symbol']:<16} TechBuyScore={r['Tech_Buy_Score']:<4}"
+                print(f"  {i:>2}. {r['Symbol']:<16} TechScore={r['Tech_Buy_Score']:<4}"
                       f"  RSI={r['RSI']:.0f} {r.get('RSI_Direction','?'):<8}"
                       f"  MACD={r['MACD']:<8}  ADX={r.get('ADX',0):.0f}"
-                      f"  Vol={r.get('Vol_Ratio',0):.1f}x")
+                      f"  Vol={r.get('Vol_Ratio',0):.1f}x"
+                      f"  [TechnoFunc: {r['Recommendation']} @ {r['Combined_Score']:.0f}]")
+        else:
+            print("  No stocks qualified.")
         print(f"{'─'*75}\n")
 
         return result
@@ -2053,32 +2062,26 @@ footer strong {{ color: #00f5ff; }}
   .kpi-band {{ flex-wrap: wrap; }}
   .kpi-item {{ flex: 0 0 50%; border-bottom: 1px solid var(--border); }}
 }}
-
-/* V58: TechnoFunc / Technical toggle switch */
+/* V58: TechnoFunc / Technical toggle */
 .mode-toggle {{
   display: flex; align-items: center; gap: 0;
   background: #0a1628; border: 2px solid #1e3a5a; border-radius: 100px;
-  padding: 3px; margin: 0 16px;
+  padding: 3px;
 }}
 .mode-btn {{
-  padding: 8px 22px; border-radius: 100px; border: none; cursor: pointer;
+  padding: 9px 24px; border-radius: 100px; border: none; cursor: pointer;
   font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   letter-spacing: 0.5px; transition: all .25s ease; white-space: nowrap;
-  background: transparent; color: #6688aa;
+  background: transparent; color: #556688;
 }}
-.mode-btn.active {{
-  color: #000; box-shadow: 0 0 16px rgba(0,245,255,0.3);
-}}
-.mode-btn.active.tf-mode {{
+.mode-btn:hover {{ color: #aaccee; }}
+.mode-btn.active.tf-active {{
   background: linear-gradient(135deg, #00f5ff, #00cc66);
-  color: #000;
+  color: #000; box-shadow: 0 0 20px rgba(0,245,255,0.3);
 }}
-.mode-btn.active.t-mode {{
+.mode-btn.active.t-active {{
   background: linear-gradient(135deg, #cc99ff, #7c4dff);
-  color: #fff;
-}}
-.mode-label {{
-  font-size: 13px; color: #88aacc; font-weight: 600; letter-spacing: 1px;
+  color: #fff; box-shadow: 0 0 20px rgba(124,77,255,0.3);
 }}
 .buy-section {{ display: block; }}
 .buy-section.hidden {{ display: none; }}
@@ -2235,26 +2238,26 @@ footer strong {{ color: #00f5ff; }}
         def beta_color(v):
             return '#ff3d57' if v > 1.5 else ('#ffab00' if v > 1.0 else '#00e676')
 
-        # == MODE TOGGLE: TechnoFunc / Technical ===========================
+        # == V58: MODE TOGGLE ===================================================
         html += """
-  <div style="display:flex;align-items:center;gap:14px;margin:0 0 18px 0;flex-wrap:wrap;">
-    <span class="mode-label">ANALYSIS MODE</span>
+  <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
+    <span style="font-size:13px;color:#88aacc;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
     <div class="mode-toggle">
-      <button class="mode-btn tf-mode active" id="btn-technofunc" onclick="switchMode('technofunc')">
+      <button class="mode-btn tf-active active" id="btn-technofunc" onclick="switchMode('technofunc')">
         📊 TechnoFunc
       </button>
-      <button class="mode-btn t-mode" id="btn-technical" onclick="switchMode('technical')">
-        📈 Technical Only
+      <button class="mode-btn t-active" id="btn-technical" onclick="switchMode('technical')">
+        📈 Technical
       </button>
     </div>
-    <span id="mode-desc" class="mode-label" style="color:#00f5ff;">
-      Fundamentals 65% + Technicals 35% · Trend Veto · Sector Diversified
+    <span id="mode-desc" style="font-size:13px;color:#00f5ff;font-weight:600;">
+      Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified
     </span>
   </div>
 """
 
-        # == TECHNOFUNC BUY TABLE (existing) ===================================
-        html += '<div id="technofunc-buy" class="buy-section">\n'
+        # == TECHNOFUNC BUY TABLE (existing logic — fundamentals + technicals) =
+        html += '<div id="technofunc-section" class="buy-section">\n'
 
         # == BUY TABLE =========================================================
         if not top_buys.empty:
@@ -2378,25 +2381,29 @@ footer strong {{ color: #00f5ff; }}
 """
             html += "    </tbody></table></div>\n"
 
-        html += '</div><!-- /technofunc-buy -->\n'
+        html += '</div><!-- end technofunc-section -->\n'
 
-        # == TECHNICAL-ONLY BUY TABLE (V58) ====================================
-        html += '<div id="technical-buy" class="buy-section hidden">\n'
+        # == V58: TECHNICAL-ONLY BUY TABLE =====================================
+        # 100% technical scoring. All 100 stocks read. Top 10 picked.
+        # Columns: ONLY technical — RSI, MACD, SMA, ADX, Volume, Targets, SL
+        # NO fundamentals (no PE, Beta, Quality, Analyst, Earnings)
+        # =================================================================
+        html += '<div id="technical-section" class="buy-section hidden">\n'
         if not tech_buys.empty:
             html += """
   <div class="section-hdr">
     <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">
-      📈 Top 10 Technical Buy Picks — Pure Chart Analysis
+      📈 Top 10 Technical Buy Picks — 100% Chart Analysis
     </div>
     <div class="section-line"></div>
-    <div class="section-note">NO FUNDAMENTALS · NO VETO · RSI + MACD + SMA + VOLUME + ADX</div>
+    <div class="section-note">ALL 100 STOCKS EVALUATED · RSI + MACD + SMA + ADX + VOLUME · NO FUNDAMENTALS</div>
   </div>
   <div class="tbl-wrap"><table>
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="4">TECH SCORE</th>
-        <th class="grp-tech gsep"  colspan="6">TECHNICAL SIGNALS</th>
+        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
+        <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
         <th class="grp-trade gsep" colspan="5">TRADE SETUP</th>
       </tr>
       <tr class="col-row">
@@ -2404,19 +2411,18 @@ footer strong {{ color: #00f5ff; }}
         <th class="ch-stock">Stock / Sector</th>
         <th class="ch-stock">Price</th>
         <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Tech Score</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Buy Signal</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Setup</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">F/T Split</th>
+        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Signal</th>
         <th class="ch-tech gsep">RSI / Slope</th>
         <th class="ch-tech">MACD</th>
+        <th class="ch-tech">SMA 20</th>
+        <th class="ch-tech">SMA 50</th>
+        <th class="ch-tech">SMA 200</th>
         <th class="ch-tech">ADX</th>
-        <th class="ch-tech">Vol/Avg</th>
-        <th class="ch-tech">RSI Div</th>
-        <th class="ch-tech">SMA Trend</th>
-        <th class="ch-trade gsep">Target 1</th>
+        <th class="ch-tech">Vol / Avg</th>
+        <th class="ch-trade gsep">Target 1 / T2</th>
         <th class="ch-trade">Stop Loss</th>
-        <th class="ch-trade">Upside</th>
         <th class="ch-trade">R : R</th>
+        <th class="ch-trade">Upside</th>
         <th class="ch-trade">ATR</th>
       </tr>
     </thead>
@@ -2430,25 +2436,23 @@ footer strong {{ color: #00f5ff; }}
                 rr       = row['Risk_Reward']
                 rsi_dir  = row.get('RSI_Direction', 'Flat')
                 rsi_slp  = row.get('RSI_Slope', 0)
-                fund_sc  = row.get('Fund_Score', 0)
-                tech_sc  = row.get('Tech_Score', 0)
 
                 # Tech Buy Score color
                 if tbs >= 70:   tbs_color, tbs_bar = '#00ff88', '#00c853'
                 elif tbs >= 50: tbs_color, tbs_bar = '#cc99ff', '#7c4dff'
-                elif tbs >= 35: tbs_color, tbs_bar = '#ffab00', '#f59e0b'
-                else:           tbs_color, tbs_bar = '#60a5fa', '#3b82f6'
+                elif tbs >= 35: tbs_color, tbs_bar = '#00f5ff', '#0099cc'
+                else:           tbs_color, tbs_bar = '#ffab00', '#f59e0b'
 
                 # RSI slope arrow
                 if rsi_dir == 'Rising':
-                    rsi_slope_html = f'<span style="color:#00e676;font-size:12px">↑ +{rsi_slp:.0f}</span>'
+                    rsi_slope_html = f'<span style="color:#00e676;font-size:12px;font-weight:700">↑ +{rsi_slp:.0f}</span>'
                 elif rsi_dir == 'Falling':
                     slp_clr = '#ff4466' if abs(rsi_slp) > 8 else '#ffab00'
-                    rsi_slope_html = f'<span style="color:{slp_clr};font-size:12px">↓ {rsi_slp:.0f}</span>'
+                    rsi_slope_html = f'<span style="color:{slp_clr};font-size:12px;font-weight:700">↓ {rsi_slp:.0f}</span>'
                 else:
-                    rsi_slope_html = '<span style="color:#4a6080;font-size:12px">→</span>'
+                    rsi_slope_html = '<span style="color:#4a6080;font-size:12px">→ flat</span>'
 
-                # Buy signal description
+                # Buy signal — plain text description of WHY this stock ranked high
                 if row['RSI'] < 30 and rsi_dir == 'Rising':
                     signal_text = '<span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span>'
                 elif row['RSI'] < 30:
@@ -2456,46 +2460,40 @@ footer strong {{ color: #00f5ff; }}
                 elif row['RSI'] < 40 and rsi_dir == 'Rising':
                     signal_text = '<span style="color:#00e676;font-weight:700">↗ Recovery Setup</span>'
                 elif row['RSI'] < 50 and row['MACD'] == 'Bullish':
-                    signal_text = '<span style="color:#00d4ff;font-weight:700">📊 MACD + Momentum</span>'
+                    signal_text = '<span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span>'
                 elif row.get('RSI_Divergence') == 'Bullish Divergence':
                     signal_text = '<span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span>'
+                elif rsi_dir == 'Rising' and row['MACD'] == 'Bullish':
+                    signal_text = '<span style="color:#00d4ff;font-weight:700">📈 Momentum + MACD</span>'
                 elif rsi_dir == 'Rising':
                     signal_text = '<span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span>'
                 else:
                     signal_text = '<span style="color:#aaccee;font-weight:700">📋 Technical Setup</span>'
 
-                # Setup type
-                setup_tags = []
-                if row['RSI'] < 40:        setup_tags.append('Oversold')
-                if row['MACD'] == 'Bullish': setup_tags.append('MACD↑')
-                if row.get('Vol_Ratio', 0) > 1.2: setup_tags.append('Vol↑')
-                if row.get('RSI_Divergence') == 'Bullish Divergence': setup_tags.append('BullDiv')
-                if row.get('Support_Dist_Pct', 99) <= 5: setup_tags.append('NearSup')
-                setup_html = ' '.join([f'<span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">{t}</span>' for t in setup_tags[:3]])
+                # Individual SMA checks — show price vs each SMA clearly
+                price = row['Price']
+                sma20 = row.get('SMA_20', 0)
+                sma50 = row.get('SMA_50', 0)
+                sma200 = row.get('SMA_200', 0)
 
-                # SMA trend
-                sma_declining = row.get('SMA_20_Declining', False)
-                death_cross   = row.get('Death_Cross', False)
-                sma200_rising = row.get('SMA_200_Rising', True)
-                if sma_declining and death_cross:
-                    sma_trend = '<span style="color:#ff4466;font-size:13px">↓ Declining</span>'
-                elif sma_declining or death_cross:
-                    sma_trend = '<span style="color:#ffab00;font-size:13px">⚠ Weakening</span>'
-                elif sma200_rising:
-                    sma_trend = '<span style="color:#00e676;font-size:13px">↑ Rising</span>'
-                else:
-                    sma_trend = '<span style="color:#60a5fa;font-size:13px">→ Flat</span>'
+                sma20_pct = ((price - sma20) / sma20 * 100) if sma20 > 0 else 0
+                sma50_pct = ((price - sma50) / sma50 * 100) if sma50 > 0 else 0
+                sma200_pct = ((price - sma200) / sma200 * 100) if sma200 > 0 else 0
 
-                # F/T split
-                tech_col = '#00e676' if tech_sc >= 3 else ('#ffab00' if tech_sc >= 0 else '#ff4466')
-                fund_col = '#00e676' if fund_sc >= 70 else ('#ffab00' if fund_sc >= 50 else '#ff4466')
-                ft_cell  = (f'<span style="font-size:12px;color:{fund_col}">F:{fund_sc:.0f}</span>'
-                            f'<span style="color:#4a6080;font-size:11px"> / </span>'
-                            f'<span style="font-size:12px;color:{tech_col}">T:{tech_sc:+d}</span>')
+                def sma_cell(pct):
+                    if pct >= 0:
+                        return f'<span style="color:#00e676;font-weight:700;font-size:14px">▲ +{pct:.1f}%</span>'
+                    else:
+                        return f'<span style="color:#ff4466;font-weight:700;font-size:14px">▼ {pct:.1f}%</span>'
 
+                # Stop type
                 st   = row.get('Stop_Type', 'ATR Stop')
                 scls = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
                 slbl = ('📐 ATR' if st == 'ATR Stop' else '🔒 Beta')
+
+                # TechnoFunc recommendation for reference (shown small)
+                tf_rec = row.get('Recommendation', 'HOLD')
+                tf_score = row.get('Combined_Score', 0)
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -2503,32 +2501,35 @@ footer strong {{ color: #00f5ff; }}
           <div class="stock-name">{row['Name']}</div>
           <div class="stock-sym">{row['Symbol']}</div>
           <div class="stock-sec">{row.get('Sector','N/A')}</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: {tf_rec} ({tf_score:.0f})</div>
         </td>
-        <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
+        <td><div class="price-val">₹{price:,.2f}</div></td>
         <td class="gsep">
           {score_cell(tbs, tbs_color, tbs_bar)}
         </td>
         <td>{signal_text}</td>
-        <td>{setup_html}</td>
-        <td>{ft_cell}</td>
         <td class="gsep">
           <div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div>
           <div class="rsi-sig">{row['RSI_Signal']}</div>
           {rsi_slope_html}
         </td>
         <td><span class="{mcdcls}">{row['MACD']}</span></td>
+        <td>{sma_cell(sma20_pct)}</td>
+        <td>{sma_cell(sma50_pct)}</td>
+        <td>{sma_cell(sma200_pct)}</td>
         <td>{adx_cell(row.get('ADX', 0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td>{divergence_badge(row.get('RSI_Divergence','None'))}</td>
-        <td>{sma_trend}</td>
-        <td class="gsep"><div class="t1-val">₹{row['Target_1']:,.2f}</div><div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹{row['Target_1']:,.2f}</div>
+          <div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div>
+        </td>
         <td>
           <div class="sl-val">₹{row['Stop_Loss']:,.2f}</div>
           <div class="sl-pct">-{row['SL_Percentage']:.1f}%</div>
           <span class="sl-type {scls}">{slbl}</span>
         </td>
-        <td><span class="upside-val {upcls}">{row['Upside']:+.1f}%</span></td>
         <td><span class="rr-val" style="color:{rr_color(rr)}">{rr:.1f}×</span></td>
+        <td><span class="upside-val {upcls}">{row['Upside']:+.1f}%</span></td>
         <td>
           <div class="atr-val">₹{row['ATR']:,.2f}</div>
           <div class="atr-sub">{row['ATR_Pct']:.1f}%</div>
@@ -2537,9 +2538,9 @@ footer strong {{ color: #00f5ff; }}
 """
             html += "    </tbody></table></div>\n"
         else:
-            html += '<p style="color:#aaccee;padding:16px;">No stocks currently meet technical buy criteria.</p>\n'
+            html += '<p style="color:#cc99ff;padding:16px;font-size:15px;">No stocks currently meet technical buy criteria.</p>\n'
 
-        html += '</div><!-- /technical-buy -->\n'
+        html += '</div><!-- end technical-section -->\n'
 
         # == SELL TABLE ========================================================
         if not top_sells.empty:
@@ -3054,25 +3055,25 @@ window.onload = function() {{ filterWL('ALL'); }};
 
 // ── V58: TechnoFunc / Technical mode toggle ──────────────────────────────
 function switchMode(mode) {{
-  var tfBuy  = document.getElementById('technofunc-buy');
-  var tBuy   = document.getElementById('technical-buy');
+  var tfSec  = document.getElementById('technofunc-section');
+  var tSec   = document.getElementById('technical-section');
   var btnTF  = document.getElementById('btn-technofunc');
   var btnT   = document.getElementById('btn-technical');
   var desc   = document.getElementById('mode-desc');
 
   if (mode === 'technical') {{
-    tfBuy.classList.add('hidden');
-    tBuy.classList.remove('hidden');
+    tfSec.classList.add('hidden');
+    tSec.classList.remove('hidden');
     btnTF.classList.remove('active');
     btnT.classList.add('active');
-    desc.innerHTML = 'Pure Chart Analysis · RSI + MACD + SMA + Volume + ADX · No Veto Gate';
+    desc.innerHTML = '100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks Evaluated · Top 10';
     desc.style.color = '#cc99ff';
   }} else {{
-    tBuy.classList.add('hidden');
-    tfBuy.classList.remove('hidden');
+    tSec.classList.add('hidden');
+    tfSec.classList.remove('hidden');
     btnT.classList.remove('active');
     btnTF.classList.add('active');
-    desc.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · Sector Diversified';
+    desc.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified';
     desc.style.color = '#00f5ff';
   }}
 }}

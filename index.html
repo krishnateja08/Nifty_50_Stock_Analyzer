@@ -258,32 +258,26 @@ footer strong { color: #00f5ff; }
   .kpi-band { flex-wrap: wrap; }
   .kpi-item { flex: 0 0 50%; border-bottom: 1px solid var(--border); }
 }
-
-/* V58: TechnoFunc / Technical toggle switch */
+/* V58: TechnoFunc / Technical toggle */
 .mode-toggle {
   display: flex; align-items: center; gap: 0;
   background: #0a1628; border: 2px solid #1e3a5a; border-radius: 100px;
-  padding: 3px; margin: 0 16px;
+  padding: 3px;
 }
 .mode-btn {
-  padding: 8px 22px; border-radius: 100px; border: none; cursor: pointer;
+  padding: 9px 24px; border-radius: 100px; border: none; cursor: pointer;
   font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   letter-spacing: 0.5px; transition: all .25s ease; white-space: nowrap;
-  background: transparent; color: #6688aa;
+  background: transparent; color: #556688;
 }
-.mode-btn.active {
-  color: #000; box-shadow: 0 0 16px rgba(0,245,255,0.3);
-}
-.mode-btn.active.tf-mode {
+.mode-btn:hover { color: #aaccee; }
+.mode-btn.active.tf-active {
   background: linear-gradient(135deg, #00f5ff, #00cc66);
-  color: #000;
+  color: #000; box-shadow: 0 0 20px rgba(0,245,255,0.3);
 }
-.mode-btn.active.t-mode {
+.mode-btn.active.t-active {
   background: linear-gradient(135deg, #cc99ff, #7c4dff);
-  color: #fff;
-}
-.mode-label {
-  font-size: 13px; color: #88aacc; font-weight: 600; letter-spacing: 1px;
+  color: #fff; box-shadow: 0 0 20px rgba(124,77,255,0.3);
 }
 .buy-section { display: block; }
 .buy-section.hidden { display: none; }
@@ -319,7 +313,7 @@ footer strong { color: #00f5ff; }
     <div class="clock-box">
       <div class="clock-time" id="liveClock">--:-- --</div>
       <div class="clock-meta" id="liveDate">25 Mar 2026 · IST</div>
-      <div class="clock-next">Report: 25 Mar 2026 02:42 AM IST</div>
+      <div class="clock-next">Report: 25 Mar 2026 02:57 AM IST</div>
       <div class="clock-next">Next Update: <strong style="color:var(--accent2)">4:30 PM</strong></div>
     </div>
   </div>
@@ -338,21 +332,21 @@ footer strong { color: #00f5ff; }
 
 <div class="main">
 
-  <div style="display:flex;align-items:center;gap:14px;margin:0 0 18px 0;flex-wrap:wrap;">
-    <span class="mode-label">ANALYSIS MODE</span>
+  <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
+    <span style="font-size:13px;color:#88aacc;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
     <div class="mode-toggle">
-      <button class="mode-btn tf-mode active" id="btn-technofunc" onclick="switchMode('technofunc')">
+      <button class="mode-btn tf-active active" id="btn-technofunc" onclick="switchMode('technofunc')">
         📊 TechnoFunc
       </button>
-      <button class="mode-btn t-mode" id="btn-technical" onclick="switchMode('technical')">
-        📈 Technical Only
+      <button class="mode-btn t-active" id="btn-technical" onclick="switchMode('technical')">
+        📈 Technical
       </button>
     </div>
-    <span id="mode-desc" class="mode-label" style="color:#00f5ff;">
-      Fundamentals 65% + Technicals 35% · Trend Veto · Sector Diversified
+    <span id="mode-desc" style="font-size:13px;color:#00f5ff;font-weight:600;">
+      Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified
     </span>
   </div>
-<div id="technofunc-buy" class="buy-section">
+<div id="technofunc-section" class="buy-section">
 
   <div class="section-hdr">
     <div class="section-pill pill-buy">▲ Top Buy Recommendations - Sector Diversified</div>
@@ -875,22 +869,22 @@ footer strong { color: #00f5ff; }
         <td><span style="display:inline-block;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:.4px;background:#2a2200;color:#ffab00;border:1px solid #ffab00;">◆ HOLD</span></td>
       </tr>
     </tbody></table></div>
-</div><!-- /technofunc-buy -->
-<div id="technical-buy" class="buy-section hidden">
+</div><!-- end technofunc-section -->
+<div id="technical-section" class="buy-section hidden">
 
   <div class="section-hdr">
     <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">
-      📈 Top 10 Technical Buy Picks — Pure Chart Analysis
+      📈 Top 10 Technical Buy Picks — 100% Chart Analysis
     </div>
     <div class="section-line"></div>
-    <div class="section-note">NO FUNDAMENTALS · NO VETO · RSI + MACD + SMA + VOLUME + ADX</div>
+    <div class="section-note">ALL 100 STOCKS EVALUATED · RSI + MACD + SMA + ADX + VOLUME · NO FUNDAMENTALS</div>
   </div>
   <div class="tbl-wrap"><table>
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="4">TECH SCORE</th>
-        <th class="grp-tech gsep"  colspan="6">TECHNICAL SIGNALS</th>
+        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
+        <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
         <th class="grp-trade gsep" colspan="5">TRADE SETUP</th>
       </tr>
       <tr class="col-row">
@@ -898,19 +892,18 @@ footer strong { color: #00f5ff; }
         <th class="ch-stock">Stock / Sector</th>
         <th class="ch-stock">Price</th>
         <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Tech Score</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Buy Signal</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Setup</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">F/T Split</th>
+        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Signal</th>
         <th class="ch-tech gsep">RSI / Slope</th>
         <th class="ch-tech">MACD</th>
+        <th class="ch-tech">SMA 20</th>
+        <th class="ch-tech">SMA 50</th>
+        <th class="ch-tech">SMA 200</th>
         <th class="ch-tech">ADX</th>
-        <th class="ch-tech">Vol/Avg</th>
-        <th class="ch-tech">RSI Div</th>
-        <th class="ch-tech">SMA Trend</th>
-        <th class="ch-trade gsep">Target 1</th>
+        <th class="ch-tech">Vol / Avg</th>
+        <th class="ch-trade gsep">Target 1 / T2</th>
         <th class="ch-trade">Stop Loss</th>
-        <th class="ch-trade">Upside</th>
         <th class="ch-trade">R : R</th>
+        <th class="ch-trade">Upside</th>
         <th class="ch-trade">ATR</th>
       </tr>
     </thead>
@@ -921,32 +914,35 @@ footer strong { color: #00f5ff; }
           <div class="stock-name">Oracle Financial Services</div>
           <div class="stock-sym">OFSS</div>
           <div class="stock-sec">Technology</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (46)</div>
         </td>
         <td><div class="price-val">₹6,605.50</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">60</div><div class="score-track"><div class="score-fill" style="width:60%;background:#7c4dff"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">51</div><div class="score-track"><div class="score-fill" style="width:51%;background:#7c4dff"></div></div></div>
         </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD + Momentum</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">MACD↑</span> <span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">BullDiv</span> <span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#00e676">F:92</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ff4466">T:-6</span></td>
+        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">46</div>
           <div class="rsi-sig">Building ↑ (30→46)</div>
-          <span style="color:#00e676;font-size:12px">↑ +16</span>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +16</span>
         </td>
         <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.6%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -7.1%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -19.5%</span></td>
         <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">1.2×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-bull">✅ Bull Div</span></td>
-        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
-        <td class="gsep"><div class="t1-val">₹6,990.25</div><div class="t2-val">T2: ₹7,105.50</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹6,990.25</div>
+          <div class="t2-val">T2: ₹7,105.50</div>
+        </td>
         <td>
           <div class="sl-val">₹6,275.22</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+5.8%</span></td>
         <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
+        <td><span class="upside-val up">+5.8%</span></td>
         <td>
           <div class="atr-val">₹216.42</div>
           <div class="atr-sub">3.3%</div>
@@ -955,260 +951,281 @@ footer strong { color: #00f5ff; }
       <tr>
         <td><span class="rnum">2</span></td>
         <td>
-          <div class="stock-name">Persistent Systems</div>
-          <div class="stock-sym">PERSISTENT</div>
-          <div class="stock-sec">Technology</div>
-        </td>
-        <td><div class="price-val">₹4,913.70</div></td>
-        <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">54</div><div class="score-track"><div class="score-fill" style="width:54%;background:#7c4dff"></div></div></div>
-        </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD + Momentum</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">MACD↑</span> <span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#00e676">F:88</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ff4466">T:-3</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">48</div>
-          <div class="rsi-sig">Building ↑ (26→48)</div>
-          <span style="color:#00e676;font-size:12px">↑ +23</span>
-        </td>
-        <td><span class="macd-bull">Bullish</span></td>
-        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
-        <td class="gsep"><div class="t1-val">₹5,413.70</div><div class="t2-val">T2: ₹5,509.50</div></td>
-        <td>
-          <div class="sl-val">₹4,668.02</div>
-          <div class="sl-pct">-5.0%</div>
-          <span class="sl-type slt-beta">🔒 Beta</span>
-        </td>
-        <td><span class="upside-val up">+10.2%</span></td>
-        <td><span class="rr-val" style="color:#00e676">2.0×</span></td>
-        <td>
-          <div class="atr-val">₹200.53</div>
-          <div class="atr-sub">4.1%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">3</span></td>
-        <td>
           <div class="stock-name">HCL Tech</div>
           <div class="stock-sym">HCLTECH</div>
           <div class="stock-sec">Technology</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (50)</div>
         </td>
         <td><div class="price-val">₹1,373.30</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#cc99ff">51</div><div class="score-track"><div class="score-fill" style="width:51%;background:#7c4dff"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
         </td>
-        <td><span style="color:#00d4ff;font-weight:700">📊 MACD + Momentum</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">MACD↑</span> <span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#00e676">F:76</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ff4466">T:-3</span></td>
+        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">45</div>
           <div class="rsi-sig">Building ↑ (26→45)</div>
-          <span style="color:#00e676;font-size:12px">↑ +19</span>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +19</span>
         </td>
         <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.5%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -8.9%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -11.5%</span></td>
         <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#ff4466;font-size:13px">↓ Declining</span></td>
-        <td class="gsep"><div class="t1-val">₹1,519.65</div><div class="t2-val">T2: ₹1,559.90</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹1,519.65</div>
+          <div class="t2-val">T2: ₹1,559.90</div>
+        </td>
         <td>
           <div class="sl-val">₹1,304.64</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+10.7%</span></td>
         <td><span class="rr-val" style="color:#00e676">2.1×</span></td>
+        <td><span class="upside-val up">+10.7%</span></td>
         <td>
           <div class="atr-val">₹40.60</div>
           <div class="atr-sub">3.0%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">4</span></td>
+        <td><span class="rnum">3</span></td>
         <td>
-          <div class="stock-name">Torrent Pharmaceuticals</div>
-          <div class="stock-sym">TORNTPHARM</div>
-          <div class="stock-sec">Healthcare</div>
+          <div class="stock-name">Persistent Systems</div>
+          <div class="stock-sym">PERSISTENT</div>
+          <div class="stock-sec">Technology</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (56)</div>
         </td>
-        <td><div class="price-val">₹4,256.60</div></td>
+        <td><div class="price-val">₹4,913.70</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">45</div><div class="score-track"><div class="score-fill" style="width:45%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#0099cc"></div></div></div>
         </td>
-        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#ffab00">F:53</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ffab00">T:+0</span></td>
+        <td><span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span></td>
         <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">49</div>
-          <div class="rsi-sig">Fading ↓ (53→49)</div>
-          <span style="color:#ffab00;font-size:12px">↓ -3</span>
+          <div class="rsi-val" style="color:#60a5fa">48</div>
+          <div class="rsi-sig">Building ↑ (26→48)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +23</span>
         </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><div class="adx-val adx-strong">52</div><div class="adx-lbl">Strong</div></td>
-        <td><div class="vol-val vol-norm">0.7×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
-        <td class="gsep"><div class="t1-val">₹4,476.45</div><div class="t2-val">T2: ₹4,756.60</div></td>
-        <td>
-          <div class="sl-val">₹4,067.89</div>
-          <div class="sl-pct">-4.4%</div>
-          <span class="sl-type slt-atr">📐 ATR</span>
-        </td>
-        <td><span class="upside-val up">+5.2%</span></td>
-        <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
-        <td>
-          <div class="atr-val">₹107.31</div>
-          <div class="atr-sub">2.5%</div>
-        </td>
-      </tr>
-      <tr>
-        <td><span class="rnum">5</span></td>
-        <td>
-          <div class="stock-name">ONGC</div>
-          <div class="stock-sym">ONGC</div>
-          <div class="stock-sec">Energy</div>
-        </td>
-        <td><div class="price-val">₹268.05</div></td>
+        <td><span class="macd-bull">Bullish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -9.9%</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -13.5%</span></td>
+        <td><div class="adx-val adx-strong">59</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">45</div><div class="score-track"><div class="score-fill" style="width:45%;background:#f59e0b"></div></div></div>
+          <div class="t1-val">₹5,413.70</div>
+          <div class="t2-val">T2: ₹5,509.50</div>
         </td>
-        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#ffab00">F:53</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ffab00">T:+1</span></td>
-        <td class="gsep">
-          <div class="rsi-val" style="color:#60a5fa">50</div>
-          <div class="rsi-sig">Building ↑ (46→50)</div>
-          <span style="color:#00e676;font-size:12px">↑ +4</span>
-        </td>
-        <td><span class="macd-bear">Bearish</span></td>
-        <td><div class="adx-val adx-mod">24</div><div class="adx-lbl">Moderate</div></td>
-        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-bear">⚠ Bear Div</span></td>
-        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
-        <td class="gsep"><div class="t1-val">₹279.03</div><div class="t2-val">T2: ₹293.00</div></td>
         <td>
-          <div class="sl-val">₹254.65</div>
+          <div class="sl-val">₹4,668.02</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+4.1%</span></td>
-        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
+        <td><span class="rr-val" style="color:#00e676">2.0×</span></td>
+        <td><span class="upside-val up">+10.2%</span></td>
         <td>
-          <div class="atr-val">₹7.93</div>
-          <div class="atr-sub">3.0%</div>
+          <div class="atr-val">₹200.53</div>
+          <div class="atr-sub">4.1%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">6</span></td>
+        <td><span class="rnum">4</span></td>
         <td>
           <div class="stock-name">Lupin</div>
           <div class="stock-sym">LUPIN</div>
           <div class="stock-sec">Healthcare</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (78)</div>
         </td>
         <td><div class="price-val">₹2,331.80</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td></td>
-        <td><span style="font-size:12px;color:#ffab00">F:63</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#00e676">T:+5</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">57</div>
           <div class="rsi-sig">Healthy (57)</div>
-          <span style="color:#4a6080;font-size:12px">→</span>
+          <span style="color:#4a6080;font-size:12px">→ flat</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +0.9%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +13.6%</span></td>
         <td><div class="adx-val adx-strong">54</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
-        <td class="gsep"><div class="t1-val">₹2,434.22</div><div class="t2-val">T2: ₹2,531.59</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹2,434.22</div>
+          <div class="t2-val">T2: ₹2,531.59</div>
+        </td>
         <td>
           <div class="sl-val">₹2,215.21</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+4.4%</span></td>
         <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
+        <td><span class="upside-val up">+4.4%</span></td>
         <td>
           <div class="atr-val">₹51.21</div>
           <div class="atr-sub">2.2%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">7</span></td>
+        <td><span class="rnum">5</span></td>
         <td>
           <div class="stock-name">Aurobindo Pharma</div>
           <div class="stock-sym">AUROPHARMA</div>
           <div class="stock-sec">Healthcare</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: BUY (76)</div>
         </td>
         <td><div class="price-val">₹1,281.60</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">43</div><div class="score-track"><div class="score-fill" style="width:43%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#0099cc"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td></td>
-        <td><span style="font-size:12px;color:#ffab00">F:58</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#00e676">T:+4</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">58</div>
           <div class="rsi-sig">Softening ↓ (63→58)</div>
-          <span style="color:#ffab00;font-size:12px">↓ -4</span>
+          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -4</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +6.7%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +11.3%</span></td>
         <td><div class="adx-val adx-strong">46</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
-        <td class="gsep"><div class="t1-val">₹1,358.08</div><div class="t2-val">T2: ₹1,412.40</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹1,358.08</div>
+          <div class="t2-val">T2: ₹1,412.40</div>
+        </td>
         <td>
           <div class="sl-val">₹1,217.52</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+6.0%</span></td>
         <td><span class="rr-val" style="color:#ffab00">1.2×</span></td>
+        <td><span class="upside-val up">+6.0%</span></td>
         <td>
           <div class="atr-val">₹38.24</div>
           <div class="atr-sub">3.0%</div>
         </td>
       </tr>
       <tr>
-        <td><span class="rnum">8</span></td>
+        <td><span class="rnum">6</span></td>
         <td>
           <div class="stock-name">NTPC</div>
           <div class="stock-sym">NTPC</div>
           <div class="stock-sec">Utilities</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (45)</div>
         </td>
         <td><div class="price-val">₹375.55</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">42</div><div class="score-track"><div class="score-fill" style="width:42%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#00f5ff">38</div><div class="score-track"><div class="score-fill" style="width:38%;background:#0099cc"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#ff4466">F:33</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ffab00">T:+2</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">51</div>
           <div class="rsi-sig">Fading ↓ (58→51)</div>
-          <span style="color:#ffab00;font-size:12px">↓ -8</span>
+          <span style="color:#ffab00;font-size:12px;font-weight:700">↓ -8</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.0%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.8%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +9.9%</span></td>
         <td><div class="adx-val adx-strong">44</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-none">-</span></td>
-        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
-        <td class="gsep"><div class="t1-val">₹388.55</div><div class="t2-val">T2: ₹394.50</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹388.55</div>
+          <div class="t2-val">T2: ₹394.50</div>
+        </td>
         <td>
           <div class="sl-val">₹356.77</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+3.5%</span></td>
         <td><span class="rr-val" style="color:#ff3d57">0.7×</span></td>
+        <td><span class="upside-val up">+3.5%</span></td>
         <td>
           <div class="atr-val">₹9.42</div>
           <div class="atr-sub">2.5%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">7</span></td>
+        <td>
+          <div class="stock-name">ONGC</div>
+          <div class="stock-sym">ONGC</div>
+          <div class="stock-sec">Energy</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (56)</div>
+        </td>
+        <td><div class="price-val">₹268.05</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#ffab00">34</div><div class="score-track"><div class="score-fill" style="width:34%;background:#f59e0b"></div></div></div>
+        </td>
+        <td><span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#60a5fa">50</div>
+          <div class="rsi-sig">Building ↑ (46→50)</div>
+          <span style="color:#00e676;font-size:12px;font-weight:700">↑ +4</span>
+        </td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.3%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.2%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +8.2%</span></td>
+        <td><div class="adx-val adx-mod">24</div><div class="adx-lbl">Moderate</div></td>
+        <td><div class="vol-val vol-norm">0.8×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹279.03</div>
+          <div class="t2-val">T2: ₹293.00</div>
+        </td>
+        <td>
+          <div class="sl-val">₹254.65</div>
+          <div class="sl-pct">-5.0%</div>
+          <span class="sl-type slt-beta">🔒 Beta</span>
+        </td>
+        <td><span class="rr-val" style="color:#ff3d57">0.8×</span></td>
+        <td><span class="upside-val up">+4.1%</span></td>
+        <td>
+          <div class="atr-val">₹7.93</div>
+          <div class="atr-sub">3.0%</div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="rnum">8</span></td>
+        <td>
+          <div class="stock-name">Sun Pharma</div>
+          <div class="stock-sym">SUNPHARMA</div>
+          <div class="stock-sec">Healthcare</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (50)</div>
+        </td>
+        <td><div class="price-val">₹1,753.30</div></td>
+        <td class="gsep">
+          <div class="score-wrap"><div class="score-num" style="color:#ffab00">33</div><div class="score-track"><div class="score-fill" style="width:33%;background:#f59e0b"></div></div></div>
+        </td>
+        <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
+        <td class="gsep">
+          <div class="rsi-val" style="color:#60a5fa">48</div>
+          <div class="rsi-sig">Falling Fast ↓ (59→48)</div>
+          <span style="color:#ff4466;font-size:12px;font-weight:700">↓ -11</span>
+        </td>
+        <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.4%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +2.0%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +3.4%</span></td>
+        <td><div class="adx-val adx-strong">35</div><div class="adx-lbl">Strong</div></td>
+        <td><div class="vol-val vol-norm">0.9×</div><div class="vol-lbl">Avg Vol</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹1,809.65</div>
+          <div class="t2-val">T2: ₹1,847.73</div>
+        </td>
+        <td>
+          <div class="sl-val">₹1,665.64</div>
+          <div class="sl-pct">-5.0%</div>
+          <span class="sl-type slt-beta">🔒 Beta</span>
+        </td>
+        <td><span class="rr-val" style="color:#ff3d57">0.6×</span></td>
+        <td><span class="upside-val up">+3.2%</span></td>
+        <td>
+          <div class="atr-val">₹34.17</div>
+          <div class="atr-sub">1.9%</div>
         </td>
       </tr>
       <tr>
@@ -1217,32 +1234,35 @@ footer strong { color: #00f5ff; }
           <div class="stock-name">Power Grid</div>
           <div class="stock-sym">POWERGRID</div>
           <div class="stock-sec">Utilities</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: BUY (52)</div>
         </td>
         <td><div class="price-val">₹299.00</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">40</div><div class="score-track"><div class="score-fill" style="width:40%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#ffab00">33</div><div class="score-track"><div class="score-fill" style="width:33%;background:#f59e0b"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td><span style="font-size:11px;padding:2px 5px;border-radius:3px;background:#1a2a3a;color:#aaccee;margin:1px;">NearSup</span></td>
-        <td><span style="font-size:12px;color:#ff4466">F:45</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ffab00">T:+1</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">54</div>
           <div class="rsi-sig">Neutral →</div>
-          <span style="color:#4a6080;font-size:12px">→</span>
+          <span style="color:#4a6080;font-size:12px">→ flat</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -0.2%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +4.7%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +5.5%</span></td>
         <td><div class="adx-val adx-strong">58</div><div class="adx-lbl">Strong</div></td>
         <td><div class="vol-val vol-norm">1.0×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-bear">⚠ Bear Div</span></td>
-        <td><span style="color:#ffab00;font-size:13px">⚠ Weakening</span></td>
-        <td class="gsep"><div class="t1-val">₹316.22</div><div class="t2-val">T2: ₹328.87</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹316.22</div>
+          <div class="t2-val">T2: ₹328.87</div>
+        </td>
         <td>
           <div class="sl-val">₹284.05</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+5.8%</span></td>
         <td><span class="rr-val" style="color:#ffab00">1.1×</span></td>
+        <td><span class="upside-val up">+5.8%</span></td>
         <td>
           <div class="atr-val">₹8.61</div>
           <div class="atr-sub">2.9%</div>
@@ -1254,39 +1274,42 @@ footer strong { color: #00f5ff; }
           <div class="stock-name">Coal India</div>
           <div class="stock-sym">COALINDIA</div>
           <div class="stock-sec">Energy</div>
+          <div style="font-size:10px;color:#556677;margin-top:2px;">TF: HOLD (44)</div>
         </td>
         <td><div class="price-val">₹442.10</div></td>
         <td class="gsep">
-          <div class="score-wrap"><div class="score-num" style="color:#ffab00">35</div><div class="score-track"><div class="score-fill" style="width:35%;background:#f59e0b"></div></div></div>
+          <div class="score-wrap"><div class="score-num" style="color:#ffab00">30</div><div class="score-track"><div class="score-fill" style="width:30%;background:#f59e0b"></div></div></div>
         </td>
         <td><span style="color:#aaccee;font-weight:700">📋 Technical Setup</span></td>
-        <td></td>
-        <td><span style="font-size:12px;color:#ff4466">F:38</span><span style="color:#4a6080;font-size:11px"> / </span><span style="font-size:12px;color:#ffab00">T:+0</span></td>
         <td class="gsep">
           <div class="rsi-val" style="color:#60a5fa">49</div>
           <div class="rsi-sig">Falling Fast ↓ (63→49)</div>
-          <span style="color:#ff4466;font-size:12px">↓ -14</span>
+          <span style="color:#ff4466;font-size:12px;font-weight:700">↓ -14</span>
         </td>
         <td><span class="macd-bear">Bearish</span></td>
+        <td><span style="color:#ff4466;font-weight:700;font-size:14px">▼ -1.2%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +1.6%</span></td>
+        <td><span style="color:#00e676;font-weight:700;font-size:14px">▲ +10.6%</span></td>
         <td><div class="adx-val adx-mod">28</div><div class="adx-lbl">Moderate</div></td>
         <td><div class="vol-val vol-norm">1.1×</div><div class="vol-lbl">Avg Vol</div></td>
-        <td><span class="div-badge div-bear">⚠ Bear Div</span></td>
-        <td><span style="color:#00e676;font-size:13px">↑ Rising</span></td>
-        <td class="gsep"><div class="t1-val">₹461.55</div><div class="t2-val">T2: ₹476.00</div></td>
+        <td class="gsep">
+          <div class="t1-val">₹461.55</div>
+          <div class="t2-val">T2: ₹476.00</div>
+        </td>
         <td>
           <div class="sl-val">₹420.00</div>
           <div class="sl-pct">-5.0%</div>
           <span class="sl-type slt-beta">🔒 Beta</span>
         </td>
-        <td><span class="upside-val up">+4.4%</span></td>
         <td><span class="rr-val" style="color:#ff3d57">0.9×</span></td>
+        <td><span class="upside-val up">+4.4%</span></td>
         <td>
           <div class="atr-val">₹14.00</div>
           <div class="atr-sub">3.2%</div>
         </td>
       </tr>
     </tbody></table></div>
-</div><!-- /technical-buy -->
+</div><!-- end technical-section -->
 
   <div class="section-hdr">
     <div class="section-pill pill-sell">▼ Top 20 Sell Recommendations</div>
@@ -6647,25 +6670,25 @@ window.onload = function() { filterWL('ALL'); };
 
 // ── V58: TechnoFunc / Technical mode toggle ──────────────────────────────
 function switchMode(mode) {
-  var tfBuy  = document.getElementById('technofunc-buy');
-  var tBuy   = document.getElementById('technical-buy');
+  var tfSec  = document.getElementById('technofunc-section');
+  var tSec   = document.getElementById('technical-section');
   var btnTF  = document.getElementById('btn-technofunc');
   var btnT   = document.getElementById('btn-technical');
   var desc   = document.getElementById('mode-desc');
 
   if (mode === 'technical') {
-    tfBuy.classList.add('hidden');
-    tBuy.classList.remove('hidden');
+    tfSec.classList.add('hidden');
+    tSec.classList.remove('hidden');
     btnTF.classList.remove('active');
     btnT.classList.add('active');
-    desc.innerHTML = 'Pure Chart Analysis · RSI + MACD + SMA + Volume + ADX · No Veto Gate';
+    desc.innerHTML = '100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks Evaluated · Top 10';
     desc.style.color = '#cc99ff';
   } else {
-    tBuy.classList.add('hidden');
-    tfBuy.classList.remove('hidden');
+    tSec.classList.add('hidden');
+    tfSec.classList.remove('hidden');
     btnT.classList.remove('active');
     btnTF.classList.add('active');
-    desc.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · Sector Diversified';
+    desc.innerHTML = 'Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate · Sector Diversified';
     desc.style.color = '#00f5ff';
   }
 }
