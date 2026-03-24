@@ -231,9 +231,13 @@ class Nifty100CompleteAnalyzer:
             'ETERNAL.NS':      'Zomato',
             'POLICYBZR.NS':   'PB Fintech (PolicyBazaar)',
             'NYKAA.NS':       'FSN E-Commerce (Nykaa)',
-            'PAYTM.NS':       'One97 Communications (Paytm)',
+            'JIOFIN.NS':       'JIO FINANCIAL',
             'RVNL.NS':        'Rail Vikas Nigam',
             'ADANIGREEN.NS':  'Adani Green Energy',
+            'HAL.NS':         'Hindustan Aeronautics',
+            'BEL.NS':         'Bharat Electronics',
+            'TRENT.NS':       'TRENT',
+            'VBL.NS':         'Varun Beverages',
         }
         self.results = []
 
