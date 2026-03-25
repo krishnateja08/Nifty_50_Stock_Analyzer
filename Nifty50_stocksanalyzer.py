@@ -1084,14 +1084,34 @@ class Nifty100CompleteAnalyzer:
 
             # V58: TECH BUY SCORE — 100% technical (0-100) =====================
             tech_buy_score = 0
-            if rsi < 30 and rsi_direction == 'Rising':    tech_buy_score += 25
-            elif rsi < 30:                                  tech_buy_score += 18
-            elif rsi < 40 and rsi_direction == 'Rising':   tech_buy_score += 22
-            elif rsi < 40:                                  tech_buy_score += 12
-            elif 40 <= rsi <= 55 and rsi_direction == 'Rising': tech_buy_score += 16
-            elif 40 <= rsi <= 55:                           tech_buy_score += 6
-            elif rsi <= 65 and rsi_direction == 'Rising':  tech_buy_score += 10
-            elif rsi <= 65:                                 tech_buy_score += 4
+
+            # RSI zone + direction (0-25) — V59-2: Now checks SMA200 trend context
+            # RSI < 45 above SMA200 = bullish pullback (higher score)
+            # RSI < 45 below SMA200 = bearish continuation (lower score)
+            if rsi < 30 and current_price > sma_200 and rsi_direction == 'Rising':
+                tech_buy_score += 25          # BEST: oversold reversal in uptrend
+            elif rsi < 30 and rsi_direction == 'Rising':
+                tech_buy_score += 18          # oversold turning up, but in downtrend
+            elif rsi < 30 and current_price > sma_200:
+                tech_buy_score += 20          # oversold in uptrend, not yet turning
+            elif rsi < 30:
+                tech_buy_score += 10          # oversold in downtrend = risky catch
+            elif rsi < 45 and current_price > sma_200 and rsi_direction == 'Rising':
+                tech_buy_score += 22          # pullback recovery in uptrend
+            elif rsi < 45 and current_price > sma_200:
+                tech_buy_score += 12          # weak but in uptrend context
+            elif rsi < 45 and rsi_direction == 'Rising':
+                tech_buy_score += 14          # recovering but below SMA200
+            elif rsi < 45:
+                tech_buy_score += 4           # weak in downtrend = low score
+            elif 45 <= rsi <= 55 and rsi_direction == 'Rising':
+                tech_buy_score += 16          # building momentum
+            elif 45 <= rsi <= 55:
+                tech_buy_score += 6           # neutral
+            elif rsi <= 65 and rsi_direction == 'Rising':
+                tech_buy_score += 10          # healthy uptrend
+            elif rsi <= 65:
+                tech_buy_score += 4           # healthy but not rising
             if macd > signal:
                 tech_buy_score += 20 if (macd - signal) > 0.5 * atr else 14
             elif abs(macd - signal) < 0.2 * atr:           tech_buy_score += 5
@@ -1805,6 +1825,11 @@ class Nifty100CompleteAnalyzer:
             r['Buy_Upside']   = round(((r['Buy_Target_1'] - price) / price) * 100, 2)
             risk = abs(price - r['Buy_Stop']); reward = abs(r['Buy_Target_1'] - price)
             r['Buy_RR'] = round(reward / risk, 2) if risk > 0 else 0
+            # V59-3: Structural stop-loss validation — same check as TechnoFunc
+            # If stop is more than 10% below nearest support, skip this stock
+            sl_below_sup_pct = ((sup - r['Buy_Stop']) / sup * 100) if sup > 0 else 0
+            if sl_below_sup_pct > 10:
+                continue  # structurally unsafe stop — skip
             if r['Buy_Upside'] > 0:
                 rows_out.append(r)
         pool = pd.DataFrame(rows_out)
