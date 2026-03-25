@@ -2021,22 +2021,109 @@ footer {{
   font-size: 13px; color: var(--dim); letter-spacing: 0.5px;
 }}
 footer strong {{ color: var(--accent2); }}
-@media(max-width: 900px) {{
-  .idx-strip {{ display: none; }}
-  .kpi-item  {{ padding: 12px 14px; }}
-  .kpi-num   {{ font-size: 27px; }}
+/* ── Responsive: Tablet (≤1024px) ──────────────────────────── */
+@media(max-width: 1024px) {{
+  .h-top {{ padding: 10px 16px; gap: 12px; }}
+  .idx-item {{ padding: 6px 14px; }}
+  .idx-price {{ font-size: 15px; }}
+  .idx-pts {{ font-size: 12px; }}
+  .idx-pct {{ font-size: 10px; padding: 2px 6px; }}
+  .kpi-num {{ font-size: 30px; }}
+  .kpi-item {{ padding: 14px 16px; }}
+  .section-note {{ display: none; }}
+  .brand-name {{ font-size: 16px; }}
+  .clock-time {{ font-size: 18px; }}
 }}
-@media(max-width: 600px) {{
-  .h-top  {{ padding: 8px 14px; }}
-  .main   {{ padding: 12px; }}
+
+/* ── Responsive: Small tablet / large phone (≤768px) ──────── */
+@media(max-width: 768px) {{
+  .h-top {{
+    flex-direction: column; align-items: stretch;
+    padding: 10px 14px; gap: 10px;
+  }}
+  .h-top > .brand {{ justify-content: center; }}
+  .idx-strip {{
+    width: 100%; justify-content: center;
+    border-radius: 10px; flex-wrap: nowrap;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }}
+  .idx-item {{ flex: 0 0 auto; padding: 8px 16px; min-width: 140px; }}
+  .clock-box {{
+    flex-direction: row; align-items: center;
+    justify-content: center; gap: 12px; flex-wrap: wrap;
+  }}
+  .clock-time {{ font-size: 18px; }}
+  .clock-meta {{ font-size: 12px; }}
+  .clock-next {{ font-size: 11px; }}
   .kpi-band {{ flex-wrap: wrap; }}
-  .kpi-item {{ flex: 0 0 50%; border-bottom: 1px solid var(--border); }}
+  .kpi-item {{
+    flex: 0 0 50%; border-bottom: 1px solid var(--border);
+    padding: 12px 14px;
+  }}
+  .kpi-num {{ font-size: 28px; }}
+  .kpi-label {{ font-size: 11px; letter-spacing: 1.5px; }}
+  .main {{ padding: 14px; }}
+  .section-hdr {{ flex-wrap: wrap; gap: 8px; }}
+  .section-pill {{ font-size: 13px; padding: 7px 16px; }}
+  .section-line {{ display: none; }}
+  .section-note {{ display: none; }}
+  .tbl-wrap {{ border-radius: 10px; margin-bottom: 20px; }}
+}}
+
+/* ── Responsive: Phone (≤480px) ───────────────────────────── */
+@media(max-width: 480px) {{
+  .h-top {{ padding: 8px 10px; gap: 8px; }}
+  .brand-gem {{ width: 34px; height: 34px; border-radius: 8px; }}
+  .brand-name {{ font-size: 14px; }}
+  .brand-sub {{ font-size: 10px; letter-spacing: 1px; }}
+  .idx-strip {{ border-radius: 8px; }}
+  .idx-item {{ padding: 6px 12px; min-width: 120px; }}
+  .idx-name {{ font-size: 10px; letter-spacing: 1.5px; }}
+  .idx-price {{ font-size: 14px; }}
+  .idx-pts {{ font-size: 11px; }}
+  .idx-pct {{ font-size: 10px; padding: 1px 5px; }}
+  .clock-time {{ font-size: 16px; }}
+  .clock-meta, .clock-next {{ font-size: 11px; }}
+  .ticker {{ display: none; }}
+  .kpi-item {{ padding: 10px 10px; }}
+  .kpi-num {{ font-size: 24px; }}
+  .kpi-label {{ font-size: 10px; letter-spacing: 1px; }}
+  .kpi-bar {{ width: 36px; }}
+  .kpi-sub {{ font-size: 10px; }}
+  .main {{ padding: 10px; }}
+  .section-pill {{ font-size: 12px; padding: 6px 12px; }}
+  .tbl-wrap {{ border-radius: 8px; margin-bottom: 16px; }}
+  footer {{ font-size: 11px; padding: 12px; }}
+  .disc {{ font-size: 12px; padding: 12px 14px; }}
+}}
+
+/* ── Mode toggle responsive ───────────────────────────────── */
+@media(max-width: 768px) {{
+  .mode-bar {{
+    flex-direction: column; align-items: stretch; gap: 10px;
+  }}
+  .mode-label {{ text-align: center; }}
+  .mode-toggle {{ width: 100%; justify-content: center; }}
+  .mode-btn {{ flex: 1; text-align: center; padding: 9px 16px; }}
+  .mode-desc-text {{ text-align: center; font-size: 12px; }}
+}}
+@media(max-width: 480px) {{
+  .mode-btn {{ font-size: 13px; padding: 8px 12px; }}
+  .mode-desc-text {{ font-size: 11px; }}
+}}
+
+/* ── Watchlist filter buttons responsive ──────────────────── */
+@media(max-width: 600px) {{
+  .wl-btn {{ font-size: 12px; padding: 5px 10px; }}
 }}
 .mode-toggle {{ display:flex;align-items:center;gap:0;background:var(--surface);border:1.5px solid var(--border2);border-radius:100px;padding:3px; }}
 .mode-btn {{ padding:9px 24px;border-radius:100px;border:none;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:.3px;transition:all .25s;white-space:nowrap;background:transparent;color:var(--dim); }}
 .mode-btn:hover {{ color:var(--muted2); }}
 .mode-btn.active.tf-a {{ background:linear-gradient(135deg,#6c5ce7,#00cec9);color:#fff; }}
 .mode-btn.active.t-a {{ background:linear-gradient(135deg,#a29bfe,#6c5ce7);color:#fff; }}
+.mode-bar {{ display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap; }}
+.mode-label {{ font-size:13px;color:var(--dim);font-weight:700;letter-spacing:1.5px;text-transform:uppercase; }}
+.mode-desc-text {{ font-size:13px;color:#00cec9;font-weight:600; }}
 .mode-sec {{ display:block; }}
 .mode-sec.hidden {{ display:none; }}
 </style>
@@ -2203,13 +2290,13 @@ footer strong {{ color: var(--accent2); }}
 
         # == V58 MODE TOGGLE ===================================================
         html += """
-  <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
-    <span style="font-size:13px;color:#8892a6;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
+  <div class="mode-bar">
+    <span class="mode-label">Analysis Mode</span>
     <div class="mode-toggle">
       <button class="mode-btn tf-a active" id="btn-tf" onclick="switchMode('tf')">📊 TechnoFunc</button>
       <button class="mode-btn t-a" id="btn-t" onclick="switchMode('t')">📈 Technical</button>
     </div>
-    <span id="mode-desc" style="font-size:13px;color:#00cec9;font-weight:600;">
+    <span id="mode-desc" class="mode-desc-text">
       Fundamentals 65%% + Technicals 35%% · Trend Veto · R:R Gate
     </span>
   </div>
