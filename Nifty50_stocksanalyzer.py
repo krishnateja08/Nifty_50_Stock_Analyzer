@@ -862,7 +862,7 @@ class Nifty100CompleteAnalyzer:
             vol_trend_dir  = vol_trend_data['direction']   # 'Rising'|'Falling'|'Flat'
             vol_trend_ratio = vol_trend_data['ratio']
 
-            # V59-1: Persistence checks — count how many of last 3 bars had signal active
+            # V59-1: Persistence checks — count how many of last 5 bars had signal active
             # Prevents one-day noise from triggering veto
             sma_20_ser_full = df['Close'].rolling(20).mean()
             sma_50_ser      = df['Close'].rolling(50).mean()
@@ -874,7 +874,7 @@ class Nifty100CompleteAnalyzer:
                 ema26_s = df['Close'].ewm(span=26, adjust=False).mean()
                 macd_s  = ema12_s - ema26_s
                 sig_s   = macd_s.ewm(span=9, adjust=False).mean()
-                for offset in [1, 2, 3]:
+                for offset in [1, 2, 3, 4, 5]:
                     idx = -(offset + 1)
                     if len(sma_20_ser_full) >= abs(idx) + 6:
                         if sma_20_ser_full.iloc[idx] < sma_20_ser_full.iloc[idx - 5]:
@@ -1068,6 +1068,14 @@ class Nifty100CompleteAnalyzer:
             elif vol_trend_dir == 'Falling' and current_price < sma_20:
                 tech_score -= 1  # falling volume + below SMA20 = weak
 
+            # V59-4b: Multi-timeframe SMA alignment — applies to MAIN tech_score
+            # SMA20 > SMA50 > SMA200 = cleanest institutional uptrend definition
+            # Misalignment = trend is broken or transitioning → reduce score
+            if sma_20 > sma_50 > sma_200:
+                tech_score = min(tech_score + 1, 6)    # perfectly aligned uptrend
+            elif sma_20 < sma_50 and sma_50 < sma_200:
+                tech_score -= 1                         # fully reversed (bearish alignment)
+
             # FIX-8: Near 52W high in uptrend
             pct_from_52w_high = ((current_price - high_52w) / high_52w) * 100
             if pct_from_52w_high >= -5 and current_price > sma_200:
@@ -1105,6 +1113,8 @@ class Nifty100CompleteAnalyzer:
                 tech_buy_score += 5   # perfectly aligned — bonus
             elif sma_20 > sma_50:
                 tech_buy_score += 2   # partially aligned
+            elif sma_20 < sma_50 and sma_50 < sma_200:
+                tech_buy_score -= 5   # fully reversed — penalty
             # V59-7: Volume trend bonus in tech score
             if vol_trend_dir == 'Rising':
                 tech_buy_score += 3   # institutional interest
@@ -1173,12 +1183,13 @@ class Nifty100CompleteAnalyzer:
                 rsi_post_ob_pullback = False
 
             # V59-1: Bearish signal count with PERSISTENCE filter.
-            # A signal only counts if it persisted for 2+ of the last 3 bars.
-            # This prevents one-day noise from triggering a veto in sideways markets.
+            # A signal only counts if it persisted for 3+ of the last 5 bars.
+            # This prevents temporary noise from blocking fundamentally strong stocks
+            # in sideways markets. Requires sustained deterioration, not one-day dips.
             bearish_signal_count = sum([
-                bool(sma_20_declining and sma20_declining_bars >= 2),   # persistent SMA20 decline
-                bool(death_cross_forming and death_cross_bars >= 2),     # persistent death cross
-                bool(macd < signal and macd_bearish_bars >= 2),          # persistent MACD bearish
+                bool(sma_20_declining and sma20_declining_bars >= 3),   # persistent SMA20 decline
+                bool(death_cross_forming and death_cross_bars >= 3),     # persistent death cross
+                bool(macd < signal and macd_bearish_bars >= 3),          # persistent MACD bearish
                 bool(rsi < 50),                                          # momentum lost (instant)
                 bool(current_price < sma_50),                           # below medium trend (instant)
                 bool(rsi_direction == 'Falling' and rsi_slope_strong),  # RSI falling fast
