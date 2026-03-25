@@ -1769,92 +1769,93 @@ class Nifty100CompleteAnalyzer:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>NIFTY 100 Market Influencers - {time_of_day} Report · {now.strftime('%d %b %Y')}</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Nifty 100 Market Pulse - {time_of_day} Report · {now.strftime('%d %b %Y')}</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --bg:       #04080f;
-  --bg2:      #060d18;
-  --surface:  #0a1628;
-  --surface2: #0c1a2e;
-  --border:   #1e3a5a;
-  --border2:  #2a4a6a;
-  --accent:   #00f5ff;
-  --accent2:  #00ccee;
-  --green:    #00ff88;
-  --green2:   #00cc66;
-  --red:      #ff4466;
-  --gold:     #ffcc00;
-  --purple:   #cc99ff;
-  --teal:     #00f5ff;
-  --text:     #ddeeff;
+  --bg:       #06090f;
+  --bg2:      #080d18;
+  --surface:  #0a1020;
+  --surface2: #0d1525;
+  --border:   #111a2e;
+  --border2:  #1a2540;
+  --accent:   #6c5ce7;
+  --accent2:  #a29bfe;
+  --cyan:     #00cec9;
+  --green:    #00e676;
+  --green2:   #00e676;
+  --red:      #fd79a8;
+  --red2:     #e84393;
+  --gold:     #ffd93d;
+  --purple:   #6c5ce7;
+  --teal:     #00cec9;
+  --text:     #e8edf5;
   --text2:    #ffffff;
-  --muted:    #aaccee;
-  --muted2:   #ccddff;
+  --muted:    #8892a6;
+  --muted2:   #b0b8cc;
+  --dim:      #5a6a8a;
+  --dim2:     #3a4a6a;
 }}
 *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
 body {{
-  background: #04080f; color: #ddeeff;
-  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg); color: var(--text);
+  font-family: 'Outfit', sans-serif;
   font-size: 15px; min-height: 100vh;
 }}
 header {{
-  background: #060d18; border-bottom: 2px solid #00f5ff;
+  background: var(--bg2); border-bottom: 2px solid var(--accent);
   position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.8);
 }}
 .h-top {{
   display: flex; align-items: center;
   justify-content: space-between;
-  padding: 10px 20px; gap: 16px; flex-wrap: wrap;
+  padding: 12px 24px; gap: 16px; flex-wrap: wrap;
 }}
-.brand {{ display: flex; align-items: center; gap: 12px; }}
+.brand {{ display: flex; align-items: center; gap: 14px; }}
 .brand-gem {{
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, #00d4ff, #7c4dff);
-  border-radius: 10px; display: flex;
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, #6c5ce7, #00cec9);
+  border-radius: 12px; display: flex;
   align-items: center; justify-content: center;
   font-size: 20px; flex-shrink: 0;
-  box-shadow: 0 0 20px rgba(0,212,255,0.3);
 }}
 .brand-name {{
-  font-family: 'Syne', sans-serif; font-size: 20px;
-  font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
+  font-family: 'Syne', sans-serif; font-size: 18px;
+  font-weight: 800; color: #ffffff; letter-spacing: -0.3px;
 }}
 .brand-sub {{
-  font-size: 12px; color: #aaddff; letter-spacing: 2px;
-  text-transform: uppercase; margin-top: 2px; font-weight: 700;
+  font-size: 11px; color: var(--dim); letter-spacing: 2px;
+  text-transform: uppercase; margin-top: 2px; font-weight: 600;
 }}
 .idx-strip {{
   display: flex; align-items: center;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.3);
   border: 1px solid var(--border2);
-  border-radius: 10px; overflow: hidden;
+  border-radius: 12px; overflow: hidden;
 }}
 .idx-item {{
   display: flex; flex-direction: column; align-items: center;
-  padding: 6px 20px; border-right: 1px solid var(--border); gap: 2px;
+  padding: 8px 22px; border-right: 1px solid var(--border); gap: 2px;
 }}
 .idx-item:last-child {{ border-right: none; }}
-.idx-name  {{ font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #aaddff; text-transform: uppercase; }}
-.idx-price {{ font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 800; color: #ffffff; }}
-.idx-chg   {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 800; }}
-.idx-chg.up {{ color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
-.idx-chg.dn {{ color: #ff4466; text-shadow: 0 0 8px rgba(255,68,102,0.6); }}
+.idx-name  {{ font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }}
+.idx-price {{ font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; color: #ffffff; }}
+.idx-chg   {{ font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }}
+.idx-chg.up {{ color: var(--green); }}
+.idx-chg.dn {{ color: var(--red); }}
 .clock-box {{ display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }}
 .clock-time {{
-  font-family: 'IBM Plex Mono', monospace; font-size: 24px;
-  font-weight: 800; color: #00ff88;
-  text-shadow: 0 0 16px rgba(0,255,136,0.8); letter-spacing: 1px;
+  font-family: 'JetBrains Mono', monospace; font-size: 22px;
+  font-weight: 700; color: var(--cyan); letter-spacing: 1px;
 }}
-.clock-meta {{ font-size: 14px; color: #ffffff; letter-spacing: 1px; font-weight: 700; }}
-.clock-next {{ font-size: 13px; color: #aaddff; margin-top: 2px; font-weight: 700; }}
+.clock-meta {{ font-size: 13px; color: #ffffff; letter-spacing: 0.5px; font-weight: 600; }}
+.clock-next {{ font-size: 12px; color: var(--dim); margin-top: 2px; font-weight: 500; }}
 .ticker {{
-  background: rgba(0,0,0,0.6); border-top: 1px solid var(--border); overflow: hidden;
+  background: rgba(0,0,0,0.5); border-top: 1px solid var(--border); overflow: hidden;
 }}
 .ticker-inner {{
   display: flex; white-space: nowrap;
-  animation: ticker-scroll 50s linear infinite; padding: 5px 0;
+  animation: ticker-scroll 50s linear infinite; padding: 6px 0;
 }}
 @keyframes ticker-scroll {{
   0%   {{ transform: translateX(0); }}
@@ -1862,173 +1863,173 @@ header {{
 }}
 .tick {{
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 0 18px; border-right: 1px solid #1e3a5a;
-  font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+  padding: 0 18px; border-right: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
 }}
-.tick-sym {{ color: #00f5ff; font-weight: 800; }}
-.tick-px  {{ color: #ffffff; font-weight: 600; }}
-.tick-up  {{ color: #00ff88; font-weight: 700; }}
-.tick-dn  {{ color: #ff4466; font-weight: 700; }}
+.tick-sym {{ color: var(--accent2); font-weight: 600; }}
+.tick-px  {{ color: #ffffff; font-weight: 500; }}
+.tick-up  {{ color: var(--green); font-weight: 600; }}
+.tick-dn  {{ color: var(--red); font-weight: 600; }}
 .kpi-band {{
   display: flex; align-items: center;
-  background: #080f1e; border-bottom: 2px solid #1e3a5a;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
 }}
 .kpi-item {{
   display: flex; flex-direction: column; align-items: center;
-  padding: 16px 24px; border-right: 1px solid #1e3a5a; flex: 1;
+  padding: 18px 26px; border-right: 1px solid var(--border); flex: 1;
 }}
 .kpi-item:last-child {{ border-right: none; }}
-.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; }}
-.kpi-label {{ font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aaddff; margin-top: 5px; }}
+.kpi-num   {{ font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }}
+.kpi-label {{ font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-top: 6px; }}
 .kpi-bar   {{ height: 3px; width: 50px; border-radius: 2px; margin-top: 8px; }}
-.kpi-sub   {{ font-size: 12px; color: #6699bb; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }}
-.main {{ padding: 20px; }}
-.section-hdr {{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }}
+.kpi-sub   {{ font-size: 11px; color: var(--dim2); margin-top: 4px; font-weight: 500; letter-spacing: 0.5px; }}
+.main {{ padding: 24px; }}
+.section-hdr {{ display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }}
 .section-pill {{
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 20px; border-radius: 100px;
-  font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 9px 22px; border-radius: 100px;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
 }}
-.pill-buy  {{ background: #004d25; color: #00ff88; border: 2px solid #00cc66; }}
-.pill-sell {{ background: #4d0010; color: #ff4466; border: 2px solid #cc0033; }}
-.section-line {{ flex: 1; height: 1px; background: #1e3a5a; }}
-.section-note {{ font-size: 13px; color: #88aacc; letter-spacing: 1.5px; white-space: nowrap; font-weight: 800; text-transform: uppercase; }}
+.pill-buy  {{ background: rgba(0,230,118,0.1); color: var(--green); border: 1.5px solid rgba(0,230,118,0.3); }}
+.pill-sell {{ background: rgba(253,121,168,0.1); color: var(--red); border: 1.5px solid rgba(253,121,168,0.3); }}
+.section-line {{ flex: 1; height: 1px; background: var(--border); }}
+.section-note {{ font-size: 12px; color: var(--dim); letter-spacing: 1px; white-space: nowrap; font-weight: 600; text-transform: uppercase; }}
 .tbl-wrap {{
   width: 100%; overflow-x: auto;
-  border: 1px solid #1e3a5a; border-radius: 12px;
-  margin-bottom: 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  -webkit-overflow-scrolling: touch; background: #080f1e;
+  border: 1px solid var(--border); border-radius: 14px;
+  margin-bottom: 28px;
+  -webkit-overflow-scrolling: touch; background: var(--bg2);
 }}
 table {{ width: 100%; border-collapse: collapse; min-width: 1600px; }}
 .grp-row th {{
-  font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-  padding: 9px 10px; text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap;
+  font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  padding: 10px 12px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06); white-space: nowrap;
 }}
-.grp-stock {{ background: #0d3a42; color: #00f5ff; text-shadow: 0 0 8px rgba(0,245,255,0.6); }}
-.grp-trade {{ background: #0a3320; color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.6); }}
-.grp-tech  {{ background: #0a2a40; color: #40c8ff; text-shadow: 0 0 8px rgba(64,200,255,0.6); }}
-.grp-fund  {{ background: #3a2a00; color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.6); }}
-.grp-meta  {{ background: #28124a; color: #cc99ff; text-shadow: 0 0 8px rgba(204,153,255,0.6); }}
+.grp-stock {{ background: rgba(108,92,231,0.12); color: var(--accent2); }}
+.grp-trade {{ background: rgba(0,206,201,0.10); color: var(--cyan); }}
+.grp-tech  {{ background: rgba(108,92,231,0.08); color: #a29bfe; }}
+.grp-fund  {{ background: rgba(255,217,61,0.08); color: var(--gold); }}
+.grp-meta  {{ background: rgba(162,155,254,0.08); color: var(--accent2); }}
 .col-row th {{
-  font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
-  padding: 9px 10px; color: #ffffff; background: #0c1a2e;
-  border-bottom: 3px solid #1e3a5a; white-space: nowrap; text-align: left;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 10px 12px; color: var(--muted2); background: var(--surface);
+  border-bottom: 2px solid var(--border2); white-space: nowrap; text-align: left;
 }}
-.ch-stock {{ border-top: 3px solid #00f5ff; color: #b0f0ff; }}
-.ch-trade {{ border-top: 3px solid #00ff88; color: #b0ffe0; }}
-.ch-tech  {{ border-top: 3px solid #40c8ff; color: #c0e8ff; }}
-.ch-fund  {{ border-top: 3px solid #ffcc00; color: #fff0a0; }}
-.ch-meta  {{ border-top: 3px solid #cc99ff; color: #e8d0ff; }}
-.gsep {{ border-left: 2px solid rgba(255,255,255,0.12) !important; }}
+.ch-stock {{ border-top: 2px solid var(--accent); color: #ccc8f5; }}
+.ch-trade {{ border-top: 2px solid var(--cyan); color: #b0f0ee; }}
+.ch-tech  {{ border-top: 2px solid var(--accent2); color: #ccc8f5; }}
+.ch-fund  {{ border-top: 2px solid var(--gold); color: #fff0a0; }}
+.ch-meta  {{ border-top: 2px solid var(--accent2); color: #d8d0ff; }}
+.gsep {{ border-left: 2px solid rgba(255,255,255,0.06) !important; }}
 td {{
-  padding: 11px 10px; border-bottom: 1px solid #0e2040;
+  padding: 12px 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
   vertical-align: middle; white-space: nowrap;
 }}
 tr:last-child td {{ border-bottom: none; }}
-tr:nth-child(even) td {{ background: rgba(255,255,255,0.025); }}
-tr:hover td {{ background: rgba(0,212,255,0.07); transition: background 0.15s; }}
-.stock-name {{ font-size: 15px; font-weight: 700; color: #ffffff; }}
-.stock-sym  {{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00f5ff; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }}
-.stock-sec  {{ font-size: 12px; color: #88bbdd; margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }}
-.price-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: #ffcc00; }}
+tr:nth-child(even) td {{ background: rgba(108,92,231,0.02); }}
+tr:hover td {{ background: rgba(108,92,231,0.06); transition: background 0.15s; }}
+.stock-name {{ font-size: 15px; font-weight: 600; color: #ffffff; }}
+.stock-sym  {{ font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent2); font-weight: 600; letter-spacing: 1px; margin-top: 2px; }}
+.stock-sec  {{ font-size: 11px; color: var(--dim); margin-top: 2px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }}
+.price-val  {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--gold); }}
 .badge {{
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 12px; font-weight: 800; padding: 5px 10px;
-  border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; padding: 5px 12px;
+  border-radius: 8px; letter-spacing: 0.5px; white-space: nowrap;
 }}
-.badge-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
-.badge-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #00f5ff; }}
-.badge-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #445566; }}
-.badge-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
-.badge-ss {{ background: #5a0015; color: #ff7788; border: 1px solid #ff7788; }}
+.badge-sb {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }}
+.badge-b  {{ background: rgba(0,206,201,0.12); color: var(--cyan); border: 1px solid rgba(0,206,201,0.25); }}
+.badge-h  {{ background: rgba(255,217,61,0.10); color: var(--gold); border: 1px solid rgba(255,217,61,0.20); }}
+.badge-s  {{ background: rgba(253,121,168,0.12); color: var(--red); border: 1px solid rgba(253,121,168,0.25); }}
+.badge-ss {{ background: rgba(232,67,147,0.12); color: var(--red2); border: 1px solid rgba(232,67,147,0.25); }}
 .score-wrap {{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 6px; }}
-.score-num  {{ font-family: 'Syne', sans-serif; font-size: 27px; font-weight: 800; line-height: 1; }}
-.score-track {{ width: 44px; height: 4px; background: #1a2a3a; border-radius: 2px; }}
+.score-num  {{ font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }}
+.score-track {{ width: 44px; height: 4px; background: var(--border); border-radius: 2px; }}
 .score-fill  {{ height: 100%; border-radius: 2px; transition: width 0.5s ease; }}
 .target-badge {{
-  font-size: 11px; font-weight: 800; padding: 3px 7px;
-  border-radius: 4px; letter-spacing: 0.5px; display: block; margin-bottom: 4px;
+  font-size: 11px; font-weight: 700; padding: 3px 8px;
+  border-radius: 6px; letter-spacing: 0.5px; display: block; margin-bottom: 4px;
 }}
-.tb-real    {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
-.tb-partial {{ background: #4d3300; color: #ffcc00; border: 1px solid #ffcc00; }}
-.tb-ath     {{ background: #003a4d; color: #00f5ff; border: 1px solid #00f5ff; }}
-.t1-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; color: #ffffff; }}
-.t2-val {{ font-size: 13px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.sl-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; color: #ff4466; }}
-.sl-pct {{ font-size: 13px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.sl-type {{ font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }}
-.slt-atr  {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
-.slt-beta {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
-.upside-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 800; }}
-.upside-val.up {{ color: #00ff88; }}
-.upside-val.dn {{ color: #ff4466; }}
-.rr-val  {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800; }}
-.atr-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; color: #00f5ff; }}
-.atr-sub {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.rsi-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
-.rsi-sig {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.div-badge {{ font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }}
-.div-bear {{ background: #4d0010; color: #ff4466; border: 1px solid #ff4466; }}
-.div-bull {{ background: #004d25; color: #00ff88; border: 1px solid #00ff88; }}
-.div-none {{ background: #1a2a3a; color: #88aacc; border: 1px solid #334455; }}
-.adx-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
-.adx-lbl {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.adx-strong {{ color: #00ff88; }}
-.adx-mod    {{ color: #ffcc00; }}
-.adx-weak   {{ color: #aabbcc; }}
-.vol-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
-.vol-lbl {{ font-size: 12px; color: #88bbdd; margin-top: 2px; font-weight: 700; }}
-.vol-high {{ color: #00ff88; }}
-.vol-norm {{ color: #ddeeff; }}
-.vol-low  {{ color: #aabbcc; }}
-.sdist-val {{ font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }}
-.sdist-close {{ color: #00ff88; }}
-.sdist-mid   {{ color: #ffcc00; }}
-.sdist-far   {{ color: #ff4466; }}
-.mono-sm {{ font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; }}
-.qbadge {{ font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 5px; }}
-.qb-ex {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
-.qb-gd {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
-.qb-av {{ background: #4d3300; color: #ffcc00; border: 1px solid #cc9900; }}
-.qb-po {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-.analyst-badge {{ font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }}
-.ab-sb {{ background: #004d25; color: #00ff88; border: 1px solid #00cc66; }}
-.ab-b  {{ background: #003a4d; color: #00f5ff; border: 1px solid #0099bb; }}
-.ab-h  {{ background: #1a2a3a; color: #aabbcc; border: 1px solid #334455; }}
-.ab-s  {{ background: #4d0010; color: #ff4466; border: 1px solid #cc0033; }}
-.earn-date {{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #00f5ff; font-weight: 700; }}
-.rnum {{ font-size: 14px; color: #88bbdd; font-weight: 700; }}
-.macd-bull {{ color: #00ff88; font-weight: 800; font-size: 14px; }}
-.macd-bear {{ color: #ff4466; font-weight: 800; font-size: 14px; }}
+.tb-real    {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }}
+.tb-partial {{ background: rgba(255,217,61,0.12); color: var(--gold); border: 1px solid rgba(255,217,61,0.2); }}
+.tb-ath     {{ background: rgba(0,206,201,0.12); color: var(--cyan); border: 1px solid rgba(0,206,201,0.2); }}
+.t1-val {{ font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: #ffffff; }}
+.t2-val {{ font-size: 13px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.sl-val {{ font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--red); }}
+.sl-pct {{ font-size: 13px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.sl-type {{ font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-top: 4px; display: inline-block; }}
+.slt-atr  {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }}
+.slt-beta {{ background: rgba(255,217,61,0.12); color: var(--gold); border: 1px solid rgba(255,217,61,0.2); }}
+.upside-val {{ font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; }}
+.upside-val.up {{ color: var(--green); }}
+.upside-val.dn {{ color: var(--red); }}
+.rr-val  {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; }}
+.atr-val {{ font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--cyan); }}
+.atr-sub {{ font-size: 12px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.rsi-val {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }}
+.rsi-sig {{ font-size: 12px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.div-badge {{ font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }}
+.div-bear {{ background: rgba(253,121,168,0.12); color: var(--red); border: 1px solid rgba(253,121,168,0.2); }}
+.div-bull {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }}
+.div-none {{ background: var(--surface); color: var(--dim); border: 1px solid var(--border); }}
+.adx-val {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }}
+.adx-lbl {{ font-size: 12px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.adx-strong {{ color: var(--green); }}
+.adx-mod    {{ color: var(--gold); }}
+.adx-weak   {{ color: var(--dim); }}
+.vol-val {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }}
+.vol-lbl {{ font-size: 12px; color: var(--dim); margin-top: 2px; font-weight: 600; }}
+.vol-high {{ color: var(--green); }}
+.vol-norm {{ color: var(--text); }}
+.vol-low  {{ color: var(--dim); }}
+.sdist-val {{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }}
+.sdist-close {{ color: var(--green); }}
+.sdist-mid   {{ color: var(--gold); }}
+.sdist-far   {{ color: var(--red); }}
+.mono-sm {{ font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; }}
+.qbadge {{ font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }}
+.qb-ex {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }}
+.qb-gd {{ background: rgba(0,206,201,0.12); color: var(--cyan); border: 1px solid rgba(0,206,201,0.2); }}
+.qb-av {{ background: rgba(255,217,61,0.10); color: var(--gold); border: 1px solid rgba(255,217,61,0.2); }}
+.qb-po {{ background: rgba(253,121,168,0.12); color: var(--red); border: 1px solid rgba(253,121,168,0.2); }}
+.analyst-badge {{ font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }}
+.ab-sb {{ background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }}
+.ab-b  {{ background: rgba(0,206,201,0.12); color: var(--cyan); border: 1px solid rgba(0,206,201,0.2); }}
+.ab-h  {{ background: var(--surface); color: var(--dim); border: 1px solid var(--border); }}
+.ab-s  {{ background: rgba(253,121,168,0.12); color: var(--red); border: 1px solid rgba(253,121,168,0.2); }}
+.earn-date {{ font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--cyan); font-weight: 600; }}
+.rnum {{ font-size: 14px; color: var(--dim); font-weight: 600; }}
+.macd-bull {{ color: var(--green); font-weight: 700; font-size: 14px; }}
+.macd-bear {{ color: var(--red); font-weight: 700; font-size: 14px; }}
 .disc {{
-  background: #0c1a2e; border: 1px solid #1e3a5a;
-  border-left: 4px solid #ff4466;
-  padding: 14px 18px; border-radius: 8px;
-  font-size: 14px; color: #aaccee; line-height: 1.9; margin: 16px 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 4px solid var(--red);
+  padding: 16px 20px; border-radius: 10px;
+  font-size: 14px; color: var(--muted); line-height: 1.9; margin: 16px 0;
 }}
 footer {{
-  text-align: center; padding: 16px;
-  background: #080f1e; border-top: 1px solid #1e3a5a;
-  font-size: 14px; color: #88aacc; letter-spacing: 1px;
+  text-align: center; padding: 18px;
+  background: var(--bg2); border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--dim); letter-spacing: 0.5px;
 }}
-footer strong {{ color: #00f5ff; }}
+footer strong {{ color: var(--accent2); }}
 @media(max-width: 900px) {{
   .idx-strip {{ display: none; }}
-  .kpi-item  {{ padding: 10px 12px; }}
+  .kpi-item  {{ padding: 12px 14px; }}
   .kpi-num   {{ font-size: 27px; }}
 }}
 @media(max-width: 600px) {{
-  .h-top  {{ padding: 8px 12px; }}
-  .main   {{ padding: 10px; }}
+  .h-top  {{ padding: 8px 14px; }}
+  .main   {{ padding: 12px; }}
   .kpi-band {{ flex-wrap: wrap; }}
   .kpi-item {{ flex: 0 0 50%; border-bottom: 1px solid var(--border); }}
 }}
-.mode-toggle {{ display:flex;align-items:center;gap:0;background:#0a1628;border:2px solid #1e3a5a;border-radius:100px;padding:3px; }}
-.mode-btn {{ padding:9px 24px;border-radius:100px;border:none;cursor:pointer;font-size:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.5px;transition:all .25s;white-space:nowrap;background:transparent;color:#556688; }}
-.mode-btn:hover {{ color:#aaccee; }}
-.mode-btn.active.tf-a {{ background:linear-gradient(135deg,#00f5ff,#00cc66);color:#000;box-shadow:0 0 20px rgba(0,245,255,0.3); }}
-.mode-btn.active.t-a {{ background:linear-gradient(135deg,#cc99ff,#7c4dff);color:#fff;box-shadow:0 0 20px rgba(124,77,255,0.3); }}
+.mode-toggle {{ display:flex;align-items:center;gap:0;background:var(--surface);border:1.5px solid var(--border2);border-radius:100px;padding:3px; }}
+.mode-btn {{ padding:9px 24px;border-radius:100px;border:none;cursor:pointer;font-size:14px;font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:.3px;transition:all .25s;white-space:nowrap;background:transparent;color:var(--dim); }}
+.mode-btn:hover {{ color:var(--muted2); }}
+.mode-btn.active.tf-a {{ background:linear-gradient(135deg,#6c5ce7,#00cec9);color:#fff; }}
+.mode-btn.active.t-a {{ background:linear-gradient(135deg,#a29bfe,#6c5ce7);color:#fff; }}
 .mode-sec {{ display:block; }}
 .mode-sec.hidden {{ display:none; }}
 </style>
@@ -2037,10 +2038,10 @@ footer strong {{ color: #00f5ff; }}
 <header>
   <div class="h-top">
     <div class="brand">
-      <div class="brand-gem">💎</div>
+      <div class="brand-gem"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
       <div>
-        <div class="brand-name">NIFTY 100 Market Influencers · NSE &amp; BSE</div>
-        <div class="brand-sub">12M S/R · ATR Stops · Trend Veto · Dynamic Weights · SMA200 Slope · v5.4</div>
+        <div class="brand-name">Nifty 100 Market Pulse</div>
+        <div class="brand-sub">Technical + Fundamental Intelligence · v5.8 Nebula</div>
       </div>
     </div>
     <div class="idx-strip">
@@ -2077,7 +2078,7 @@ footer strong {{ color: #00f5ff; }}
   <div class="kpi-item"><div class="kpi-num" style="color:var(--green)">{strong_buy_count}</div><div class="kpi-label">Strong Buy</div><div class="kpi-bar" style="background:var(--green)"></div></div>
   <div class="kpi-item"><div class="kpi-num" style="color:var(--teal)">{buy_count}</div><div class="kpi-label">Buy</div><div class="kpi-bar" style="background:var(--teal)"></div></div>
   <div class="kpi-item"><div class="kpi-num" style="color:var(--red)">{sell_count + strong_sell_count}</div><div class="kpi-label">Sell / Strong Sell</div><div class="kpi-bar" style="background:var(--red)"></div></div>
-  <div class="kpi-item"><div class="kpi-num" style="color:#60a5fa">{hold_count}</div><div class="kpi-label">Hold</div><div class="kpi-bar" style="background:#60a5fa"></div><div class="kpi-sub">Sectors: {sector_kpi}</div></div>
+  <div class="kpi-item"><div class="kpi-num" style="color:#a29bfe">{hold_count}</div><div class="kpi-label">Hold</div><div class="kpi-bar" style="background:#a29bfe"></div><div class="kpi-sub">Sectors: {sector_kpi}</div></div>
 </div>
 
 <div class="main">
@@ -2100,11 +2101,11 @@ footer strong {{ color: #00f5ff; }}
             SELL (red) / STRONG SELL (deep red).
             """
             styles = {
-                'STRONG BUY':  ('background:#004d25;color:#00ff88;border:1px solid #00ff88;', '⭐⭐ STRONG BUY'),
-                'BUY':         ('background:#003a4d;color:#00f5ff;border:1px solid #00f5ff;', '▲ BUY'),
-                'HOLD':        ('background:#2a2200;color:#ffab00;border:1px solid #ffab00;', '◆ HOLD'),
-                'SELL':        ('background:#4d0010;color:#ff4466;border:1px solid #ff4466;', '▼ SELL'),
-                'STRONG SELL': ('background:#5a0015;color:#ff7788;border:1px solid #ff7788;', '⚠ STRONG SELL'),
+                'STRONG BUY':  ('background:rgba(0,230,118,0.12);color:#00e676;border:1px solid #00e676;', '⭐⭐ STRONG BUY'),
+                'BUY':         ('background:rgba(0,206,201,0.12);color:#00cec9;border:1px solid #00cec9;', '▲ BUY'),
+                'HOLD':        ('background:rgba(255,217,61,0.10);color:#ffd93d;border:1px solid #ffd93d;', '◆ HOLD'),
+                'SELL':        ('background:rgba(253,121,168,0.12);color:#fd79a8;border:1px solid #fd79a8;', '▼ SELL'),
+                'STRONG SELL': ('background:rgba(232,67,147,0.12);color:#ff7788;border:1px solid #ff7788;', '⚠ STRONG SELL'),
             }
             style, label = styles.get(rec, styles['HOLD'])
             return (f'<span style="display:inline-block;padding:4px 10px;border-radius:5px;'
@@ -2116,8 +2117,8 @@ footer strong {{ color: #00f5ff; }}
             action is HOLD — fundamentals were good but trend vetoed it."""
             if bearish_signals >= 3:
                 return (f'<div style="margin-top:3px;display:inline-block;padding:2px 6px;'
-                        f'border-radius:3px;background:#2a1500;color:#ff8c00;'
-                        f'border:1px solid #ff8c00;font-size:12px;font-weight:700;">'
+                        f'border-radius:3px;background:rgba(253,121,168,0.15);color:#ffd93d;'
+                        f'border:1px solid #ffd93d;font-size:12px;font-weight:700;">'
                         f'🚫 Trend Veto ({bearish_signals}/5)</div>')
             return ''
 
@@ -2169,30 +2170,30 @@ footer strong {{ color: #00f5ff; }}
             return f'<span class="qbadge {m.get(q, "qb-av")}">{q}</span>'
 
         def rr_color(v):
-            return '#00e676' if v >= 2 else ('#00d4ff' if v >= 1.5 else ('#ffab00' if v >= 1 else '#ff3d57'))
+            return '#00e676' if v >= 2 else ('#00cec9' if v >= 1.5 else ('#ffd93d' if v >= 1 else '#fd79a8'))
 
         def pe_color(v, direction='buy'):
-            if v <= 0: return '#4a6080'
+            if v <= 0: return '#3a4a6a'
             if direction == 'buy':
-                return '#00e676' if v < 25 else ('#ffab00' if v < 40 else '#ff3d57')
+                return '#00e676' if v < 25 else ('#ffd93d' if v < 40 else '#fd79a8')
             else:
-                return '#ff3d57' if v > 40 else ('#ffab00' if v > 25 else '#00e676')
+                return '#fd79a8' if v > 40 else ('#ffd93d' if v > 25 else '#00e676')
 
         def w52_color(pct):
-            return '#ff3d57' if pct >= -5 else ('#ffab00' if pct >= -20 else '#00e676')
+            return '#fd79a8' if pct >= -5 else ('#ffd93d' if pct >= -20 else '#00e676')
 
         def beta_color(v):
-            return '#ff3d57' if v > 1.5 else ('#ffab00' if v > 1.0 else '#00e676')
+            return '#fd79a8' if v > 1.5 else ('#ffd93d' if v > 1.0 else '#00e676')
 
         # == V58 MODE TOGGLE ===================================================
         html += """
   <div style="display:flex;align-items:center;gap:16px;margin:0 0 20px 0;flex-wrap:wrap;">
-    <span style="font-size:13px;color:#88aacc;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
+    <span style="font-size:13px;color:#8892a6;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Analysis Mode</span>
     <div class="mode-toggle">
       <button class="mode-btn tf-a active" id="btn-tf" onclick="switchMode('tf')">📊 TechnoFunc</button>
       <button class="mode-btn t-a" id="btn-t" onclick="switchMode('t')">📈 Technical</button>
     </div>
-    <span id="mode-desc" style="font-size:13px;color:#00f5ff;font-weight:600;">
+    <span id="mode-desc" style="font-size:13px;color:#00cec9;font-weight:600;">
       Fundamentals 65%% + Technicals 35%% · Trend Veto · R:R Gate
     </span>
   </div>
@@ -2246,17 +2247,17 @@ footer strong {{ color: #00f5ff; }}
 """
             for i, (_, row) in enumerate(top_buys.iterrows(), 1):
                 rec      = row['Recommendation']
-                sc_color = '#00e676' if row['Combined_Score'] >= 75 else ('#00d4ff' if row['Combined_Score'] >= 55 else '#ffab00')
-                sc_bar   = '#00c853' if row['Combined_Score'] >= 75 else ('#0099cc' if row['Combined_Score'] >= 55 else '#f59e0b')
+                sc_color = '#00e676' if row['Combined_Score'] >= 75 else ('#00cec9' if row['Combined_Score'] >= 55 else '#ffd93d')
+                sc_bar   = '#00e676' if row['Combined_Score'] >= 75 else ('#00cec9' if row['Combined_Score'] >= 55 else '#ffd93d')
                 upcls    = 'up' if row['Upside'] >= 0 else 'dn'
-                rsic     = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#60a5fa')
+                rsic     = '#fd79a8' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#a29bfe')
                 w52      = ((row['Price'] - row['52W_High']) / row['52W_High']) * 100
                 tbcls, tbtxt = target_badge_html(row.get('Target_Status', ''))
                 st       = row.get('Stop_Type', 'ATR Stop')
                 scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
                 slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
                 div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '-'
-                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
+                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#3a4a6a'
                 rr       = row['Risk_Reward']
                 mcdcls   = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
                 bs       = row.get('Bearish_Signals', 0)
@@ -2266,10 +2267,10 @@ footer strong {{ color: #00f5ff; }}
                 if rsi_dir_b == 'Rising':
                     rsi_slope_html = f'<span style="color:#00e676;font-size:12px">↑ +{rsi_slp_b:.0f}</span>'
                 elif rsi_dir_b == 'Falling':
-                    slp_clr = '#ff4466' if abs(rsi_slp_b) > 8 else '#ffab00'
+                    slp_clr = '#fd79a8' if abs(rsi_slp_b) > 8 else '#ffd93d'
                     rsi_slope_html = f'<span style="color:{slp_clr};font-size:12px">↓ {rsi_slp_b:.0f}</span>'
                 else:
-                    rsi_slope_html = '<span style="color:#4a6080;font-size:12px">→</span>'
+                    rsi_slope_html = '<span style="color:#3a4a6a;font-size:12px">→</span>'
 
                 html += f"""      <tr>
         <td><span class="rnum">{i}</span></td>
@@ -2368,7 +2369,7 @@ footer strong {{ color: #00f5ff; }}
             for i, (_, row) in enumerate(top_sells.iterrows(), 1):
                 rec      = row['Recommendation']
                 dncls    = 'dn' if row['Upside'] >= 0 else 'up'
-                rsic     = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#ffab00')
+                rsic     = '#fd79a8' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#ffd93d')
                 mcdcls   = 'macd-bear' if row['MACD'] == 'Bearish' else 'macd-bull'
                 w52      = ((row['Price'] - row['52W_High']) / row['52W_High']) * 100
                 tbcls, tbtxt = target_badge_html(row.get('Target_Status', ''))
@@ -2376,7 +2377,7 @@ footer strong {{ color: #00f5ff; }}
                 scls     = 'slt-atr' if st == 'ATR Stop' else 'slt-beta'
                 slbl     = ('📐 ATR Stop' if st == 'ATR Stop' else '🔒 Beta Cap')
                 div      = f"{row['Dividend_Yield']:.2f}%" if row['Dividend_Yield'] > 0 else '-'
-                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#4a6080'
+                divc     = '#00e676' if row['Dividend_Yield'] > 0 else '#3a4a6a'
                 rr       = row['Risk_Reward']
 
                 html += f"""      <tr>
@@ -2389,7 +2390,7 @@ footer strong {{ color: #00f5ff; }}
         <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
         <td class="gsep">
           {rating_badge(rec, {'STRONG BUY':'⭐⭐⭐⭐⭐ STRONG BUY','BUY':'⭐⭐⭐⭐ BUY','HOLD':'⭐⭐⭐ HOLD','SELL':'⭐⭐ SELL','STRONG SELL':'⭐ STRONG SELL'}.get(rec, rec))}
-          {score_cell(row['Combined_Score'], '#ff3d57', '#c62828')}
+          {score_cell(row['Combined_Score'], '#fd79a8', '#c62828')}
         </td>
         <td><span class="upside-val {dncls}">{row['Upside']:+.1f}%</span></td>
         <td>
@@ -2398,7 +2399,7 @@ footer strong {{ color: #00f5ff; }}
           <div class="t2-val">T2: ₹{row['Target_2']:,.2f}</div>
         </td>
         <td>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:#ffd93d">₹{row['Stop_Loss']:,.2f}</div>
           <div class="sl-pct">+{row['SL_Percentage']:.1f}%</div>
           <span class="sl-type {scls}">{slbl}</span>
         </td>
@@ -2434,7 +2435,7 @@ footer strong {{ color: #00f5ff; }}
 
         html += """
   <div class="section-hdr" style="margin-top:32px">
-    <div class="section-pill" style="background:linear-gradient(90deg,#1a2a4a,#0c1a2e);color:#aaccee;border:1px solid #2a4a6a;">
+    <div class="section-pill" style="background:linear-gradient(90deg,#1a1a3a,#0d1525);color:#b0b8cc;border:1px solid rgba(108,92,231,0.3);">
       📋 Complete Watchlist — All {count} Stocks · Sorted by Score
     </div>
     <div class="section-line"></div>
@@ -2491,7 +2492,7 @@ footer strong {{ color: #00f5ff; }}
             rec   = row['Recommendation']
             bs    = row.get('Bearish_Signals', 0)
             wm    = row.get('Weight_Mode', '')
-            rsic  = '#ff3d57' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#60a5fa')
+            rsic  = '#fd79a8' if row['RSI'] > 70 else ('#00e676' if row['RSI'] < 30 else '#a29bfe')
             mcdcls = 'macd-bull' if row['MACD'] == 'Bullish' else 'macd-bear'
             rr    = row['Risk_Reward']
             upcls = 'up' if row['Upside'] >= 0 else 'dn'
@@ -2501,29 +2502,29 @@ footer strong {{ color: #00f5ff; }}
             death_cross   = row.get('Death_Cross', False)
             sma200_rising = row.get('SMA_200_Rising', True)
             if sma_declining and death_cross:
-                sma_trend = '<span style="color:#ff4466;font-size:13px">↓ Declining</span>'
+                sma_trend = '<span style="color:#fd79a8;font-size:13px">↓ Declining</span>'
             elif sma_declining or death_cross:
-                sma_trend = '<span style="color:#ffab00;font-size:13px">⚠ Weakening</span>'
+                sma_trend = '<span style="color:#ffd93d;font-size:13px">⚠ Weakening</span>'
             elif sma200_rising:
                 sma_trend = '<span style="color:#00e676;font-size:13px">↑ Rising</span>'
             else:
-                sma_trend = '<span style="color:#60a5fa;font-size:13px">→ Flat</span>'
+                sma_trend = '<span style="color:#a29bfe;font-size:13px">→ Flat</span>'
 
             # Bearish signal count pill
             if bs >= 4:
-                sig_pill = f'<span style="color:#ff4466;font-size:13px">🔴 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#fd79a8;font-size:13px">🔴 {bs}/5 Bear</span>'
             elif bs >= 3:
-                sig_pill = f'<span style="color:#ff8c00;font-size:13px">🟠 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟠 {bs}/5 Bear</span>'
             elif bs >= 1:
-                sig_pill = f'<span style="color:#ffab00;font-size:13px">🟡 {bs}/5</span>'
+                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟡 {bs}/5</span>'
             else:
                 sig_pill = f'<span style="color:#00e676;font-size:13px">🟢 0/5</span>'
 
             # Score colour
-            if row['Combined_Score'] >= 70:   sc = '#00ff88'
-            elif row['Combined_Score'] >= 50:  sc = '#00f5ff'
-            elif row['Combined_Score'] >= 40:  sc = '#ffab00'
-            else:                              sc = '#ff4466'
+            if row['Combined_Score'] >= 70:   sc = '#00e676'
+            elif row['Combined_Score'] >= 50:  sc = '#00cec9'
+            elif row['Combined_Score'] >= 40:  sc = '#ffd93d'
+            else:                              sc = '#fd79a8'
 
             # data-rec attribute drives JS filter
             data_rec = rec.replace(' ', '_')
@@ -2540,28 +2541,28 @@ footer strong {{ color: #00f5ff; }}
             if rsi_dir == 'Rising':
                 rsi_dir_html = f'<span style="color:#00e676;font-size:12px">↑ +{rsi_slp:.0f}</span>'
             elif rsi_dir == 'Falling':
-                clr = '#ff4466' if abs(rsi_slp) > 8 else '#ffab00'
+                clr = '#fd79a8' if abs(rsi_slp) > 8 else '#ffd93d'
                 rsi_dir_html = f'<span style="color:{clr};font-size:12px">↓ {rsi_slp:.0f}</span>'
             else:
-                rsi_dir_html = '<span style="color:#4a6080;font-size:12px">→ flat</span>'
+                rsi_dir_html = '<span style="color:#3a4a6a;font-size:12px">→ flat</span>'
 
             # F/T split pill: shows fund score / tech score
-            tech_col  = '#00e676' if tech_sc >= 3 else ('#ffab00' if tech_sc >= 0 else '#ff4466')
-            fund_col  = '#00e676' if fund_sc >= 70 else ('#ffab00' if fund_sc >= 50 else '#ff4466')
+            tech_col  = '#00e676' if tech_sc >= 3 else ('#ffd93d' if tech_sc >= 0 else '#fd79a8')
+            fund_col  = '#00e676' if fund_sc >= 70 else ('#ffd93d' if fund_sc >= 50 else '#fd79a8')
             ft_cell   = (f'<span style="font-size:13px;color:{fund_col}">F:{fund_sc:.0f}</span>'
-                         f'<span style="color:#4a6080;font-size:12px"> / </span>'
+                         f'<span style="color:#3a4a6a;font-size:12px"> / </span>'
                          f'<span style="font-size:13px;color:{tech_col}">T:{tech_sc:+d}</span>')
 
             # RSI divergence pill
             if rsi_div == 'Bearish Divergence':
-                rsi_div_cell = '<span style="color:#ff4466;font-size:12px">⚠ Bear Div</span>'
+                rsi_div_cell = '<span style="color:#fd79a8;font-size:12px">⚠ Bear Div</span>'
             elif rsi_div == 'Bullish Divergence':
                 rsi_div_cell = '<span style="color:#00e676;font-size:12px">✅ Bull Div</span>'
             else:
-                rsi_div_cell = '<span style="color:#4a6080;font-size:12px">—</span>'
+                rsi_div_cell = '<span style="color:#3a4a6a;font-size:12px">—</span>'
 
             # Veto label inside action cell
-            veto_cell = ('<span style="display:block;font-size:11px;color:#ff8c00;margin-top:2px">🚫 Veto</span>'
+            veto_cell = ('<span style="display:block;font-size:11px;color:#ffd93d;margin-top:2px">🚫 Veto</span>'
                          if veto else '')
 
             # Sort key for SMA trend (numeric: 3=Rising, 2=Flat, 1=Weakening, 0=Declining)
@@ -2594,10 +2595,10 @@ footer strong {{ color: #00f5ff; }}
           <div class="stock-name" style="font-size:14px">{row['Name']}</div>
           <div class="stock-sym">{row['Symbol']}</div>
         </td>
-        <td><span style="font-size:13px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
+        <td><span style="font-size:13px;color:#8892a6">{row.get('Sector','N/A')}</span></td>
         <td><div class="price-val" style="font-size:15px">₹{row['Price']:,.2f}</div></td>
         <td>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:{sc}">{row['Combined_Score']:.0f}</span>
           {veto_badge(bs, wm)}
         </td>
         <td>{ft_cell}</td>
@@ -2607,15 +2608,15 @@ footer strong {{ color: #00f5ff; }}
         </td>
         <td>
           <div class="rsi-val" style="color:{rsic};font-size:15px">{row['RSI']:.0f}</div>
-          <div style="font-size:12px;color:#8899aa">{row['RSI_Signal']}</div>
+          <div style="font-size:12px;color:#8892a6">{row['RSI_Signal']}</div>
           {rsi_dir_html}
         </td>
         <td>{rsi_div_cell}</td>
         <td><span class="{mcdcls}" style="font-size:13px">{row['MACD']}</span></td>
         <td>{sma_trend}</td>
         <td>{vol_cell(row.get('Vol_Ratio', 1.0))}</td>
-        <td><div style="font-size:14px;color:#00d4ff">₹{row['Target_1']:,.2f}</div></td>
-        <td><div style="font-size:14px;color:#ffab00">₹{row['Stop_Loss']:,.2f}</div></td>
+        <td><div style="font-size:14px;color:#00cec9">₹{row['Target_1']:,.2f}</div></td>
+        <td><div style="font-size:14px;color:#ffd93d">₹{row['Stop_Loss']:,.2f}</div></td>
         <td><span class="rr-val" style="color:{rr_color(rr)};font-size:14px">{rr:.1f}×</span></td>
         <td><span class="upside-val {upcls}" style="font-size:14px">{row['Upside']:+.1f}%</span></td>
         <td><span style="font-size:14px;color:{pe_color(row['PE_Ratio'],'buy')}">{f"{row['PE_Ratio']:.1f}" if row['PE_Ratio']>0 else 'N/A'}</span></td>
@@ -2632,27 +2633,27 @@ footer strong {{ color: #00f5ff; }}
         html += """
   <div style="margin:32px 0 0 0;">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-      <span style="font-size:22px;font-weight:800;color:#ffcc00;font-family:'Syne',sans-serif;letter-spacing:1px;">
+      <span style="font-size:22px;font-weight:800;color:#ffd93d;font-family:'Syne',sans-serif;letter-spacing:1px;">
         ⏳ Accumulate on Dip
       </span>
-      <span style="font-size:13px;color:#aaccee;background:#1a1a00;border:1px solid #ffcc00;
+      <span style="font-size:13px;color:#b0b8cc;background:rgba(255,217,61,0.08);border:1px solid #ffd93d;
                    border-radius:6px;padding:3px 10px;">
         Score 42–49 · Good Fundamentals · Wait for Signal
       </span>
     </div>
-    <p style="font-size:13px;color:#8899aa;margin-bottom:12px;">
+    <p style="font-size:13px;color:#8892a6;margin-bottom:12px;">
       These stocks just missed the BUY threshold but have solid fundamentals.
       Watch for RSI to stabilise above 50 or MACD to flip bullish — then they become actionable.
     </p>
 """
         if accumulate_df.empty:
-            html += '<p style="color:#aaccee;padding:12px;">No stocks currently in the accumulate zone.</p>\n'
+            html += '<p style="color:#b0b8cc;padding:12px;">No stocks currently in the accumulate zone.</p>\n'
         else:
             html += """
     <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <thead>
-        <tr style="background:#1a1500;color:#ffcc00;text-align:left;">
+        <tr style="background:rgba(255,217,61,0.06);color:#ffd93d;text-align:left;">
           <th style="padding:10px 8px;">#</th>
           <th style="padding:10px 8px;">Stock / Sector</th>
           <th style="padding:10px 8px;">Price</th>
@@ -2678,20 +2679,20 @@ footer strong {{ color: #00f5ff; }}
                 price    = row.get('Price', 0)
 
                 # Colour coding
-                rsi_col  = '#ff4466' if rsi_val > 65 else ('#00e676' if rsi_val < 40 else '#60a5fa')
+                rsi_col  = '#fd79a8' if rsi_val > 65 else ('#00e676' if rsi_val < 40 else '#a29bfe')
                 macd_col = '#00e676' if macd_sig == 'Bullish' else '#ff6680'
-                qual_col = {'Excellent': '#00ff88', 'Good': '#00d4ff',
-                            'Average': '#ffab00', 'Poor': '#ff4466'}.get(qual, '#aaccee')
-                ts_col   = '#00e676' if ts >= 0 else '#ff4466'
-                fs_col   = '#00e676' if fs >= 70 else ('#ffab00' if fs >= 50 else '#ff4466')
+                qual_col = {'Excellent': '#00e676', 'Good': '#00cec9',
+                            'Average': '#ffd93d', 'Poor': '#fd79a8'}.get(qual, '#b0b8cc')
+                ts_col   = '#00e676' if ts >= 0 else '#fd79a8'
+                fs_col   = '#00e676' if fs >= 70 else ('#ffd93d' if fs >= 50 else '#fd79a8')
 
                 # Direction arrow
                 if rsi_dir == 'Rising':
                     dir_html = f'<span style="color:#00e676;font-size:11px">↑+{rsi_slp:.0f}</span>'
                 elif rsi_dir == 'Falling':
-                    dir_html = f'<span style="color:#ffab00;font-size:11px">↓{rsi_slp:.0f}</span>'
+                    dir_html = f'<span style="color:#ffd93d;font-size:11px">↓{rsi_slp:.0f}</span>'
                 else:
-                    dir_html = '<span style="color:#4a6080;font-size:11px">→flat</span>'
+                    dir_html = '<span style="color:#3a4a6a;font-size:11px">→flat</span>'
 
                 # What to watch for — context-aware trigger hint
                 triggers = []
@@ -2705,20 +2706,20 @@ footer strong {{ color: #00f5ff; }}
                     triggers.append('Volume confirmation')
                 watch_str = ' · '.join(triggers)
 
-                bg = '#0c1005' if i % 2 == 0 else '#090d02'
-                html += f"""        <tr style="background:{bg};border-bottom:1px solid #1e2a10;">
-          <td style="padding:9px 8px;color:#6a8a4a;">{i}</td>
+                bg = '#0d1020' if i % 2 == 0 else '#080d18'
+                html += f"""        <tr style="background:{bg};border-bottom:1px solid #111a2e;">
+          <td style="padding:9px 8px;color:#5a6a8a;">{i}</td>
           <td style="padding:9px 8px;">
-            <div style="font-weight:600;color:#ddeeff;font-size:13px;">{row['Name']}</div>
-            <div style="font-size:11px;color:#6a8a6a;">{row['Symbol']} · {row.get('Sector','N/A')}</div>
+            <div style="font-weight:600;color:#e8edf5;font-size:13px;">{row['Name']}</div>
+            <div style="font-size:11px;color:#5a6a8a;">{row['Symbol']} · {row.get('Sector','N/A')}</div>
           </td>
-          <td style="padding:9px 8px;color:#aaccee;font-family:'IBM Plex Mono',monospace;">₹{price:,.2f}</td>
+          <td style="padding:9px 8px;color:#b0b8cc;font-family:'JetBrains Mono',monospace;">₹{price:,.2f}</td>
           <td style="padding:9px 8px;">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#ffcc00;">{cs:.0f}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#ffd93d;">{cs:.0f}</span>
           </td>
           <td style="padding:9px 8px;">
             <span style="font-size:12px;color:{fs_col}">F:{fs:.0f}</span>
-            <span style="color:#4a6080;font-size:11px"> / </span>
+            <span style="color:#3a4a6a;font-size:11px"> / </span>
             <span style="font-size:12px;color:{ts_col}">T:{ts:+d}</span>
           </td>
           <td style="padding:9px 8px;">
@@ -2727,7 +2728,7 @@ footer strong {{ color: #00f5ff; }}
           </td>
           <td style="padding:9px 8px;color:{macd_col};font-size:12px;">{macd_sig}</td>
           <td style="padding:9px 8px;color:{qual_col};font-size:12px;">{qual}</td>
-          <td style="padding:9px 8px;color:#ccaa44;font-size:12px;">👁 {watch_str}</td>
+          <td style="padding:9px 8px;color:#ffd93d;font-size:12px;">👁 {watch_str}</td>
         </tr>
 """
             html += "      </tbody></table></div>\n"
@@ -2744,39 +2745,39 @@ footer strong {{ color: #00f5ff; }}
 
         # ── Helper for SMA % cell ──
         def tech_sma_cell(price, sma_val):
-            if sma_val <= 0: return '<span style="color:#4a6080">N/A</span>'
+            if sma_val <= 0: return '<span style="color:#3a4a6a">N/A</span>'
             pct = ((price - sma_val) / sma_val) * 100
             if pct >= 0:
                 return f'<span style="color:#00e676;font-weight:700;font-size:14px">▲ +{pct:.1f}%</span>'
-            return f'<span style="color:#ff4466;font-weight:700;font-size:14px">▼ {pct:.1f}%</span>'
+            return f'<span style="color:#fd79a8;font-weight:700;font-size:14px">▼ {pct:.1f}%</span>'
 
         def tech_signal_label(row):
             rsi_d = row.get('RSI_Direction', 'Flat')
-            if row['RSI'] < 30 and rsi_d == 'Rising':    return '<span style="color:#00ff88;font-weight:700">🔥 Oversold Reversal</span>'
+            if row['RSI'] < 30 and rsi_d == 'Rising':    return '<span style="color:#00e676;font-weight:700">🔥 Oversold Reversal</span>'
             if row['RSI'] < 30:                            return '<span style="color:#00e676;font-weight:700">⬇ Deep Oversold</span>'
             if row['RSI'] < 40 and rsi_d == 'Rising':     return '<span style="color:#00e676;font-weight:700">↗ Recovery Setup</span>'
-            if row['RSI'] < 50 and row['MACD']=='Bullish': return '<span style="color:#00d4ff;font-weight:700">📊 MACD Bullish Cross</span>'
-            if row.get('RSI_Divergence')=='Bullish Divergence': return '<span style="color:#cc99ff;font-weight:700">🔀 Bullish Divergence</span>'
-            if rsi_d == 'Rising':                          return '<span style="color:#00d4ff;font-weight:700">📈 Momentum Build</span>'
-            return '<span style="color:#aaccee;font-weight:700">📋 Technical Setup</span>'
+            if row['RSI'] < 50 and row['MACD']=='Bullish': return '<span style="color:#00cec9;font-weight:700">📊 MACD Bullish Cross</span>'
+            if row.get('RSI_Divergence')=='Bullish Divergence': return '<span style="color:#a29bfe;font-weight:700">🔀 Bullish Divergence</span>'
+            if rsi_d == 'Rising':                          return '<span style="color:#00cec9;font-weight:700">📈 Momentum Build</span>'
+            return '<span style="color:#b0b8cc;font-weight:700">📋 Technical Setup</span>'
 
         def tech_rsi_slope_html(row):
             d, s = row.get('RSI_Direction','Flat'), row.get('RSI_Slope',0)
             if d == 'Rising':  return f'<span style="color:#00e676;font-size:12px;font-weight:700">↑ +{s:.0f}</span>'
-            if d == 'Falling': return f'<span style="color:{"#ff4466" if abs(s)>8 else "#ffab00"};font-size:12px;font-weight:700">↓ {s:.0f}</span>'
-            return '<span style="color:#4a6080;font-size:12px">→</span>'
+            if d == 'Falling': return f'<span style="color:{"#fd79a8" if abs(s)>8 else "#ffd93d"};font-size:12px;font-weight:700">↓ {s:.0f}</span>'
+            return '<span style="color:#3a4a6a;font-size:12px">→</span>'
 
         def tech_score_color(tbs):
-            if tbs >= 70: return '#00ff88', '#00c853'
-            if tbs >= 50: return '#cc99ff', '#7c4dff'
-            if tbs >= 35: return '#00f5ff', '#0099cc'
-            return '#ffab00', '#f59e0b'
+            if tbs >= 70: return '#00e676', '#00e676'
+            if tbs >= 50: return '#a29bfe', '#7c4dff'
+            if tbs >= 35: return '#00cec9', '#00cec9'
+            return '#ffd93d', '#ffd93d'
 
         # ── TECHNICAL BUY TABLE ───────────────────────────────────────────
         if not tech_buys.empty:
             html += """
   <div class="section-hdr">
-    <div class="section-pill" style="background:#28124a;color:#cc99ff;border:2px solid #7c4dff;">📈 Top 10 Technical Buy — 100%% Chart Analysis</div>
+    <div class="section-pill" style="background:#28124a;color:#a29bfe;border:2px solid #7c4dff;">📈 Top 10 Technical Buy — 100%% Chart Analysis</div>
     <div class="section-line"></div>
     <div class="section-note">ALL 100 STOCKS · RSI + MACD + SMA + ADX + VOLUME · ZERO FUNDAMENTALS</div>
   </div>
@@ -2784,14 +2785,14 @@ footer strong {{ color: #00f5ff; }}
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th style="background:#28124a;color:#cc99ff;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
+        <th style="background:#28124a;color:#a29bfe;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
         <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
         <th class="grp-trade gsep" colspan="5">TRADE SETUP (BUY SIDE)</th>
       </tr>
       <tr class="col-row">
         <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Score</th>
-        <th style="border-top:3px solid #cc99ff;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;">Signal</th>
+        <th style="border-top:3px solid #a29bfe;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;" class="gsep">Score</th>
+        <th style="border-top:3px solid #a29bfe;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;">Signal</th>
         <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
         <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Upside</th><th class="ch-trade">ATR</th>
       </tr>
@@ -2799,7 +2800,7 @@ footer strong {{ color: #00f5ff; }}
 """
             for i, (_, row) in enumerate(tech_buys.iterrows(), 1):
                 tbs = row['Tech_Buy_Score']; tc, tb = tech_score_color(tbs)
-                rsic = '#ff3d57' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#60a5fa')
+                rsic = '#fd79a8' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#a29bfe')
                 mcdcls = 'macd-bull' if row['MACD']=='Bullish' else 'macd-bear'
                 bt1,bt2,bsl = row.get('Buy_Target_1',0), row.get('Buy_Target_2',0), row.get('Buy_Stop',0)
                 bup,brr,bslp = row.get('Buy_Upside',0), row.get('Buy_RR',0), row.get('Buy_SL_Pct',0)
@@ -2837,20 +2838,20 @@ footer strong {{ color: #00f5ff; }}
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th style="background:#4d0010;color:#ff4466;text-shadow:0 0 8px rgba(255,68,102,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="1">TECH SCORE</th>
+        <th style="background:rgba(253,121,168,0.12);color:#fd79a8;text-shadow:0 0 8px rgba(255,68,102,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="1">TECH SCORE</th>
         <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
         <th class="grp-trade gsep" colspan="5">TRADE SETUP (SELL SIDE)</th>
       </tr>
       <tr class="col-row">
         <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
-        <th style="border-top:3px solid #ff4466;color:#ffb0b0;font-size:13px;font-weight:800;padding:9px 10px;background:#0c1a2e;border-bottom:3px solid #1e3a5a;white-space:nowrap;text-align:left;" class="gsep">Score</th>
+        <th style="border-top:3px solid #fd79a8;color:#ffb0b0;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;" class="gsep">Score</th>
         <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
         <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Downside</th><th class="ch-trade">ATR</th>
       </tr>
     </thead><tbody>
 """
             for i, (_, row) in enumerate(tech_sells.iterrows(), 1):
-                tbs = row['Tech_Buy_Score']; rsic = '#ff3d57' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#60a5fa')
+                tbs = row['Tech_Buy_Score']; rsic = '#fd79a8' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#a29bfe')
                 mcdcls = 'macd-bear'
                 st1,st2,ssl = row.get('Sell_Target_1',0), row.get('Sell_Target_2',0), row.get('Sell_Stop',0)
                 sdwn,srr,sslp = row.get('Sell_Downside',0), row.get('Sell_RR',0), row.get('Sell_SL_Pct',0)
@@ -2858,7 +2859,7 @@ footer strong {{ color: #00f5ff; }}
         <td><span class="rnum">{i}</span></td>
         <td><div class="stock-name">{row['Name']}</div><div class="stock-sym">{row['Symbol']}</div><div class="stock-sec">{row.get('Sector','N/A')}</div></td>
         <td><div class="price-val">₹{row['Price']:,.2f}</div></td>
-        <td class="gsep"><span class="score-num" style="color:#ff4466">{tbs:.0f}</span></td>
+        <td class="gsep"><span class="score-num" style="color:#fd79a8">{tbs:.0f}</span></td>
         <td class="gsep"><div class="rsi-val" style="color:{rsic}">{row['RSI']:.0f}</div><div class="rsi-sig">{row['RSI_Signal']}</div>{tech_rsi_slope_html(row)}</td>
         <td><span class="{mcdcls}">Bearish</span></td>
         <td>{tech_sma_cell(row['Price'], row.get('SMA_20',0))}</td>
@@ -2867,7 +2868,7 @@ footer strong {{ color: #00f5ff; }}
         <td>{adx_cell(row.get('ADX',0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio',1.0))}</td>
         <td class="gsep"><div class="t1-val">₹{st1:,.2f}</div><div class="t2-val">T2: ₹{st2:,.2f}</div></td>
-        <td><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#ffab00">₹{ssl:,.2f}</div><div class="sl-pct">+{sslp:.1f}%</div></td>
+        <td><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:#ffd93d">₹{ssl:,.2f}</div><div class="sl-pct">+{sslp:.1f}%</div></td>
         <td><span class="rr-val" style="color:{rr_color(srr)}">{srr:.1f}×</span></td>
         <td><span class="upside-val dn">{sdwn:+.1f}%</span></td>
         <td><div class="atr-val">₹{row['ATR']:,.2f}</div><div class="atr-sub">{row['ATR_Pct']:.1f}%</div></td>
@@ -2878,7 +2879,7 @@ footer strong {{ color: #00f5ff; }}
         all_tech_sorted = df.sort_values('Tech_Buy_Score', ascending=False)
         html += f"""
   <div class="section-hdr" style="margin-top:32px">
-    <div class="section-pill" style="background:linear-gradient(90deg,#1a1a3a,#0c0c2e);color:#cc99ff;border:1px solid #7c4dff;">
+    <div class="section-pill" style="background:linear-gradient(90deg,#1a1a3a,#0c0c2e);color:#a29bfe;border:1px solid #7c4dff;">
       📋 Technical Watchlist — All {{0}} Stocks · Sorted by Tech Score
     </div>
     <div class="section-line"></div>
@@ -2903,30 +2904,30 @@ footer strong {{ color: #00f5ff; }}
 
         for i, (_, row) in enumerate(all_tech_sorted.iterrows(), 1):
             tbs = row.get('Tech_Buy_Score', 0)
-            rsic = '#ff3d57' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#60a5fa')
+            rsic = '#fd79a8' if row['RSI']>70 else ('#00e676' if row['RSI']<30 else '#a29bfe')
             mcdcls = 'macd-bull' if row['MACD']=='Bullish' else 'macd-bear'
-            if tbs >= 50: tc = '#cc99ff'
-            elif tbs >= 35: tc = '#00f5ff'
-            elif tbs >= 20: tc = '#ffab00'
-            else: tc = '#ff4466'
+            if tbs >= 50: tc = '#a29bfe'
+            elif tbs >= 35: tc = '#00cec9'
+            elif tbs >= 20: tc = '#ffd93d'
+            else: tc = '#fd79a8'
             # SMA trend
             sd, dc, s2r = row.get('SMA_20_Declining',False), row.get('Death_Cross',False), row.get('SMA_200_Rising',True)
-            if sd and dc:     sma_t = '<span style="color:#ff4466;font-size:13px">↓ Declining</span>'
-            elif sd or dc:    sma_t = '<span style="color:#ffab00;font-size:13px">⚠ Weakening</span>'
+            if sd and dc:     sma_t = '<span style="color:#fd79a8;font-size:13px">↓ Declining</span>'
+            elif sd or dc:    sma_t = '<span style="color:#ffd93d;font-size:13px">⚠ Weakening</span>'
             elif s2r:         sma_t = '<span style="color:#00e676;font-size:13px">↑ Rising</span>'
-            else:             sma_t = '<span style="color:#60a5fa;font-size:13px">→ Flat</span>'
+            else:             sma_t = '<span style="color:#a29bfe;font-size:13px">→ Flat</span>'
             sma_sort = 3 if (s2r and not sd and not dc) else (0 if (sd and dc) else (1 if (sd or dc) else 2))
             # RSI div
             rd = row.get('RSI_Divergence','None')
-            if rd=='Bearish Divergence': rdc='<span style="color:#ff4466;font-size:12px">⚠ Bear</span>'
+            if rd=='Bearish Divergence': rdc='<span style="color:#fd79a8;font-size:12px">⚠ Bear</span>'
             elif rd=='Bullish Divergence': rdc='<span style="color:#00e676;font-size:12px">✅ Bull</span>'
-            else: rdc='<span style="color:#4a6080;font-size:12px">—</span>'
+            else: rdc='<span style="color:#3a4a6a;font-size:12px">—</span>'
             div_sort = 2 if rd=='Bullish Divergence' else (0 if rd=='Bearish Divergence' else 1)
             # Bearish signals
             bs = row.get('Bearish_Signals', 0)
-            if bs >= 4:   sp = f'<span style="color:#ff4466;font-size:13px">🔴 {bs}/7</span>'
-            elif bs >= 3: sp = f'<span style="color:#ff8c00;font-size:13px">🟠 {bs}/7</span>'
-            elif bs >= 1: sp = f'<span style="color:#ffab00;font-size:13px">🟡 {bs}/7</span>'
+            if bs >= 4:   sp = f'<span style="color:#fd79a8;font-size:13px">🔴 {bs}/7</span>'
+            elif bs >= 3: sp = f'<span style="color:#ffd93d;font-size:13px">🟠 {bs}/7</span>'
+            elif bs >= 1: sp = f'<span style="color:#ffd93d;font-size:13px">🟡 {bs}/7</span>'
             else:         sp = f'<span style="color:#00e676;font-size:13px">🟢 0/7</span>'
             macd_sort = 1 if row['MACD']=='Bullish' else 0
 
@@ -2944,10 +2945,10 @@ footer strong {{ color: #00f5ff; }}
           data-signals="{bs}">
         <td><span class="rnum">{i}</span></td>
         <td><div class="stock-name" style="font-size:14px">{row['Name']}</div><div class="stock-sym">{row['Symbol']}</div></td>
-        <td><span style="font-size:13px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
+        <td><span style="font-size:13px;color:#8892a6">{row.get('Sector','N/A')}</span></td>
         <td><div class="price-val" style="font-size:15px">₹{row['Price']:,.2f}</div></td>
-        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:{tc}">{tbs:.0f}</span></td>
-        <td><div class="rsi-val" style="color:{rsic};font-size:15px">{row['RSI']:.0f}</div><div style="font-size:12px;color:#8899aa">{row['RSI_Signal']}</div>{tech_rsi_slope_html(row)}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:{tc}">{tbs:.0f}</span></td>
+        <td><div class="rsi-val" style="color:{rsic};font-size:15px">{row['RSI']:.0f}</div><div style="font-size:12px;color:#8892a6">{row['RSI_Signal']}</div>{tech_rsi_slope_html(row)}</td>
         <td><span class="{mcdcls}" style="font-size:13px">{row['MACD']}</span></td>
         <td>{sma_t}</td>
         <td>{adx_cell(row.get('ADX',0))}</td>
@@ -2972,8 +2973,8 @@ footer strong {{ color: #00f5ff; }}
 </div>
 
 <footer>
-  <strong>NIFTY 100 Market Influencers · NSE &amp; BSE</strong>
-  · 12M S/R · Trend Veto · Dynamic Weights · SMA200 Slope · Sector PE · v5.7
+  <strong>Nifty 100 Market Pulse</strong> · NSE &amp; BSE
+  · 12M S/R · Trend Veto · Dynamic Weights · TechnoFunc + Technical · v5.8 Nebula
   · Next Update: <strong>{next_update} IST</strong> · {now.strftime('%d %b %Y')}
 </footer>
 
@@ -3067,12 +3068,12 @@ function switchMode(m) {{
     sTF.classList.add('hidden');    sT.classList.remove('hidden');
     bTF.classList.remove('active'); bT.classList.add('active');
     d.innerHTML='100% Technical · RSI + MACD + SMA + ADX + Volume · All 100 Stocks · Zero Fundamentals';
-    d.style.color='#cc99ff';
+    d.style.color='#a29bfe';
   }} else {{
     sT.classList.add('hidden');     sTF.classList.remove('hidden');
     bT.classList.remove('active');  bTF.classList.add('active');
     d.innerHTML='Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate';
-    d.style.color='#00f5ff';
+    d.style.color='#00cec9';
   }}
 }}
 
@@ -3120,22 +3121,22 @@ function renumberTWL() {{
 </script>
 <style>
 .wl-btn {{
-  padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
-  font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  padding: 7px 16px; border-radius: 100px; border: none; cursor: pointer;
+  font-size: 13px; font-family: 'Outfit', sans-serif; font-weight: 600;
   transition: all .2s; letter-spacing: .3px;
 }}
 th.sortable {{
   cursor: pointer; user-select: none; white-space: nowrap;
   transition: color .15s;
 }}
-th.sortable:hover {{ color: #00f5ff !important; }}
-.sort-icon {{ font-size: 10px; opacity: 0.8; color: #00f5ff; }}
-.wl-all {{ background:#1a2a3a; color:#aaccee; border:1px solid #2a4a6a; }}
-.wl-sb  {{ background:#004d25; color:#00ff88; border:1px solid #00ff88; }}
-.wl-b   {{ background:#003a4d; color:#00f5ff; border:1px solid #00f5ff; }}
-.wl-h   {{ background:#2a2200; color:#ffab00; border:1px solid #ffab00; }}
-.wl-s   {{ background:#4d0010; color:#ff4466; border:1px solid #ff4466; }}
-.wl-ss  {{ background:#5a0015; color:#ff7788; border:1px solid #ff7788; }}
+th.sortable:hover {{ color: #a29bfe !important; }}
+.sort-icon {{ font-size: 10px; opacity: 0.8; color: #a29bfe; }}
+.wl-all {{ background:rgba(108,92,231,0.10); color:#b0b8cc; border:1px solid rgba(108,92,231,0.3); }}
+.wl-sb  {{ background:rgba(0,230,118,0.12); color:#00e676; border:1px solid #00e676; }}
+.wl-b   {{ background:rgba(0,206,201,0.12); color:#00cec9; border:1px solid #00cec9; }}
+.wl-h   {{ background:rgba(255,217,61,0.10); color:#ffd93d; border:1px solid #ffd93d; }}
+.wl-s   {{ background:rgba(253,121,168,0.12); color:#fd79a8; border:1px solid #fd79a8; }}
+.wl-ss  {{ background:rgba(232,67,147,0.12); color:#ff7788; border:1px solid #ff7788; }}
 .wl-btn:hover {{ opacity: 1 !important; transform: translateY(-1px); }}
 </style>
 </body></html>"""
