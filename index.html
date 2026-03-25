@@ -77,6 +77,13 @@ header {
 .idx-chg   { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
 .idx-chg.up { color: var(--green); }
 .idx-chg.dn { color: var(--red); }
+.idx-row  { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.idx-pts  { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+.idx-pts.up { color: var(--green); }
+.idx-pts.dn { color: var(--red); }
+.idx-pct  { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; }
+.idx-pct.up { background: rgba(0,230,118,0.12); color: var(--green); }
+.idx-pct.dn { background: rgba(253,121,168,0.12); color: var(--red); }
 .clock-box { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .clock-time {
   font-family: 'JetBrains Mono', monospace; font-size: 22px;
@@ -282,23 +289,32 @@ footer strong { color: var(--accent2); }
       <div class="idx-item">
         <span class="idx-name">SENSEX</span>
         <span class="idx-price">74,068.45</span>
-        <span class="idx-chg up">▲ +1.89%</span>
+        <div class="idx-row">
+          <span class="idx-pts up">+1,372.06</span>
+          <span class="idx-pct up">+1.89%</span>
+        </div>
       </div>
       <div class="idx-item">
         <span class="idx-name">NIFTY 50</span>
         <span class="idx-price">22,912.40</span>
-        <span class="idx-chg up">▲ +1.78%</span>
+        <div class="idx-row">
+          <span class="idx-pts up">+399.75</span>
+          <span class="idx-pct up">+1.78%</span>
+        </div>
       </div>
       <div class="idx-item">
         <span class="idx-name">BANK NIFTY</span>
         <span class="idx-price">52,605.65</span>
-        <span class="idx-chg up">▲ +2.27%</span>
+        <div class="idx-row">
+          <span class="idx-pts up">+1,167.90</span>
+          <span class="idx-pct up">+2.27%</span>
+        </div>
       </div>
     </div>
     <div class="clock-box">
       <div class="clock-time" id="liveClock">--:-- --</div>
       <div class="clock-meta" id="liveDate">25 Mar 2026 · IST</div>
-      <div class="clock-next">Report: 25 Mar 2026 06:16 AM IST</div>
+      <div class="clock-next">Report: 25 Mar 2026 06:37 AM IST</div>
       <div class="clock-next">Next Update: <strong style="color:var(--accent2)">4:30 PM</strong></div>
     </div>
   </div>
@@ -553,9 +569,9 @@ footer strong { color: var(--accent2); }
         <td><span class="sdist-val sdist-close">2.6%</span></td>
         <td><span class="mono-sm" style="color:#00e676">-25.5%</span></td>
         <td><span class="macd-bull">Bullish</span></td>
-        <td class="gsep"><span class="mono-sm" style="color:#fd79a8">44.5</span></td>
+        <td class="gsep"><span class="mono-sm" style="color:#fd79a8">44.4</span></td>
         <td><span class="mono-sm" style="color:#00e676">0.17</span></td>
-        <td><span class="mono-sm" style="color:#00e676">93.00%</span></td>
+        <td><span class="mono-sm" style="color:#00e676">90.00%</span></td>
         <td><span class="qbadge qb-ex">Excellent</span></td>
         <td class="gsep"><span class="analyst-badge ab-b">Buy</span></td>
         <td><div class="earn-date">20 Jan 2026</div></td>
@@ -697,7 +713,7 @@ footer strong { color: var(--accent2); }
         <td><span class="sdist-val sdist-close">1.9%</span></td>
         <td><span class="mono-sm" style="color:#ffd93d">-5.0%</span></td>
         <td><span class="macd-bear">Bearish</span></td>
-        <td class="gsep"><span class="mono-sm" style="color:#fd79a8">63.5</span></td>
+        <td class="gsep"><span class="mono-sm" style="color:#fd79a8">63.3</span></td>
         <td><span class="mono-sm" style="color:#00e676">0.16</span></td>
         <td><span class="mono-sm" style="color:#00e676">83.00%</span></td>
         <td><span class="qbadge qb-av">Average</span></td>
@@ -1311,7 +1327,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="4668.02"
           data-rr="2.04"
           data-upside="10.18"
-          data-pe="44.45"
+          data-pe="44.44"
           data-quality="4"
           data-sma="1"
           data-macd="1"
@@ -1345,7 +1361,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹4,668.02</div></td>
         <td><span class="rr-val" style="color:#00e676;font-size:14px">2.0×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+10.2%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">44.5</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">44.4</span></td>
         <td><span class="qbadge qb-ex">Excellent</span></td>
         <td><span class="analyst-badge ab-b">Buy</span></td>
         <td><span style="color:#fd79a8;font-size:13px">🔴 4/5 Bear</span></td>
@@ -1461,7 +1477,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="4067.89"
           data-rr="1.17"
           data-upside="5.16"
-          data-pe="63.53"
+          data-pe="63.30"
           data-quality="2"
           data-sma="1"
           data-macd="0"
@@ -1495,7 +1511,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹4,067.89</div></td>
         <td><span class="rr-val" style="color:#ffd93d;font-size:14px">1.2×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+5.2%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">63.5</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">63.3</span></td>
         <td><span class="qbadge qb-av">Average</span></td>
         <td><span class="analyst-badge ab-b">Buy</span></td>
         <td><span style="color:#ffd93d;font-size:13px">🟠 3/5 Bear</span></td>
@@ -1561,7 +1577,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="1665.64"
           data-rr="0.64"
           data-upside="3.21"
-          data-pe="38.50"
+          data-pe="38.46"
           data-quality="2"
           data-sma="3"
           data-macd="0"
@@ -1911,7 +1927,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="1504.33"
           data-rr="0.19"
           data-upside="0.95"
-          data-pe="27.53"
+          data-pe="27.47"
           data-quality="2"
           data-sma="1"
           data-macd="1"
@@ -2861,7 +2877,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="4071.39"
           data-rr="0.33"
           data-upside="1.45"
-          data-pe="72.81"
+          data-pe="72.47"
           data-quality="1"
           data-sma="1"
           data-macd="0"
@@ -2895,7 +2911,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹4,071.39</div></td>
         <td><span class="rr-val" style="color:#fd79a8;font-size:14px">0.3×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+1.4%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">72.8</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">72.5</span></td>
         <td><span class="qbadge qb-po">Poor</span></td>
         <td><span class="analyst-badge ab-b">Buy</span></td>
         <td><span style="color:#fd79a8;font-size:13px">🔴 4/5 Bear</span></td>
@@ -3211,7 +3227,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="3151.89"
           data-rr="0.51"
           data-upside="2.56"
-          data-pe="63.18"
+          data-pe="63.29"
           data-quality="2"
           data-sma="1"
           data-macd="0"
@@ -3245,7 +3261,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹3,151.89</div></td>
         <td><span class="rr-val" style="color:#fd79a8;font-size:14px">0.5×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+2.6%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">63.2</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">63.3</span></td>
         <td><span class="qbadge qb-av">Average</span></td>
         <td><span class="analyst-badge ab-b">Buy</span></td>
         <td><span style="color:#fd79a8;font-size:13px">🔴 4/5 Bear</span></td>
@@ -4111,7 +4127,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="1398.81"
           data-rr="0.58"
           data-upside="2.92"
-          data-pe="59.26"
+          data-pe="59.18"
           data-quality="2"
           data-sma="1"
           data-macd="0"
@@ -4145,7 +4161,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹1,398.81</div></td>
         <td><span class="rr-val" style="color:#fd79a8;font-size:14px">0.6×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+2.9%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">59.3</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">59.2</span></td>
         <td><span class="qbadge qb-av">Average</span></td>
         <td><span class="analyst-badge ab-b">Buy</span></td>
         <td><span style="color:#fd79a8;font-size:13px">🔴 5/5 Bear</span></td>
@@ -4761,7 +4777,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="4389.21"
           data-rr="0.76"
           data-upside="3.79"
-          data-pe="44.78"
+          data-pe="44.84"
           data-quality="1"
           data-sma="1"
           data-macd="1"
@@ -5111,7 +5127,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="427.93"
           data-rr="0.66"
           data-upside="3.32"
-          data-pe="27.21"
+          data-pe="27.24"
           data-quality="1"
           data-sma="1"
           data-macd="0"
@@ -5961,7 +5977,7 @@ footer strong { color: var(--accent2); }
           data-stoploss="1367.20"
           data-rr="0.21"
           data-upside="1.04"
-          data-pe="86.00"
+          data-pe="86.23"
           data-quality="1"
           data-sma="1"
           data-macd="0"
@@ -5995,7 +6011,7 @@ footer strong { color: var(--accent2); }
         <td><div style="font-size:14px;color:#ffd93d">₹1,367.20</div></td>
         <td><span class="rr-val" style="color:#fd79a8;font-size:14px">0.2×</span></td>
         <td><span class="upside-val up" style="font-size:14px">+1.0%</span></td>
-        <td><span style="font-size:14px;color:#fd79a8">86.0</span></td>
+        <td><span style="font-size:14px;color:#fd79a8">86.2</span></td>
         <td><span class="qbadge qb-po">Poor</span></td>
         <td><span class="analyst-badge ab-h">Hold</span></td>
         <td><span style="color:#fd79a8;font-size:13px">🔴 4/5 Bear</span></td>
