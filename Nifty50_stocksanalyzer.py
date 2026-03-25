@@ -487,14 +487,32 @@ class Nifty100CompleteAnalyzer:
         return round(adx.iloc[-1], 1)
 
     def calculate_volume_ratio(self, df):
-        # CAL-3: Use 5-day average instead of single last-bar snapshot.
-        # Single-bar volume is too noisy - a great stock with a quiet
-        # day before the report runs gets blocked despite a strong trend.
         avg_vol    = df['Volume'].tail(20).mean()
         if avg_vol == 0:
             return 1.0
-        recent_vol = df['Volume'].tail(5).mean()   # 5-day average
+        recent_vol = df['Volume'].tail(5).mean()
         return round(recent_vol / avg_vol, 2)
+
+    def calculate_volume_trend(self, df):
+        """V59-7: Volume trend — is volume rising or falling over last 10 bars?
+        Compares 5-bar avg vs 10-bar avg. Rising volume = institutional interest.
+        Returns: 'Rising', 'Falling', or 'Flat' + numeric ratio."""
+        try:
+            vol = df['Volume'].tail(10)
+            if len(vol) < 10 or vol.mean() == 0:
+                return {'direction': 'Flat', 'ratio': 1.0}
+            recent_5  = vol.tail(5).mean()
+            older_5   = vol.head(5).mean()
+            if older_5 == 0:
+                return {'direction': 'Flat', 'ratio': 1.0}
+            ratio = round(recent_5 / older_5, 2)
+            if ratio > 1.15:
+                return {'direction': 'Rising', 'ratio': ratio}
+            elif ratio < 0.85:
+                return {'direction': 'Falling', 'ratio': ratio}
+            return {'direction': 'Flat', 'ratio': ratio}
+        except Exception:
+            return {'direction': 'Flat', 'ratio': 1.0}
 
     def get_earnings_date(self, info):
         try:
@@ -588,13 +606,19 @@ class Nifty100CompleteAnalyzer:
         high_52w = df['High'].tail(252).max()
         if high_52w > current_price * 1.005:
             swing_highs.append(high_52w)
-        magnitude = 10 ** (len(str(int(current_price))) - 2)
-        step      = magnitude * 5
-        level     = current_price
-        for _ in range(20):
-            level += step
-            if level <= current_price * 1.30:
-                swing_highs.append(level)
+        # V59-6: Only add synthetic round-number levels when:
+        #   (a) fewer than 2 real swing highs found, OR
+        #   (b) price is within 5% of 52W high (near ATH, no history above)
+        real_above = [h for h in swing_highs if h > current_price * 1.005]
+        near_ath   = ((high_52w - current_price) / high_52w) < 0.05
+        if len(real_above) < 2 or near_ath:
+            magnitude = 10 ** (len(str(int(current_price))) - 2)
+            step      = magnitude * 5
+            level     = current_price
+            for _ in range(20):
+                level += step
+                if level <= current_price * 1.30:
+                    swing_highs.append(level)
         if not swing_highs:
             return []
         swing_highs = sorted(set([round(h, 2) for h in swing_highs]))
@@ -623,13 +647,16 @@ class Nifty100CompleteAnalyzer:
         low_52w = df['Low'].tail(252).min()
         if low_52w < current_price * 0.995:
             swing_lows.append(low_52w)
-        magnitude = 10 ** (len(str(int(current_price))) - 2)
-        step      = magnitude * 5
-        level     = current_price
-        for _ in range(20):
-            level -= step
-            if level >= current_price * 0.70 and level > 0:
-                swing_lows.append(level)
+        # V59-6: Only add synthetic round-number levels when fewer than 2 real supports
+        real_below = [l for l in swing_lows if l < current_price * 0.995]
+        if len(real_below) < 2:
+            magnitude = 10 ** (len(str(int(current_price))) - 2)
+            step      = magnitude * 5
+            level     = current_price
+            for _ in range(20):
+                level -= step
+                if level >= current_price * 0.70 and level > 0:
+                    swing_lows.append(level)
         if not swing_lows:
             return []
         swing_lows = sorted(set([round(l, 2) for l in swing_lows]))
@@ -830,6 +857,37 @@ class Nifty100CompleteAnalyzer:
             adx          = self.calculate_adx(df)
             vol_ratio    = self.calculate_volume_ratio(df)
 
+            # V59-7: Volume trend — institutional signal
+            vol_trend_data = self.calculate_volume_trend(df)
+            vol_trend_dir  = vol_trend_data['direction']   # 'Rising'|'Falling'|'Flat'
+            vol_trend_ratio = vol_trend_data['ratio']
+
+            # V59-1: Persistence checks — count how many of last 3 bars had signal active
+            # Prevents one-day noise from triggering veto
+            sma_20_ser_full = df['Close'].rolling(20).mean()
+            sma_50_ser      = df['Close'].rolling(50).mean()
+            sma20_declining_bars = 0
+            death_cross_bars     = 0
+            macd_bearish_bars    = 0
+            try:
+                ema12_s = df['Close'].ewm(span=12, adjust=False).mean()
+                ema26_s = df['Close'].ewm(span=26, adjust=False).mean()
+                macd_s  = ema12_s - ema26_s
+                sig_s   = macd_s.ewm(span=9, adjust=False).mean()
+                for offset in [1, 2, 3]:
+                    idx = -(offset + 1)
+                    if len(sma_20_ser_full) >= abs(idx) + 6:
+                        if sma_20_ser_full.iloc[idx] < sma_20_ser_full.iloc[idx - 5]:
+                            sma20_declining_bars += 1
+                    if len(sma_20_ser_full) >= abs(idx) and len(sma_50_ser) >= abs(idx):
+                        if sma_20_ser_full.iloc[idx] < sma_50_ser.iloc[idx]:
+                            death_cross_bars += 1
+                    if len(macd_s) >= abs(idx) and len(sig_s) >= abs(idx):
+                        if macd_s.iloc[idx] < sig_s.iloc[idx]:
+                            macd_bearish_bars += 1
+            except Exception:
+                pass
+
             # NEW-1: RSI Divergence detection
             rsi_divergence = self.detect_rsi_divergence(df['Close'])
 
@@ -925,13 +983,27 @@ class Nifty100CompleteAnalyzer:
                     tech_score -= 1
                     rsi_signal = "Overbought"
             elif 30 <= rsi <= 45:
-                if rsi_direction == 'Falling':
-                    # Weak zone AND still falling — double trouble
-                    tech_score -= 2
-                    rsi_signal = f"Weak & Falling ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                # V59-2: RSI relative to trend — same RSI level means different things
+                # RSI 38 above SMA200 = healthy pullback in uptrend (buyable)
+                # RSI 38 below SMA200 = falling in bear trend (avoid)
+                if current_price > sma_200:
+                    # Uptrend context: weak RSI = pullback opportunity
+                    if rsi_direction == 'Rising':
+                        tech_score += 1    # recovering in uptrend = bullish
+                        rsi_signal = f"Pullback Recovery ↑ ({rsi_5bar:.0f}→{rsi:.0f})"
+                    elif rsi_direction == 'Falling':
+                        tech_score -= 1    # still falling but in uptrend = mild concern
+                        rsi_signal = f"Pullback Deepening ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                    else:
+                        rsi_signal = "Weak Momentum ⚠"
                 else:
-                    tech_score -= 1
-                    rsi_signal = "Weak Momentum ⚠"
+                    # Downtrend context: weak RSI = continuation, not reversal
+                    if rsi_direction == 'Falling':
+                        tech_score -= 2
+                        rsi_signal = f"Weak & Falling (Downtrend) ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
+                    else:
+                        tech_score -= 1
+                        rsi_signal = "Weak Momentum (Downtrend) ⚠"
             elif 45 < rsi <= 55:
                 # Neutral zone — direction is the only signal here
                 if rsi_direction == 'Rising':
@@ -990,6 +1062,12 @@ class Nifty100CompleteAnalyzer:
             elif vol_ratio < 0.7:
                 tech_score -= 1
 
+            # V59-7: Volume trend — rising volume = institutional buying
+            if vol_trend_dir == 'Rising' and current_price > sma_20:
+                tech_score = min(tech_score + 1, 6)
+            elif vol_trend_dir == 'Falling' and current_price < sma_20:
+                tech_score -= 1  # falling volume + below SMA20 = weak
+
             # FIX-8: Near 52W high in uptrend
             pct_from_52w_high = ((current_price - high_52w) / high_52w) * 100
             if pct_from_52w_high >= -5 and current_price > sma_200:
@@ -1022,6 +1100,16 @@ class Nifty100CompleteAnalyzer:
             elif adx > 15:              tech_buy_score += 2
             if rsi_divergence == 'Bullish Divergence':  tech_buy_score += 10
             elif rsi_divergence == 'Bearish Divergence': tech_buy_score -= 5
+            # V59-5: SMA alignment bonus — SMA20 > SMA50 > SMA200 = clean uptrend
+            if sma_20 > sma_50 > sma_200:
+                tech_buy_score += 5   # perfectly aligned — bonus
+            elif sma_20 > sma_50:
+                tech_buy_score += 2   # partially aligned
+            # V59-7: Volume trend bonus in tech score
+            if vol_trend_dir == 'Rising':
+                tech_buy_score += 3   # institutional interest
+            elif vol_trend_dir == 'Falling':
+                tech_buy_score -= 2   # drying up
             tech_buy_score = min(max(tech_buy_score, 0), 100)
             # =================================================================
 
@@ -1084,23 +1172,36 @@ class Nifty100CompleteAnalyzer:
             except Exception:
                 rsi_post_ob_pullback = False
 
+            # V59-1: Bearish signal count with PERSISTENCE filter.
+            # A signal only counts if it persisted for 2+ of the last 3 bars.
+            # This prevents one-day noise from triggering a veto in sideways markets.
             bearish_signal_count = sum([
-                bool(sma_20_declining),                          # SMA20 rolling over
-                bool(death_cross_forming),                       # SMA20 < SMA50
-                bool(macd < signal),                             # MACD bearish crossover
-                bool(rsi < 50),                                  # momentum lost
-                bool(current_price < sma_50),                   # below medium trend
-                bool(rsi_direction == 'Falling' and rsi_slope_strong),  # V55: RSI falling fast (Power Grid case)
-                bool(rsi_post_ob_pullback),                      # V56-2: RSI came from overbought and falling (Lupin case)
+                bool(sma_20_declining and sma20_declining_bars >= 2),   # persistent SMA20 decline
+                bool(death_cross_forming and death_cross_bars >= 2),     # persistent death cross
+                bool(macd < signal and macd_bearish_bars >= 2),          # persistent MACD bearish
+                bool(rsi < 50),                                          # momentum lost (instant)
+                bool(current_price < sma_50),                           # below medium trend (instant)
+                bool(rsi_direction == 'Falling' and rsi_slope_strong),  # RSI falling fast
+                bool(rsi_post_ob_pullback),                              # post-overbought pullback
             ])
-            # V54-4: Dynamic weight shift at 2+ signals (lower than veto threshold of 3).
-            # This means the score already shifts to 50/50 before the veto fires,
-            # correctly penalising weakening stocks in the score WITHOUT removing them.
-            # Only at 3+ signals does the veto hard-cap them to HOLD.
-            if bearish_signal_count >= 2:
+
+            # V59-4: THREE-MODE dynamic weight shift.
+            # Mode 1 (35/65): Normal — fundamentals dominate
+            # Mode 2 (50/50): Downtrend — 2+ bearish signals, tech gets more say
+            # Mode 3 (65/35): Reversal — RSI rising strongly + MACD bullish, trust technicals
+            #   This rewards early trend reversals like Infosys oversold + MACD flip
+            is_reversal = (rsi_direction == 'Rising' and rsi_slope > 5
+                           and macd > signal
+                           and rsi < 55)  # only in recovery zone, not already overbought
+
+            if bearish_signal_count >= 2 and not is_reversal:
                 tech_weight  = 0.50
                 fund_weight  = 0.50
                 weight_label = "50/50 (Downtrend Override)"
+            elif is_reversal:
+                tech_weight  = 0.65
+                fund_weight  = 0.35
+                weight_label = "65/35 (Reversal Mode)"
             else:
                 tech_weight  = 0.35
                 fund_weight  = 0.65
@@ -1285,6 +1386,16 @@ class Nifty100CompleteAnalyzer:
                 recommendation = "HOLD"
                 rating         = "⭐⭐⭐ HOLD (R:R < 1.0)"
 
+            # V59-3: Stop loss structural safety check.
+            # If stop is more than 10% below nearest support, the trade is structurally
+            # unsafe — the stop is technically correct (ATR-based) but there's no real
+            # floor underneath it. Downgrade to HOLD.
+            if recommendation in ("BUY", "STRONG BUY"):
+                sl_below_support_pct = ((nearest_support - stop_loss) / nearest_support) * 100 if nearest_support > 0 else 0
+                if sl_below_support_pct > 10:
+                    recommendation = "HOLD"
+                    rating         = "⭐⭐⭐ HOLD (Wide Stop)"
+
             if fund_score >= 80:   quality = "Excellent"
             elif fund_score >= 60: quality = "Good"
             elif fund_score >= 40: quality = "Average"
@@ -1306,6 +1417,8 @@ class Nifty100CompleteAnalyzer:
                 'MACD':              macd_signal,
                 'ADX':               adx,
                 'Vol_Ratio':         vol_ratio,
+                'Vol_Trend':         vol_trend_dir,
+                'Vol_Trend_Ratio':   vol_trend_ratio,
                 'SMA_20':            round(sma_20, 2),        # used by watchlist sma_trend
                 'SMA_50':            round(sma_50, 2),        # used by watchlist sma_trend
                 'SMA_200':           round(sma_200, 2),       # used by watchlist sma_trend
@@ -1612,6 +1725,15 @@ class Nifty100CompleteAnalyzer:
             if rsi_val < 45 and rsi_dir == 'Rising' and rsi_slp > 8:
                 return False
 
+            # V59-8: Extended sell filter — if price already 10%+ below SMA20,
+            # the short entry is late. The stock has already fallen significantly
+            # and a bounce is more likely than further downside.
+            sma20_val = row.get('SMA_20', 0)
+            if sma20_val > 0:
+                pct_below_sma20 = ((sma20_val - row.get('Price', 0)) / sma20_val) * 100
+                if pct_below_sma20 > 10:
+                    return False
+
             return True
 
         top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
@@ -1697,6 +1819,11 @@ class Nifty100CompleteAnalyzer:
             (df['RSI'] >= 25) &             # not already bottomed
             (df['MACD'] == 'Bearish')       # must have bearish MACD
         ].copy()
+        # V59-8: Filter out stocks where price is already 10%+ below SMA20 (late short)
+        pool = pool[
+            pool.apply(lambda r: ((r.get('SMA_20',0) - r['Price']) / r.get('SMA_20',1) * 100) <= 10
+                       if r.get('SMA_20',0) > 0 else True, axis=1)
+        ]
         # Recalculate SELL-SIDE targets
         rows_out = []
         for _, row in pool.iterrows():
