@@ -200,7 +200,7 @@ class Nifty100CompleteAnalyzer:
             'ICICIGI.NS':     'ICICI Lombard General Insurance',
             'HDFCAMC.NS':     'HDFC AMC',
             'NAUKRI.NS':      'Info Edge (Naukri)',
-            'UNITDSPR.NS':  'United Spirits',
+            'MCDOWELL-N.NS':  'United Spirits',
             'TATAELXSI.NS':   'Tata Elxsi',
             'COFORGE.NS':     'Coforge',
             'PERSISTENT.NS':  'Persistent Systems',
@@ -228,16 +228,12 @@ class Nifty100CompleteAnalyzer:
             'ALKEM.NS':       'Alkem Laboratories',
             'MAXHEALTH.NS':   'Max Healthcare',
             'FORTIS.NS':      'Fortis Healthcare',
-            'ETERNAL.NS':      'Zomato',
+            'ZOMATO.NS':      'Zomato',
             'POLICYBZR.NS':   'PB Fintech (PolicyBazaar)',
             'NYKAA.NS':       'FSN E-Commerce (Nykaa)',
-            'JIOFIN.NS':       'JIO FINANCIAL',
+            'PAYTM.NS':       'One97 Communications (Paytm)',
             'RVNL.NS':        'Rail Vikas Nigam',
             'ADANIGREEN.NS':  'Adani Green Energy',
-            'HAL.NS':         'Hindustan Aeronautics',
-            'BEL.NS':         'Bharat Electronics',
-            'TRENT.NS':       'TRENT',
-            'VBL.NS':         'Varun Beverages',
         }
         self.results = []
 
@@ -2886,13 +2882,22 @@ footer strong {{ color: #00f5ff; }}
       📋 Technical Watchlist — All {{0}} Stocks · Sorted by Tech Score
     </div>
     <div class="section-line"></div>
-    <div class="section-note">100% CHART ANALYSIS · YOU DECIDE THE ACTION</div>
+    <div class="section-note">100% CHART ANALYSIS · CLICK ANY COLUMN TO SORT</div>
   </div>
-  <div class="tbl-wrap"><table>
-    <thead><tr class="col-row">
-      <th style="width:22px">#</th><th>Stock</th><th>Sector</th><th>Price</th>
-      <th>Tech Score</th><th>RSI / Slope</th><th>MACD</th><th>SMA Trend</th>
-      <th>ADX</th><th>Vol</th><th>RSI Div</th><th>Signals</th>
+  <div class="tbl-wrap"><table id="twl-tbl">
+    <thead><tr class="col-row" id="twl-sort-row">
+      <th style="width:22px">#</th>
+      <th onclick="sortTWL('name')"   class="sortable">Stock <span class="sort-icon" id="ti-name"></span></th>
+      <th onclick="sortTWL('sector')" class="sortable">Sector <span class="sort-icon" id="ti-sector"></span></th>
+      <th onclick="sortTWL('price')"  class="sortable">Price <span class="sort-icon" id="ti-price"></span></th>
+      <th onclick="sortTWL('tscore')" class="sortable">Tech Score <span class="sort-icon" id="ti-tscore"> ▼</span></th>
+      <th onclick="sortTWL('rsi')"    class="sortable">RSI / Slope <span class="sort-icon" id="ti-rsi"></span></th>
+      <th onclick="sortTWL('macd')"   class="sortable">MACD <span class="sort-icon" id="ti-macd"></span></th>
+      <th onclick="sortTWL('sma')"    class="sortable">SMA Trend <span class="sort-icon" id="ti-sma"></span></th>
+      <th onclick="sortTWL('adx')"    class="sortable">ADX <span class="sort-icon" id="ti-adx"></span></th>
+      <th onclick="sortTWL('vol')"    class="sortable">Vol <span class="sort-icon" id="ti-vol"></span></th>
+      <th onclick="sortTWL('div')"    class="sortable">RSI Div <span class="sort-icon" id="ti-div"></span></th>
+      <th onclick="sortTWL('signals')" class="sortable">Signals <span class="sort-icon" id="ti-signals"></span></th>
     </tr></thead><tbody>
 """.format(len(all_tech_sorted))
 
@@ -2910,19 +2915,33 @@ footer strong {{ color: #00f5ff; }}
             elif sd or dc:    sma_t = '<span style="color:#ffab00;font-size:13px">⚠ Weakening</span>'
             elif s2r:         sma_t = '<span style="color:#00e676;font-size:13px">↑ Rising</span>'
             else:             sma_t = '<span style="color:#60a5fa;font-size:13px">→ Flat</span>'
+            sma_sort = 3 if (s2r and not sd and not dc) else (0 if (sd and dc) else (1 if (sd or dc) else 2))
             # RSI div
             rd = row.get('RSI_Divergence','None')
             if rd=='Bearish Divergence': rdc='<span style="color:#ff4466;font-size:12px">⚠ Bear</span>'
             elif rd=='Bullish Divergence': rdc='<span style="color:#00e676;font-size:12px">✅ Bull</span>'
             else: rdc='<span style="color:#4a6080;font-size:12px">—</span>'
+            div_sort = 2 if rd=='Bullish Divergence' else (0 if rd=='Bearish Divergence' else 1)
             # Bearish signals
             bs = row.get('Bearish_Signals', 0)
             if bs >= 4:   sp = f'<span style="color:#ff4466;font-size:13px">🔴 {bs}/7</span>'
             elif bs >= 3: sp = f'<span style="color:#ff8c00;font-size:13px">🟠 {bs}/7</span>'
             elif bs >= 1: sp = f'<span style="color:#ffab00;font-size:13px">🟡 {bs}/7</span>'
             else:         sp = f'<span style="color:#00e676;font-size:13px">🟢 0/7</span>'
+            macd_sort = 1 if row['MACD']=='Bullish' else 0
 
-            html += f"""      <tr>
+            html += f"""      <tr
+          data-name="{row['Name'].lower()}"
+          data-sector="{row.get('Sector','N/A').lower()}"
+          data-price="{row['Price']:.2f}"
+          data-tscore="{tbs:.1f}"
+          data-rsi="{row['RSI']:.2f}"
+          data-macd="{macd_sort}"
+          data-sma="{sma_sort}"
+          data-adx="{row.get('ADX',0):.1f}"
+          data-vol="{row.get('Vol_Ratio',1.0):.3f}"
+          data-div="{div_sort}"
+          data-signals="{bs}">
         <td><span class="rnum">{i}</span></td>
         <td><div class="stock-name" style="font-size:14px">{row['Name']}</div><div class="stock-sym">{row['Symbol']}</div></td>
         <td><span style="font-size:13px;color:#8899aa">{row.get('Sector','N/A')}</span></td>
@@ -3055,6 +3074,48 @@ function switchMode(m) {{
     d.innerHTML='Fundamentals 65% + Technicals 35% · Trend Veto · R:R Gate';
     d.style.color='#00f5ff';
   }}
+}}
+
+// ── V58: Technical Watchlist column sort ──────────────────────────────────
+var twlSortCol = 'tscore';
+var twlSortAsc = false;
+
+function sortTWL(col) {{
+  if (twlSortCol === col) {{ twlSortAsc = !twlSortAsc; }}
+  else {{ twlSortCol = col; twlSortAsc = (col === 'name' || col === 'sector'); }}
+
+  // Update header icons
+  var allIcons = document.querySelectorAll('#twl-tbl .sort-icon');
+  allIcons.forEach(function(ic) {{ ic.textContent = ''; }});
+  var activeIcon = document.getElementById('ti-' + col);
+  if (activeIcon) {{ activeIcon.textContent = twlSortAsc ? ' ▲' : ' ▼'; }}
+
+  var tbody = document.querySelector('#twl-tbl tbody');
+  var rows  = Array.from(tbody.querySelectorAll('tr'));
+
+  rows.sort(function(a, b) {{
+    var av = a.getAttribute('data-' + col) || '';
+    var bv = b.getAttribute('data-' + col) || '';
+    if (col === 'name' || col === 'sector') {{
+      return twlSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    }}
+    var an = parseFloat(av), bn = parseFloat(bv);
+    if (isNaN(an)) an = -Infinity;
+    if (isNaN(bn)) bn = -Infinity;
+    return twlSortAsc ? an - bn : bn - an;
+  }});
+
+  rows.forEach(function(r) {{ tbody.appendChild(r); }});
+  renumberTWL();
+}}
+
+function renumberTWL() {{
+  var rows = document.querySelectorAll('#twl-tbl tbody tr');
+  var n = 1;
+  rows.forEach(function(r) {{
+    var rnum = r.querySelector('.rnum');
+    if (rnum) rnum.textContent = n++;
+  }});
 }}
 </script>
 <style>
