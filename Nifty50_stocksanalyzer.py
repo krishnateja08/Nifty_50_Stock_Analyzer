@@ -527,16 +527,16 @@ class Nifty100CompleteAnalyzer:
                 prev  = d['Close'].iloc[-2]
                 chg   = price - prev
                 pct   = chg / prev * 100
-                arrow = '▲' if chg >= 0 else '▼'
                 cls   = 'up' if chg >= 0 else 'dn'
                 sign  = '+' if chg >= 0 else ''
                 result[label] = {
                     'price': f"{price:,.2f}",
-                    'chg':   f"{arrow} {sign}{pct:.2f}%",
+                    'pts':   f"{sign}{chg:,.2f}",
+                    'pct':   f"{sign}{pct:.2f}%",
                     'cls':   cls,
                 }
             except Exception:
-                result[label] = {'price': 'N/A', 'chg': '-', 'cls': ''}
+                result[label] = {'price': 'N/A', 'pts': '-', 'pct': '-', 'cls': ''}
         return result
 
     # =========================================================================
@@ -1843,6 +1843,13 @@ header {{
 .idx-chg   {{ font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }}
 .idx-chg.up {{ color: var(--green); }}
 .idx-chg.dn {{ color: var(--red); }}
+.idx-row  {{ display: flex; align-items: center; gap: 8px; margin-top: 2px; }}
+.idx-pts  {{ font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }}
+.idx-pts.up {{ color: var(--green); }}
+.idx-pts.dn {{ color: var(--red); }}
+.idx-pct  {{ font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; }}
+.idx-pct.up {{ background: rgba(0,230,118,0.12); color: var(--green); }}
+.idx-pct.dn {{ background: rgba(253,121,168,0.12); color: var(--red); }}
 .clock-box {{ display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }}
 .clock-time {{
   font-family: 'JetBrains Mono', monospace; font-size: 22px;
@@ -2048,17 +2055,26 @@ footer strong {{ color: var(--accent2); }}
       <div class="idx-item">
         <span class="idx-name">SENSEX</span>
         <span class="idx-price">{idx_data['SENSEX']['price']}</span>
-        <span class="idx-chg {idx_data['SENSEX']['cls']}">{idx_data['SENSEX']['chg']}</span>
+        <div class="idx-row">
+          <span class="idx-pts {idx_data['SENSEX']['cls']}">{idx_data['SENSEX']['pts']}</span>
+          <span class="idx-pct {idx_data['SENSEX']['cls']}">{idx_data['SENSEX']['pct']}</span>
+        </div>
       </div>
       <div class="idx-item">
         <span class="idx-name">NIFTY 50</span>
         <span class="idx-price">{idx_data['NIFTY 50']['price']}</span>
-        <span class="idx-chg {idx_data['NIFTY 50']['cls']}">{idx_data['NIFTY 50']['chg']}</span>
+        <div class="idx-row">
+          <span class="idx-pts {idx_data['NIFTY 50']['cls']}">{idx_data['NIFTY 50']['pts']}</span>
+          <span class="idx-pct {idx_data['NIFTY 50']['cls']}">{idx_data['NIFTY 50']['pct']}</span>
+        </div>
       </div>
       <div class="idx-item">
         <span class="idx-name">BANK NIFTY</span>
         <span class="idx-price">{idx_data['BANK NIFTY']['price']}</span>
-        <span class="idx-chg {idx_data['BANK NIFTY']['cls']}">{idx_data['BANK NIFTY']['chg']}</span>
+        <div class="idx-row">
+          <span class="idx-pts {idx_data['BANK NIFTY']['cls']}">{idx_data['BANK NIFTY']['pts']}</span>
+          <span class="idx-pct {idx_data['BANK NIFTY']['cls']}">{idx_data['BANK NIFTY']['pct']}</span>
+        </div>
       </div>
     </div>
     <div class="clock-box">
