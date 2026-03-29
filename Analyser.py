@@ -9,6 +9,8 @@ import argparse
 import sys
 import time
 import json
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, date
 from pathlib import Path
 
@@ -1205,21 +1207,35 @@ def main():
     args    = parse_args()
     tickers = args.tickers if args.tickers else NIFTY50
     total   = len(tickers)
-    results = []
 
-    print(f"\n[Nifty 50 Analyser] Processing {total} stocks ...\n")
-    for i, ticker in enumerate(tickers, 1):
-        print(f"  [{i:02d}/{total}] {ticker:15s}", end=" ", flush=True)
-        try:
-            d = analyse(ticker)
-            results.append(d)
-            print(f"conf={d['conf_lbl']:<12} growth={d['gclass']:<14} val={d['overall_val']}")
-        except Exception as e:
-            print(f"ERROR: {e}")
+    print(f"\n[Nifty 50 Analyser] Processing {total} stocks in parallel (10 workers) ...\n")
+
+    results   = []
+    completed = 0
+    lock      = threading.Lock()
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_ticker = {executor.submit(analyse, t): t for t in tickers}
+        for future in as_completed(future_to_ticker):
+            ticker = future_to_ticker[future]
+            with lock:
+                completed += 1
+                idx = completed
+            try:
+                d = future.result()
+                with lock:
+                    results.append(d)
+                print(f"  [{idx:02d}/{total}] {ticker:15s} conf={d['conf_lbl']:<12} growth={d['gclass']:<14} val={d['overall_val']}")
+            except Exception as e:
+                print(f"  [{idx:02d}/{total}] {ticker:15s} ERROR: {e}")
 
     if not results:
         print("\nNo data retrieved. Check network connection.")
         sys.exit(1)
+
+    # Restore original NIFTY50 order for consistent HTML output
+    order = {t: i for i, t in enumerate(tickers)}
+    results.sort(key=lambda d: order.get(d["ticker"], 9999))
 
     generated_at = datetime.now().strftime("%d %b %Y, %H:%M IST")
     html  = build_html(results, generated_at)
