@@ -26,7 +26,7 @@ jobs:
         run: pip install yfinance requests beautifulsoup4 lxml
 
       - name: Run Nifty 50 analyser
-        run: python analyser.py --out reports
+        run: python Analyser.py --out reports
 
       - name: Upload combined HTML report
         uses: actions/upload-artifact@v4
