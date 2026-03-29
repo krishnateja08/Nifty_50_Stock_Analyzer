@@ -8,10 +8,15 @@ on:
   schedule:
     - cron: "30 1 * * 1"
 
+permissions:
+  contents: write       # needed to push to gh-pages branch
+  pages: write
+  id-token: write
+
 jobs:
   analyse:
     runs-on: ubuntu-latest
-    timeout-minutes: 60       # 50 stocks × ~60s each = ~50 min max
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -28,9 +33,21 @@ jobs:
       - name: Run Nifty 50 analyser
         run: python Analyser.py --out reports
 
-      - name: Upload combined HTML report
+      - name: Rename report to index.html for GitHub Pages
+        run: |
+          mkdir -p pages
+          cp reports/nifty50_*.html pages/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          publish_branch: gh-pages
+
+      - name: Upload combined HTML report (backup artifact)
         uses: actions/upload-artifact@v4
         with:
           name: nifty50-report-${{ github.run_number }}
           path: reports/nifty50_*.html
-          retention-days: 90    # keep 3 months of weekly reports
+          retention-days: 90
