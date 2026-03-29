@@ -1,0 +1,122 @@
+name: Indian Stock Fundamental Analyser
+
+on:
+  # ── Manual trigger ──────────────────────────────────────────────────
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: "NSE ticker (e.g. RELIANCE, TCS, HDFCBANK)"
+        required: true
+        default: "RELIANCE"
+      horizon:
+        description: "Investment horizon in years"
+        required: true
+        default: "5"
+
+  # ── Scheduled run (every weekday at 07:00 IST = 01:30 UTC) ──────────
+  # Edit the tickers list in the matrix below to run multiple stocks
+  schedule:
+    - cron: "30 1 * * 1-5"   # Mon–Fri 07:00 IST
+
+# ────────────────────────────────────────────────────────────────────────
+# SCHEDULED STOCKS  ← add/remove tickers here
+# ────────────────────────────────────────────────────────────────────────
+env:
+  SCHEDULED_TICKERS: "RELIANCE TCS HDFCBANK INFY ICICIBANK"
+  DEFAULT_HORIZON: "5"
+
+jobs:
+  # ── Job 1: single stock (manual trigger) ────────────────────────────
+  analyse-single:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run analyser
+        run: |
+          python analyser.py \
+            --ticker "${{ github.event.inputs.ticker }}" \
+            --horizon "${{ github.event.inputs.horizon }}" \
+            --out reports
+
+      - name: Upload HTML report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "report-${{ github.event.inputs.ticker }}-${{ github.event.inputs.horizon }}yr"
+          path: reports/
+          retention-days: 30
+
+  # ── Job 2: scheduled batch (all tickers in SCHEDULED_TICKERS) ────────
+  analyse-batch:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false          # one ticker failing won't cancel others
+      matrix:
+        ticker: ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK"]
+        # ↑ Keep this in sync with SCHEDULED_TICKERS env var above
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run analyser — ${{ matrix.ticker }}
+        run: |
+          python analyser.py \
+            --ticker "${{ matrix.ticker }}" \
+            --horizon "${{ env.DEFAULT_HORIZON }}" \
+            --out reports
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: "report-${{ matrix.ticker }}"
+          path: reports/
+          retention-days: 30
+
+  # ── Job 3: commit reports to gh-pages branch (optional) ──────────────
+  # Uncomment this job if you want reports browsable at
+  # https://<your-username>.github.io/<repo-name>/reports/
+  #
+  # publish-to-pages:
+  #   needs: [analyse-batch]
+  #   if: github.event_name == 'schedule'
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: gh-pages
+  #     - name: Download all reports
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: reports/
+  #         merge-multiple: true
+  #     - name: Push to gh-pages
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
+  #         git add reports/
+  #         git diff --quiet && git diff --staged --quiet || \
+  #           git commit -m "auto: stock reports $(date +%Y-%m-%d)" && git push
