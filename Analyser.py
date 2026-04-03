@@ -1048,13 +1048,13 @@ CSS = """<style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0f1117;--bg2:#131623;--bg3:#1a1d2e;--bg4:#1e2235;
-  --txt:#e8e9ec;--txt2:#8a8fa8;--txt3:#555a70;
-  --bdr:#1e2235;--bdr2:rgba(255,255,255,0.08);--bdr3:rgba(255,255,255,0.16);
+  --txt:#f0f1f5;--txt2:#c4c7d6;--txt3:#8a8fa8;
+  --bdr:#1e2235;--bdr2:rgba(255,255,255,0.08);--bdr3:rgba(255,255,255,0.22);
   --blue:#4f8ef7;--blue-dim:rgba(79,142,247,0.12);--blue-bdr:rgba(79,142,247,0.25);
   --green:#34c759;--green-dim:rgba(52,199,89,0.12);--green-bdr:rgba(52,199,89,0.22);
   --amber:#ff9f0a;--amber-dim:rgba(255,159,10,0.12);--amber-bdr:rgba(255,159,10,0.22);
   --red:#ff453a;--red-dim:rgba(255,69,58,0.12);--red-bdr:rgba(255,69,58,0.22);
-  --neu-dim:rgba(138,143,168,0.12);--neu-bdr:rgba(138,143,168,0.2);
+  --neu-dim:rgba(180,185,210,0.1);--neu-bdr:rgba(180,185,210,0.22);
 }
 body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
   color:var(--txt);background:var(--bg);margin:0;padding:0;min-height:100vh}
@@ -1111,17 +1111,16 @@ body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   background:var(--bg2);border:1px solid var(--bdr)}
 .conf .cl{color:var(--txt3)}
-.conf strong{color:var(--txt2)}
+.conf strong{color:var(--txt)}
 .conf.high .cl,.conf.moderate .cl{color:var(--green)}
-.conf.high strong,.conf.moderate strong{color:var(--txt)}
 
 /* ── Tabs ──────────────────────────────────────────────────── */
 .tab-row{display:flex;gap:3px;margin-bottom:16px;
   background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
   padding:4px;flex-wrap:wrap}
 .tab-btn{padding:6px 14px;border-radius:7px;border:none;background:transparent;
-  color:var(--txt2);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
-.tab-btn:hover{color:var(--txt)}
+  color:var(--txt3);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--txt2)}
 .tab-btn.active{background:var(--bg4);color:var(--txt);font-weight:500}
 .tpanel{display:none}.tpanel.on{display:block}
 
@@ -1135,21 +1134,22 @@ body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
 
 /* ── Metric grid ───────────────────────────────────────────── */
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px;margin:10px 0}
-.mc{background:var(--bg3);border-radius:8px;padding:11px 13px}
+.mc{background:var(--bg3);border-radius:8px;padding:11px 13px;border:1px solid var(--bdr)}
 .mc .ml{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);margin-bottom:3px}
 .mc .mv{font-size:17px;font-weight:600;color:var(--txt)}
 .mc .ms{font-size:10px;color:var(--txt3);margin-top:2px}
 
 /* ── Info rows & tables ────────────────────────────────────── */
 .info-row{display:flex;justify-content:space-between;align-items:baseline;
-  padding:7px 0;border-bottom:1px solid var(--bdr);gap:12px}
+  padding:8px 0;border-bottom:1px solid var(--bdr);gap:12px}
 .info-row:last-child{border-bottom:none}
 .il{font-size:12px;color:var(--txt2)}
 .iv{font-size:12px;font-weight:500;text-align:right;max-width:380px;color:var(--txt)}
 table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
-th{text-align:left;padding:7px 10px;font-weight:500;font-size:10px;text-transform:uppercase;
+th{text-align:left;padding:8px 10px;font-weight:500;font-size:10px;text-transform:uppercase;
   letter-spacing:.6px;color:var(--txt3);border-bottom:1px solid var(--bdr)}
 td{padding:9px 10px;border-bottom:1px solid var(--bdr);color:var(--txt2)}
+td:first-child{color:var(--txt)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--bg3)}
 .peer-you td{color:var(--txt);background:var(--blue-dim)}
@@ -1176,6 +1176,7 @@ tr:hover td{background:var(--bg3)}
 /* ── Score box ─────────────────────────────────────────────── */
 .score-box{background:var(--bg3);border-radius:8px;padding:11px 14px;
   margin-top:10px;font-size:12px;color:var(--txt2);border:1px solid var(--bdr)}
+.score-box strong{color:var(--txt)}
 
 /* ── EPS chips ─────────────────────────────────────────────── */
 .eps-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -1602,7 +1603,7 @@ def render_panel(d: dict) -> str:
   <div class="tpanel on" id="tp-{esc}-7">
     <div class="card {d["view_card"]}">
       <div class="view-label {d["view_card"]}">{d["view_label"]}</div>
-      <div style="font-size:13px;margin-bottom:13px">
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:13px;line-height:1.65">
         {d["company"]} shows {d["gclass"].lower()} growth with {quality_word} returns on equity
         and {health_word} financial risk based on available data.
       </div>
@@ -1611,8 +1612,8 @@ def render_panel(d: dict) -> str:
       <div class="sec-label">What to watch</div>
       {wat_html}
       <div class="sec-label">Track going forward</div>
-      <div class="bullet-row"><span class="bicon" style="color:var(--txt2)">&rarr;</span><span>{d["track"]}</span></div>
-      <div style="margin-top:13px;font-size:11px;color:var(--txt2);font-style:italic">
+      <div class="bullet-row"><span class="bicon" style="color:var(--txt3)">&rarr;</span><span style="color:var(--txt2)">{d["track"]}</span></div>
+      <div style="margin-top:13px;font-size:11px;color:var(--txt3);font-style:italic">
         This is a VIEW based on fundamentals only. Not a buy/sell recommendation. The decision is always yours.
       </div>
     </div>
