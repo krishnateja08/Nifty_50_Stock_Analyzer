@@ -9,6 +9,7 @@ import argparse
 import sys
 import time
 import json
+import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, date
@@ -17,6 +18,23 @@ from pathlib import Path
 import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
+
+try:
+    from tqdm import tqdm
+    _TQDM = True
+except ImportError:
+    _TQDM = False
+
+# ─────────────────────────────────────────────────────────────────
+# LOGGING
+# ─────────────────────────────────────────────────────────────────
+
+logging.basicConfig(
+    filename="analyser_errors.log",
+    level=logging.WARNING,
+    format="%(asctime)s  %(levelname)s  %(message)s",
+)
+log = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────────────────────────
 # NIFTY 50 TICKERS
@@ -45,6 +63,51 @@ HEADERS = {
 }
 
 # ─────────────────────────────────────────────────────────────────
+# CACHE HELPERS
+# ─────────────────────────────────────────────────────────────────
+
+CACHE_DIR = Path(".analyser_cache")
+
+def _cache_path(ticker: str) -> Path:
+    return CACHE_DIR / f"{ticker.replace('&','_').replace('-','_')}.json"
+
+def cache_load(ticker: str, max_age_hours: int = 6):
+    """Return cached dict if fresh, else None."""
+    p = _cache_path(ticker)
+    if not p.exists():
+        return None
+    age_hours = (time.time() - p.stat().st_mtime) / 3600
+    if age_hours > max_age_hours:
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+def cache_save(ticker: str, data: dict):
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        _cache_path(ticker).write_text(json.dumps(data, default=str), encoding="utf-8")
+    except Exception:
+        pass
+
+# ─────────────────────────────────────────────────────────────────
+# RETRY WRAPPER
+# ─────────────────────────────────────────────────────────────────
+
+def with_retry(fn, retries: int = 3, base_delay: float = 2.0):
+    """Call fn(), retrying up to `retries` times with exponential backoff."""
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            return fn()
+        except Exception as exc:
+            last_exc = exc
+            if attempt < retries - 1:
+                time.sleep(base_delay * (2 ** attempt))
+    raise last_exc
+
+# ─────────────────────────────────────────────────────────────────
 # SCREENER SCRAPER
 # ─────────────────────────────────────────────────────────────────
 
@@ -55,8 +118,16 @@ def _clean_num(s):
     if not s:
         return None
     s = str(s).replace(",", "").replace("%", "").replace("\u20b9", "").strip()
+    # Handle Indian magnitude suffixes
+    multiplier = 1.0
+    if s.endswith("Cr"):
+        multiplier = 1e7; s = s[:-2].strip()
+    elif s.upper().endswith("L"):
+        multiplier = 1e5; s = s[:-1].strip()
+    elif s.upper().endswith("K"):
+        multiplier = 1e3; s = s[:-1].strip()
     try:
-        return float(s)
+        return float(s) * multiplier
     except ValueError:
         return None
 
@@ -66,7 +137,11 @@ def screener_fetch(ticker: str) -> dict:
     for suffix in ["/consolidated/", "/"]:
         url = f"https://www.screener.in/company/{sc_ticker}{suffix}"
         try:
-            r = requests.get(url, headers=HEADERS, timeout=25)
+            def _get():
+                r = requests.get(url, headers=HEADERS, timeout=25)
+                r.raise_for_status()
+                return r
+            r = with_retry(_get)
             if r.status_code == 200:
                 soup = BeautifulSoup(r.text, "lxml")
                 data["url"] = url
@@ -75,9 +150,12 @@ def screener_fetch(ticker: str) -> dict:
                 data.update(_screener_shareholding(soup))
                 data.update(_screener_peers(soup, ticker))
                 data.update(_screener_quarters(soup))
+                data.update(_screener_interest_coverage(soup))
+                data.update(_screener_dividends(soup))
                 return data
         except Exception as e:
             data["screener_error"] = str(e)
+            log.warning("screener_fetch %s%s: %s", ticker, suffix, e)
     return data
 
 def _screener_ratios(soup) -> dict:
@@ -224,6 +302,62 @@ def _screener_quarters(soup) -> dict:
         out["quarters_error"] = str(e)
     return out
 
+def _screener_interest_coverage(soup) -> dict:
+    """Compute Interest Coverage = EBIT / Interest Expense from P&L section."""
+    out = {}
+    try:
+        section = soup.find("section", {"id": "profit-loss"})
+        if not section:
+            return out
+        years = [_text(th) for th in section.select("table thead th")[1:] if _text(th)]
+        ebit_vals = interest_vals = None
+        for row in section.select("table tbody tr"):
+            cells = row.select("td")
+            if not cells:
+                continue
+            label = _text(cells[0]).lower() if cells[0] else ""
+            vals  = [_clean_num(_text(c)) for c in cells[1:]]
+            if label.strip() in ("ebit", "operating profit"):
+                ebit_vals = dict(zip(years, vals))
+            elif "interest" in label and "coverage" not in label:
+                interest_vals = dict(zip(years, vals))
+        if ebit_vals and interest_vals:
+            latest_year = years[0] if years else None
+            ebit = ebit_vals.get(latest_year)
+            intr = interest_vals.get(latest_year)
+            if ebit is not None and intr and intr != 0:
+                out["interest_coverage"] = round(ebit / intr, 2)
+            out["ebit_annual"]     = ebit_vals
+            out["interest_annual"] = interest_vals
+    except Exception as e:
+        out["interest_coverage_error"] = str(e)
+        log.warning("_screener_interest_coverage: %s", e)
+    return out
+
+def _screener_dividends(soup) -> dict:
+    """Scrape 5-year dividend history from Screener."""
+    out = {}
+    try:
+        section = soup.find("section", {"id": "dividends"})
+        if not section:
+            return out
+        rows = section.select("table tbody tr")
+        history = []
+        for row in rows[:5]:
+            cells = row.select("td")
+            if len(cells) < 2:
+                continue
+            year = _text(cells[0])
+            dps  = _clean_num(_text(cells[1]))
+            if year:
+                history.append({"year": year, "dps": dps})
+        if history:
+            out["dividend_history"] = history
+    except Exception as e:
+        out["dividend_error"] = str(e)
+        log.warning("_screener_dividends: %s", e)
+    return out
+
 # ─────────────────────────────────────────────────────────────────
 # YFINANCE FETCH
 # ─────────────────────────────────────────────────────────────────
@@ -232,8 +366,11 @@ def yf_fetch(ticker: str) -> dict:
     out = {}
     nse = ticker + ".NS"
     try:
-        tk   = yf.Ticker(nse)
-        info = tk.info or {}
+        def _get_info():
+            tk   = yf.Ticker(nse)
+            info = tk.info or {}
+            return tk, info
+        tk, info = with_retry(_get_info)
         out["company_name"]    = info.get("longName") or info.get("shortName", ticker)
         out["sector"]          = info.get("sector", "N/A")
         out["industry"]        = info.get("industry", "N/A")
@@ -299,6 +436,7 @@ def yf_fetch(ticker: str) -> dict:
             pass
     except Exception as e:
         out["yf_error"] = str(e)
+        log.warning("yf_fetch %s: %s", ticker, e)
     return out
 
 # ─────────────────────────────────────────────────────────────────
@@ -387,6 +525,188 @@ SECTOR_PE = {
     "Communication Services": 22, "Real Estate": 30,
 }
 
+# ─────────────────────────────────────────────────────────────────
+# SECTOR-SPECIFIC VALUATION CONFIGURATION
+# Keys map to substrings found in yfinance sector/industry fields.
+# primary  : metric name shown in UI
+# metric   : key used in analyse() result dict (must be present)
+# avg      : sector-average benchmark for that metric
+# red_flag : (field, operator, threshold) — human-readable warning
+# ─────────────────────────────────────────────────────────────────
+
+SECTOR_VALUATION = {
+    "bank": {
+        "primary": "P/B (Price-to-Book)",
+        "metric":  "pb",
+        "avg":     2.0,
+        "secondary": "RoA",
+        "red_flag": ("gnpa_pct", ">", 5, "GNPA above 5% — stressed book"),
+    },
+    "financial services": {
+        "primary": "P/B (Price-to-Book)",
+        "metric":  "pb",
+        "avg":     2.5,
+        "secondary": "RoA",
+        "red_flag": ("gnpa_pct", ">", 3, "GNPA above 3% — watch credit quality"),
+    },
+    "insurance": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     30.0,
+        "secondary": "Combined Ratio",
+        "red_flag": None,
+    },
+    "software": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     28.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "information technology": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     28.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "pharmaceuticals": {
+        "primary": "P/E (adj.)",
+        "metric":  "pe",
+        "avg":     25.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "healthcare": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     18.0,
+        "secondary": "EV/Bed",
+        "red_flag": None,
+    },
+    "cement": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     12.0,
+        "secondary": "EV/tonne",
+        "red_flag": None,
+    },
+    "consumer defensive": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     45.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "consumer cyclical": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     35.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "automobiles": {
+        "primary": "P/E (mid-cycle)",
+        "metric":  "pe",
+        "avg":     20.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "auto": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     20.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "metals": {
+        "primary": "EV/EBITDA (through-cycle)",
+        "metric":  "ev_eb",
+        "avg":     6.0,
+        "secondary": "EV/tonne",
+        "red_flag": None,
+    },
+    "steel": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     6.0,
+        "secondary": "EV/tonne",
+        "red_flag": None,
+    },
+    "energy": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     7.0,
+        "secondary": "P/E",
+        "red_flag": None,
+    },
+    "utilities": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     9.0,
+        "secondary": "P/B",
+        "red_flag": None,
+    },
+    "real estate": {
+        "primary": "P/B (NAV proxy)",
+        "metric":  "pb",
+        "avg":     2.5,
+        "secondary": "P/E",
+        "red_flag": None,
+    },
+    "industrials": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     25.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+    "chemicals": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     14.0,
+        "secondary": "P/E",
+        "red_flag": None,
+    },
+    "telecom": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     9.0,
+        "secondary": "EV/Subscriber",
+        "red_flag": None,
+    },
+    "communication": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     9.0,
+        "secondary": "P/E",
+        "red_flag": None,
+    },
+    "retail": {
+        "primary": "EV/EBITDA",
+        "metric":  "ev_eb",
+        "avg":     20.0,
+        "secondary": "P/Sales",
+        "red_flag": None,
+    },
+    # default fallback
+    "_default": {
+        "primary": "P/E",
+        "metric":  "pe",
+        "avg":     22.0,
+        "secondary": "EV/EBITDA",
+        "red_flag": None,
+    },
+}
+
+def get_sector_val_config(sector: str, industry: str) -> dict:
+    """Return the best-matching SECTOR_VALUATION entry for this stock."""
+    combined = (sector + " " + industry).lower()
+    for key, cfg in SECTOR_VALUATION.items():
+        if key != "_default" and key in combined:
+            return cfg
+    return SECTOR_VALUATION["_default"]
+
 def sector_pe(sector: str) -> float:
     for k, v in SECTOR_PE.items():
         if k.lower() in (sector or "").lower():
@@ -462,7 +782,13 @@ def growth_class(rev3, rev5, np3, np5):
 # PER-STOCK ANALYSIS PIPELINE
 # ─────────────────────────────────────────────────────────────────
 
-def analyse(ticker: str) -> dict:
+def analyse(ticker: str, use_cache: bool = False, cache_hours: int = 6) -> dict:
+    # ── Cache check ──────────────────────────────────────────────
+    if use_cache:
+        cached = cache_load(ticker, max_age_hours=cache_hours)
+        if cached:
+            return cached
+
     sc  = screener_fetch(ticker)
     yfd = yf_fetch(ticker)
     time.sleep(1.5)
@@ -482,15 +808,36 @@ def analyse(ticker: str) -> dict:
     pe    = yfd.get("pe_yf")   or _clean_num(sc.get("pe"))
     pb    = yfd.get("pb_yf")
     ev_eb = yfd.get("ev_ebitda_yf")
-    sp    = sector_pe(sector)
+
+    # ── Sector-specific valuation ────────────────────────────────
+    svc         = get_sector_val_config(sector, industry)
+    primary_metric_name = svc["primary"]
+    primary_metric_val  = {"pe": pe, "pb": pb, "ev_eb": ev_eb}.get(svc["metric"])
+    primary_avg         = svc["avg"]
+    primary_sig, primary_cls = val_signal(primary_metric_val, primary_avg)
+
+    sp    = sector_pe(sector)                    # kept for P/E fallback in UI
     pe_sig, pe_cls = val_signal(pe, sp)
     pb_sig, pb_cls = val_signal(pb, 3.0)
     ev_sig, ev_cls = val_signal(ev_eb, 15.0)
-    v = [pe_cls, pb_cls, ev_cls]
-    if v.count("ok") >= 2:     overall_val = "UNDERVALUED"
-    elif v.count("bad") >= 2:  overall_val = "OVERVALUED"
+
+    # Overall valuation: weight primary metric more heavily
+    v = [primary_cls, primary_cls, pe_cls, pb_cls, ev_cls]   # primary counted twice
+    if v.count("ok") >= 3:     overall_val = "UNDERVALUED"
+    elif v.count("bad") >= 3:  overall_val = "OVERVALUED"
     elif v.count("warn") >= 2: overall_val = "FAIRLY VALUED"
     else:                       overall_val = "MIXED"
+
+    # ── Red flag from sector config ──────────────────────────────
+    sector_red_flag = None
+    if svc.get("red_flag"):
+        field, op, thresh, msg = svc["red_flag"]
+        fval = sc.get(field) or yfd.get(field)
+        if fval is not None:
+            fval = _clean_num(str(fval)) if isinstance(fval, str) else fval
+            triggered = (fval > thresh if op == ">" else fval < thresh)
+            if triggered:
+                sector_red_flag = msg
 
     rl   = rev_list(sc)
     nl   = np_list(sc)
@@ -520,13 +867,20 @@ def analyse(ticker: str) -> dict:
     d_e  = de_ratio(sc, yfd)
     cr   = current_ratio(yfd)
     fcfc = fcf_crore(yfd)
+    icr  = sc.get("interest_coverage")   # from _screener_interest_coverage
+    div_history = sc.get("dividend_history", [])
+
     de_lbl,  de_cls  = badge(d_e,  [1, 2],   ["SAFE","MODERATE","LEVERAGED"], ["ok","warn","bad"]) if d_e  is not None else ("N/A","neu")
     cr_lbl,  cr_cls  = badge(cr,   [1, 1.5], ["RISK","WATCH","COMFORTABLE"],  ["bad","warn","ok"])  if cr   is not None else ("N/A","neu")
     fcf_lbl, fcf_cls = ("CONCERN","bad") if fcfc and fcfc < 0 else (("STRONG","ok") if fcfc else ("N/A","neu"))
-    hs = [de_cls, cr_cls, fcf_cls]
-    if hs.count("bad") >= 2:    overall_health, hcard = "HIGH RISK",     "red"
-    elif hs.count("warn") >= 2: overall_health, hcard = "MODERATE RISK", "amber"
-    else:                        overall_health, hcard = "SAFE",          "green"
+    icr_lbl, icr_cls = badge(icr,  [1.5, 3], ["RISK","WATCH","HEALTHY"],      ["bad","warn","ok"])  if icr  is not None else ("N/A","neu")
+
+    hs = [de_cls, cr_cls, fcf_cls, icr_cls]
+    bad_cnt  = sum(1 for x in hs if x == "bad")
+    warn_cnt = sum(1 for x in hs if x == "warn")
+    if bad_cnt >= 2:    overall_health, hcard = "HIGH RISK",     "red"
+    elif warn_cnt >= 2: overall_health, hcard = "MODERATE RISK", "amber"
+    else:               overall_health, hcard = "SAFE",          "green"
     de_trend = trend_arrow(sc.get("borrowings_annual", {}))
 
     HORIZON = 5
@@ -590,6 +944,11 @@ def analyse(ticker: str) -> dict:
     if d_e and d_e > 2:
         flags.append(("\u26a0 HIGH LEVERAGE",
                        f"D/E of {d_e:.2f} — heavily reliant on debt. Rising rates could hurt profits."))
+    if icr is not None and icr < 1.5:
+        flags.append(("\u26a0 WEAK INTEREST COVERAGE",
+                       f"Interest coverage of {icr:.1f}x — earnings barely cover interest expense. High financial risk."))
+    if sector_red_flag:
+        flags.append(("\u26a0 SECTOR RED FLAG", sector_red_flag))
 
     score = 0
     if gclass in ["ACCELERATING","STEADY"]:            score += 2
@@ -598,6 +957,8 @@ def analyse(ticker: str) -> dict:
     if overall_health == "SAFE":                        score += 2
     if pledge_val and pledge_val > 10:                  score -= 2
     if d_e and d_e > 2:                                 score -= 1
+    if icr is not None and icr < 1.5:                   score -= 1
+    if sector_red_flag:                                  score -= 1
     if score >= 5:   view_label, view_card = "STRONG FUNDAMENTALS",   "green"
     elif score >= 2: view_label, view_card = "MODERATE FUNDAMENTALS", "amber"
     else:            view_label, view_card = "WEAK FUNDAMENTALS",     "red"
@@ -608,13 +969,17 @@ def analyse(ticker: str) -> dict:
     if roe_cls == "ok":
         strengths.append(f"Strong ROE of {pct(roe_pct)} — solid returns on shareholder capital")
     if overall_val in ["UNDERVALUED","FAIRLY VALUED"]:
-        strengths.append(f"{overall_val.title()} vs sector — P/E {xfmt(pe)} vs sector avg {xfmt(sp)}")
+        strengths.append(f"{overall_val.title()} vs sector — {primary_metric_name} {xfmt(primary_metric_val)} vs sector avg {xfmt(primary_avg)}")
     if overall_health == "SAFE":
         strengths.append("Low debt burden provides resilience in economic downturns")
+    if icr is not None and icr >= 3:
+        strengths.append(f"Strong interest coverage of {icr:.1f}x — debt well-serviced from operating profits")
     while len(strengths) < 3:
         strengths.append("Refer Screener.in / NSE filings for additional qualitative strengths")
     if d_e and d_e > 1.5:
         watches.append(f"Elevated debt (D/E {xfmt(d_e)}) — monitor borrowing trend each quarter")
+    if icr is not None and icr < 3:
+        watches.append(f"Interest coverage {icr:.1f}x — {'borderline, watch earnings' if icr >= 1.5 else 'below safe threshold, high risk'}")
     if gclass in ["SLOWING","DECLINING"]:
         watches.append("Growth momentum has slowed — watch for margin improvement signals")
     if pledge_val and pledge_val > 5:
@@ -635,21 +1000,28 @@ def analyse(ticker: str) -> dict:
         else ("TRIMMING" if "decreas" in prom_trend.lower() else "HOLDING STEADY")
     )
 
-    return dict(
+    result = dict(
         ticker=ticker, company=company, sector=sector, industry=industry,
         desc=desc[:220] + ("\u2026" if len(desc) > 220 else "") if desc else "N/A",
         cmp=cmp, high52=high52, low52=low52, mcap_str=mcap_str, fv=fv,
         pe=pe, pb=pb, ev_eb=ev_eb, sp=sp,
         pe_sig=pe_sig, pe_cls=pe_cls, pb_sig=pb_sig, pb_cls=pb_cls,
         ev_sig=ev_sig, ev_cls=ev_cls, overall_val=overall_val,
+        primary_metric_name=primary_metric_name,
+        primary_metric_val=primary_metric_val,
+        primary_avg=primary_avg,
+        primary_sig=primary_sig, primary_cls=primary_cls,
+        sector_secondary=svc.get("secondary", "EV/EBITDA"),
         rev3=rev3, rev5=rev5, np3=np3, np5=np5, eps3=eps3, eps5=eps5,
         opm=opm, gclass=gclass, eps_chips=eps_chips,
-        d_e=d_e, cr=cr, fcfc=fcfc,
+        d_e=d_e, cr=cr, fcfc=fcfc, icr=icr,
         de_lbl=de_lbl, de_cls=de_cls, cr_lbl=cr_lbl, cr_cls=cr_cls,
         fcf_lbl=fcf_lbl, fcf_cls=fcf_cls,
+        icr_lbl=icr_lbl, icr_cls=icr_cls,
         overall_health=overall_health, hcard=hcard, de_trend=de_trend,
         proj_rev=proj_rev, proj_np=proj_np, proj_eps=proj_eps,
         roe_pct=roe_pct, roce_raw=roce_raw, div_y=div_y, payout_p=payout_p,
+        div_history=div_history,
         roe_lbl=roe_lbl, roe_cls=roe_cls, roce_lbl=roce_lbl, roce_cls=roce_cls,
         ret_q=ret_q, peers=peers, peer_stand=peer_stand,
         prom_val=prom_val, prom_trend=prom_trend, prom_badge=prom_badge,
@@ -658,11 +1030,15 @@ def analyse(ticker: str) -> dict:
         pledge_val=pledge_val, pledge_flag=pledge_flag, pledge_lbl=pledge_lbl,
         flags=flags, view_label=view_label, view_card=view_card,
         strengths=strengths[:3], watches=watches[:2],
-        track="Watch quarterly revenue and margin trend; monitor promoter stake and D/E ratio",
+        track="Watch quarterly revenue, margin trend, promoter stake, and D/E ratio each quarter",
         conf_cls=conf_cls, conf_lbl=conf_lbl, live=live,
         own_signal=own_signal,
         screener_ok=("screener_error" not in sc),
+        errors={k: v for k, v in {**sc, **yfd}.items() if k.endswith("_error")},
     )
+    if use_cache:
+        cache_save(ticker, result)
+    return result
 
 # ─────────────────────────────────────────────────────────────────
 # HTML TEMPLATES
@@ -671,148 +1047,240 @@ def analyse(ticker: str) -> dict:
 CSS = """<style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --g-fill:#EAF3DE;--g-text:#27500A;--g-border:#C0DD97;--g-accent:#639922;
-  --a-fill:#FAEEDA;--a-text:#854F0B;--a-border:#FAC775;--a-accent:#EF9F27;
-  --r-fill:#FCEBEB;--r-text:#A32D2D;--r-border:#F7C1C1;--r-accent:#E24B4A;
-  --b-fill:#E6F1FB;--b-text:#185FA5;--b-border:#B5D4F4;--b-accent:#378ADD;
-  --n-fill:#F1EFE8;--n-text:#444441;--n-border:#D3D1C7;
-  --bg:#fff;--bg2:#f5f5f3;--txt:#1a1a1a;--txt2:#666;
-  --bdr:#e0ddd5;--bdr2:rgba(0,0,0,0.15);--bdr3:rgba(0,0,0,0.3)
+  --bg:#0f1117;--bg2:#131623;--bg3:#1a1d2e;--bg4:#1e2235;
+  --txt:#e8e9ec;--txt2:#8a8fa8;--txt3:#555a70;
+  --bdr:#1e2235;--bdr2:rgba(255,255,255,0.08);--bdr3:rgba(255,255,255,0.16);
+  --blue:#4f8ef7;--blue-dim:rgba(79,142,247,0.12);--blue-bdr:rgba(79,142,247,0.25);
+  --green:#34c759;--green-dim:rgba(52,199,89,0.12);--green-bdr:rgba(52,199,89,0.22);
+  --amber:#ff9f0a;--amber-dim:rgba(255,159,10,0.12);--amber-bdr:rgba(255,159,10,0.22);
+  --red:#ff453a;--red-dim:rgba(255,69,58,0.12);--red-bdr:rgba(255,69,58,0.22);
+  --neu-dim:rgba(138,143,168,0.12);--neu-bdr:rgba(138,143,168,0.2);
 }
-@media(prefers-color-scheme:dark){:root{
-  --g-fill:#173404;--g-text:#C0DD97;--g-border:#3B6D11;--g-accent:#97C459;
-  --a-fill:#412402;--a-text:#FAC775;--a-border:#854F0B;--a-accent:#EF9F27;
-  --r-fill:#501313;--r-text:#F09595;--r-border:#A32D2D;--r-accent:#E24B4A;
-  --b-fill:#042C53;--b-text:#85B7EB;--b-border:#185FA5;--b-accent:#378ADD;
-  --n-fill:#2C2C2A;--n-text:#D3D1C7;--n-border:#5F5E5A;
-  --bg:#1c1c1a;--bg2:#2a2a28;--txt:#f0ede6;--txt2:#aaa;
-  --bdr:#3a3a38;--bdr2:rgba(255,255,255,0.12);--bdr3:rgba(255,255,255,0.25)
-}}
-body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;color:var(--txt);background:var(--bg);margin:0;padding:0}
-.topbar{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--bdr);
-  padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.topbar h1{font-size:15px;font-weight:600;white-space:nowrap}
+body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
+  color:var(--txt);background:var(--bg);margin:0;padding:0;min-height:100vh}
+
+/* ── Topbar ─────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--bg);
+  border-bottom:1px solid var(--bdr);padding:11px 20px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
 .sw{position:relative;flex:1;min-width:180px;max-width:320px}
-.sw input{width:100%;padding:7px 10px 7px 30px;border-radius:8px;border:1px solid var(--bdr2);
-  background:var(--bg2);color:var(--txt);font-size:13px;outline:none;font-family:inherit}
-.sw input:focus{border-color:var(--bdr3)}
-.si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--txt2);font-size:13px;pointer-events:none}
+.sw input{width:100%;padding:7px 10px 7px 32px;border-radius:8px;
+  border:1px solid var(--bdr2);background:var(--bg3);color:var(--txt);
+  font-size:12px;outline:none;font-family:inherit}
+.sw input:focus{border-color:var(--blue)}
+.sw input::placeholder{color:var(--txt3)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--txt3);font-size:13px;pointer-events:none}
 .stock-select{padding:7px 10px;border-radius:8px;border:1px solid var(--bdr2);
-  background:var(--bg2);color:var(--txt);font-size:13px;font-family:inherit;cursor:pointer;min-width:200px}
-.gen-time{font-size:11px;color:var(--txt2);white-space:nowrap;margin-left:auto}
+  background:var(--bg3);color:var(--txt2);font-size:12px;font-family:inherit;cursor:pointer}
+.gen-time{font-size:11px;color:var(--txt3);white-space:nowrap;margin-left:auto;
+  background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:4px 10px}
+
+/* ── Landing grid ──────────────────────────────────────────── */
 .landing{max-width:1100px;margin:0 auto;padding:20px}
-.landing h2{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--txt2)}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px}
-.sgc{background:var(--bg2);border:.5px solid var(--bdr);border-radius:10px;
-  padding:13px 15px;cursor:pointer;transition:border-color .15s,transform .1s}
+.sort-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.sort-lbl{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-right:2px}
+.sort-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;
+  color:var(--txt3);font-size:11px;cursor:pointer;font-family:inherit;transition:.15s}
+.sort-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sort-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.sgc{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:border-color .15s,transform .12s}
 .sgc:hover{border-color:var(--bdr3);transform:translateY(-1px)}
-.sgc .sn{font-size:13px;font-weight:500;margin-bottom:3px}
-.sgc .st{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
-.sgc .sb{display:flex;gap:4px;flex-wrap:wrap}
-.sgc .sc{font-size:16px;font-weight:600;margin-top:6px}
-.stock-panel{display:none;max-width:900px;margin:0 auto;padding:18px 20px 48px}
+.sgc .sn{font-size:12px;font-weight:500;color:var(--txt);margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sgc .st{font-size:10px;color:var(--txt3);letter-spacing:.6px;margin-bottom:9px}
+.sgc .sb{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.sgc .sc{font-size:20px;font-weight:600;color:var(--txt);letter-spacing:-.5px}
+.sgc .stk{font-size:11px;font-weight:600;color:var(--blue);letter-spacing:.4px;margin-bottom:4px}
+
+/* ── Stock panel ───────────────────────────────────────────── */
+.stock-panel{display:none;max-width:920px;margin:0 auto;padding:18px 20px 56px}
 .stock-panel.active{display:block}
-.ph{margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ph h2{font-size:19px;font-weight:600}
-.ph .sub{font-size:12px;color:var(--txt2)}
-.back-btn{background:none;border:1px solid var(--bdr2);border-radius:8px;padding:5px 11px;
-  font-size:12px;cursor:pointer;color:var(--txt2);font-family:inherit}
-.back-btn:hover{border-color:var(--bdr3);color:var(--txt)}
-.conf{padding:8px 13px;border-radius:8px;margin-bottom:13px;font-size:12px}
-.conf.high,.conf.moderate{background:var(--g-fill);color:var(--g-text)}
-.conf.low{background:var(--a-fill);color:var(--a-text)}
-.conf.vlow{background:var(--r-fill);color:var(--r-text)}
-.tab-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
-.tab-btn{padding:5px 14px;border-radius:100px;border:1px solid var(--bdr2);
-  background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s}
-.tab-btn:hover{border-color:var(--bdr3);color:var(--txt)}
-.tab-btn.active{border:1.5px solid var(--txt);color:var(--txt);font-weight:500}
+.ph{margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.ph h2{font-size:21px;font-weight:600;color:var(--txt);letter-spacing:-.4px}
+.ph .sub{font-size:12px;color:var(--txt3);margin-top:3px}
+.back-btn{background:transparent;border:1px solid var(--bdr2);border-radius:8px;
+  padding:5px 12px;font-size:12px;cursor:pointer;color:var(--txt2);font-family:inherit;
+  white-space:nowrap;transition:.15s}
+.back-btn:hover{border-color:var(--blue);color:var(--blue)}
+.conf{padding:9px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--bg2);border:1px solid var(--bdr)}
+.conf .cl{color:var(--txt3)}
+.conf strong{color:var(--txt2)}
+.conf.high .cl,.conf.moderate .cl{color:var(--green)}
+.conf.high strong,.conf.moderate strong{color:var(--txt)}
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+.tab-row{display:flex;gap:3px;margin-bottom:16px;
+  background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
+  padding:4px;flex-wrap:wrap}
+.tab-btn{padding:6px 14px;border-radius:7px;border:none;background:transparent;
+  color:var(--txt2);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--txt)}
+.tab-btn.active{background:var(--bg4);color:var(--txt);font-weight:500}
 .tpanel{display:none}.tpanel.on{display:block}
-.card{background:var(--bg);border:.5px solid var(--bdr);border-radius:12px;padding:15px 18px;margin-bottom:11px}
-.card.green{background:var(--g-fill);border-color:var(--g-border)}
-.card.amber{background:var(--a-fill);border-color:var(--a-border)}
-.card.red{background:var(--r-fill);border-color:var(--r-border)}
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:8px;margin:11px 0}
-.mc{background:var(--bg2);border-radius:8px;padding:10px 12px}
-.mc .ml{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt2);margin-bottom:2px}
-.mc .mv{font-size:16px;font-weight:500}
-.mc .ms{font-size:10px;color:var(--txt2);margin-top:1px}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;
+  padding:15px 18px;margin-bottom:10px}
+.card.green{background:var(--green-dim);border-color:var(--green-bdr)}
+.card.amber{background:var(--amber-dim);border-color:var(--amber-bdr)}
+.card.red{background:var(--red-dim);border-color:var(--red-bdr)}
+.card.blue-hi{background:var(--blue-dim);border-color:var(--blue-bdr)}
+
+/* ── Metric grid ───────────────────────────────────────────── */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px;margin:10px 0}
+.mc{background:var(--bg3);border-radius:8px;padding:11px 13px}
+.mc .ml{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);margin-bottom:3px}
+.mc .mv{font-size:17px;font-weight:600;color:var(--txt)}
+.mc .ms{font-size:10px;color:var(--txt3);margin-top:2px}
+
+/* ── Info rows & tables ────────────────────────────────────── */
 .info-row{display:flex;justify-content:space-between;align-items:baseline;
-  padding:7px 0;border-bottom:.5px solid var(--bdr);gap:12px}
+  padding:7px 0;border-bottom:1px solid var(--bdr);gap:12px}
 .info-row:last-child{border-bottom:none}
 .il{font-size:12px;color:var(--txt2)}
-.iv{font-size:12px;font-weight:500;text-align:right;max-width:380px}
-table{width:100%;border-collapse:collapse;font-size:12px;margin:7px 0}
-th{text-align:left;padding:6px 9px;font-weight:500;font-size:11px;text-transform:uppercase;
-  letter-spacing:.6px;color:var(--txt2);border-bottom:.5px solid var(--bdr)}
-td{padding:8px 9px;border-bottom:.5px solid var(--bdr)}
+.iv{font-size:12px;font-weight:500;text-align:right;max-width:380px;color:var(--txt)}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+th{text-align:left;padding:7px 10px;font-weight:500;font-size:10px;text-transform:uppercase;
+  letter-spacing:.6px;color:var(--txt3);border-bottom:1px solid var(--bdr)}
+td{padding:9px 10px;border-bottom:1px solid var(--bdr);color:var(--txt2)}
 tr:last-child td{border-bottom:none}
-.peer-you{background:var(--bg2)}
-.badge{display:inline-block;padding:2px 7px;border-radius:100px;font-size:11px;font-weight:500}
-.badge.ok{background:var(--g-fill);color:var(--g-text)}
-.badge.warn{background:var(--a-fill);color:var(--a-text)}
-.badge.bad{background:var(--r-fill);color:var(--r-text)}
-.badge.neu{background:var(--n-fill);color:var(--n-text)}
+tr:hover td{background:var(--bg3)}
+.peer-you td{color:var(--txt);background:var(--blue-dim)}
+.peer-you:hover td{background:rgba(79,142,247,0.18)}
+
+/* ── Badges ────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.3px}
+.badge.ok{background:var(--green-dim);color:var(--green);border:1px solid var(--green-bdr)}
+.badge.warn{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-bdr)}
+.badge.bad{background:var(--red-dim);color:var(--red);border:1px solid var(--red-bdr)}
+.badge.neu{background:var(--neu-dim);color:var(--txt2);border:1px solid var(--neu-bdr)}
+.badge.blu{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-bdr)}
+
+/* ── Section labels ────────────────────────────────────────── */
 .sec-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;
-  color:var(--txt2);margin:13px 0 7px}
-.bullet-row{display:flex;gap:8px;align-items:flex-start;padding:5px 0;
-  border-bottom:.5px solid var(--bdr);font-size:13px}
+  color:var(--txt3);margin:13px 0 7px}
+
+/* ── Bullet rows ───────────────────────────────────────────── */
+.bullet-row{display:flex;gap:8px;align-items:flex-start;padding:6px 0;
+  border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2)}
 .bullet-row:last-child{border-bottom:none}
 .bicon{font-size:13px;min-width:16px;margin-top:1px}
-.score-box{background:var(--bg2);border-radius:8px;padding:12px 14px;margin-top:11px;font-size:12px;color:var(--txt2)}
+
+/* ── Score box ─────────────────────────────────────────────── */
+.score-box{background:var(--bg3);border-radius:8px;padding:11px 14px;
+  margin-top:10px;font-size:12px;color:var(--txt2);border:1px solid var(--bdr)}
+
+/* ── EPS chips ─────────────────────────────────────────────── */
 .eps-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-.eps-chip{background:var(--bg2);border-radius:8px;padding:8px 11px;text-align:center;min-width:78px}
-.eps-q{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
-.eps-v{font-size:14px;font-weight:500;margin:2px 0}
+.eps-chip{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;
+  padding:8px 11px;text-align:center;min-width:78px}
+.eps-q{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
+.eps-v{font-size:14px;font-weight:600;color:var(--txt);margin:2px 0}
 .eps-y{font-size:11px}
-.pos{color:var(--g-accent);font-weight:500}.neg{color:var(--r-accent);font-weight:500}
-.flag-card{border-left:3px solid var(--a-accent);background:var(--a-fill);
-  border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:7px}
-.flag-title{font-size:13px;font-weight:500;color:var(--a-text);margin-bottom:2px}
-.flag-note{font-size:12px;color:var(--a-text)}
-.view-label{font-size:16px;font-weight:500;margin-bottom:5px}
-.view-label.green{color:var(--g-text)}.view-label.amber{color:var(--a-text)}.view-label.red{color:var(--r-text)}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.pos{color:var(--green);font-weight:500}.neg{color:var(--red);font-weight:500}
+
+/* ── Flag cards ────────────────────────────────────────────── */
+.flag-card{border-left:3px solid var(--amber);background:var(--amber-dim);
+  border-radius:0 8px 8px 0;padding:9px 13px;margin-bottom:8px}
+.flag-title{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:2px}
+.flag-note{font-size:12px;color:var(--txt2)}
+
+/* ── View tab ──────────────────────────────────────────────── */
+.view-label{font-size:16px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.view-label.green{color:var(--green)}
+.view-label.amber{color:var(--amber)}
+.view-label.red{color:var(--red)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
 @media(max-width:520px){.two-col{grid-template-columns:1fr}}
-.cap-note{font-size:11px;color:var(--txt2);margin-top:6px}
-.disc{font-size:11px;color:var(--txt2);border-top:.5px solid var(--bdr);padding-top:11px;margin-top:18px;line-height:1.6}
+
+/* ── Misc ──────────────────────────────────────────────────── */
+.cap-note{font-size:11px;color:var(--txt3);margin-top:7px}
+.disc{font-size:11px;color:var(--txt3);border-top:1px solid var(--bdr);
+  padding-top:11px;margin-top:20px;line-height:1.7}
 details summary{font-size:12px;color:var(--txt2);cursor:pointer;padding:6px 0}
-details p{font-size:12px;color:var(--txt2);padding:4px 0;border-bottom:.5px solid var(--bdr)}
+details p{font-size:12px;color:var(--txt2);padding:4px 0;border-bottom:1px solid var(--bdr)}
 details p:last-child{border-bottom:none}
 details strong{color:var(--txt);font-weight:500}
 </style>"""
 
 GLOSSARY = """<details style="margin-top:16px;padding:0 2px">
-  <summary>Definitions</summary>
-  <p><strong>P/E</strong> — What you pay per Rs 1 of profit. Lower vs sector = cheaper.</p>
+  <summary>Glossary</summary>
+  <p><strong>P/E</strong> — What you pay per ₹1 of profit. Lower vs sector = cheaper.</p>
   <p><strong>P/B</strong> — Price vs net assets. Below 1 = buying at a discount to book value.</p>
-  <p><strong>EV/EBITDA</strong> — Full business value check including debt. Lower = better value.</p>
-  <p><strong>ROE</strong> — Profit generated per Rs 100 of shareholder equity. Above 15% = good.</p>
-  <p><strong>ROCE</strong> — How efficiently the whole business uses all capital. Above 15% = healthy.</p>
-  <p><strong>Free Cash Flow</strong> — Cash left after all expenses and capex. Positive and growing = genuinely healthy.</p>
+  <p><strong>EV/EBITDA</strong> — Full business value including debt. Lower = better value.</p>
+  <p><strong>ROE</strong> — Profit per ₹100 of shareholder equity. Above 15% = good.</p>
+  <p><strong>ROCE</strong> — How efficiently total capital is deployed. Above 15% = healthy.</p>
+  <p><strong>Interest Coverage</strong> — EBIT ÷ Interest. Above 3× = healthy. Below 1.5× = risk.</p>
+  <p><strong>Free Cash Flow</strong> — Cash left after all expenses and capex. Positive &amp; growing = genuinely healthy.</p>
   <p><strong>Promoter pledging</strong> — Founders borrowing against their shares. Above 10% = red flag.</p>
-  <p><strong>CAGR</strong> — Compound Annual Growth Rate. Average yearly growth over a period.</p>
+  <p><strong>CAGR</strong> — Compound Annual Growth Rate over a stated period.</p>
 </details>"""
 
 DISCLAIMER = """<div class="disc">
-  Fundamental screening tool only. Data: yfinance (Yahoo Finance) + Screener.in.
-  NOT investment advice or SEBI-registered research. Verify all numbers on NSE/BSE/Screener.in before any decision.
-  Past performance does not guarantee future results. Consult a SEBI-registered financial advisor before investing.
+  Fundamental screening tool only. Data: yfinance (Yahoo Finance) + Screener.in. NOT investment advice
+  or SEBI-registered research. AI can make errors — verify all numbers at NSE/BSE/Screener.in before acting.
+  Past performance does not guarantee future results. Consult a SEBI-registered investment advisor before any decision.
 </div>"""
 
 SCRIPT = """<script>
 var allStocks=[];
+var _sortKey='ticker';
 function init(s){allStocks=s;renderGrid(s);}
+
+function _sortedStocks(stocks){
+  var k=_sortKey;
+  return stocks.slice().sort(function(a,b){
+    if(k==='verdict'){
+      var order={green:0,amber:1,red:2};
+      return (order[a.view_card]||1)-(order[b.view_card]||1);
+    }
+    if(k==='val'){
+      var vo={UNDERVALUED:0,'FAIRLY VALUED':1,MIXED:2,OVERVALUED:3};
+      return (vo[a.overall_val]||2)-(vo[b.overall_val]||2);
+    }
+    if(k==='mcap'){
+      return (parseFloat(b.mcap_num)||0)-(parseFloat(a.mcap_num)||0);
+    }
+    if(k==='cmp'){
+      return (parseFloat(b.cmp)||0)-(parseFloat(a.cmp)||0);
+    }
+    // default: ticker alphabetical
+    return (a.ticker||'').localeCompare(b.ticker||'');
+  });
+}
+
+function setSort(key){
+  _sortKey=key;
+  document.querySelectorAll('.sort-btn').forEach(function(b){
+    b.className='sort-btn'+(b.dataset.key===key?' active':'');
+  });
+  renderGrid(allStocks.filter(function(s){
+    var sv=document.getElementById('search-input').value.toLowerCase().trim();
+    if(!sv) return true;
+    return s.ticker.toLowerCase().includes(sv)||s.company.toLowerCase().includes(sv)||
+           (s.sector||'').toLowerCase().includes(sv)||(s.industry||'').toLowerCase().includes(sv);
+  }));
+}
+
 function renderGrid(stocks){
   var g=document.getElementById('sgrid');
   g.innerHTML='';
-  stocks.forEach(function(s){
+  _sortedStocks(stocks).forEach(function(s){
     var vc=s.view_card==='green'?'ok':(s.view_card==='red'?'bad':'warn');
     var el=document.createElement('div');
     el.className='sgc';
     el.onclick=function(){openStock(s.ticker);};
-    el.innerHTML='<div class="sn">'+s.company+'</div>'+
-      '<div class="st">'+s.ticker+'</div>'+
+    el.innerHTML=
+      '<div class="stk">'+s.ticker+'</div>'+
+      '<div class="sn">'+s.company+'</div>'+
+      '<div class="st">'+(s.sector||'')+'</div>'+
       '<div class="sb">'+
         '<span class="badge '+vc+'">'+s.view_label.replace(' FUNDAMENTALS','')+'</span>'+
         '<span class="badge neu">'+s.overall_val+'</span>'+
@@ -876,22 +1344,38 @@ def render_panel(d: dict) -> str:
         chips_html += (f'<div class="eps-chip"><div class="eps-q">{c["q"]}</div>'
                        f'<div class="eps-v">\u20b9{c["v"]}</div>{yoy_html}</div>')
     if not chips_html:
-        chips_html = '<span style="color:var(--txt2);font-size:12px">Data unavailable — verify at screener.in</span>'
+        chips_html = '<span style="color:var(--txt3);font-size:12px">Data unavailable — verify at screener.in</span>'
 
     peer_rows = ""
     for p in d["peers"][:3]:
-        peer_rows += (f'<tr><td>{p.get("name","N/A")}</td><td>{xfmt(p.get("pe"))}</td>'
-                      f'<td>{xfmt(p.get("pb"))}</td><td>{pct(p.get("roe"))}</td>'
+        peer_rows += (f'<tr><td>{p.get("name","N/A")}</td>'
+                      f'<td>{xfmt(p.get("pe"))}</td>'
+                      f'<td>{xfmt(p.get("pe"))}</td><td>{pct(p.get("roe"))}</td>'
                       f'<td>{pct(p.get("rev_growth"))}</td><td>N/A</td></tr>')
     if not peer_rows:
-        peer_rows = '<tr><td colspan="6" style="color:var(--txt2);text-align:center">Verify at screener.in</td></tr>'
+        peer_rows = '<tr><td colspan="6" style="color:var(--txt3);text-align:center">Verify at screener.in</td></tr>'
+
+    # Dividend history table
+    dh = d.get("div_history", [])
+    if dh:
+        dh_rows = "".join(
+            f'<tr><td>{row["year"]}</td><td>{fmt_inr(row["dps"]) if row["dps"] else "N/A"}</td></tr>'
+            for row in dh
+        )
+        div_history_html = f"""<div class="card">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt3);margin-bottom:8px">Dividend history &mdash; last 5 years</div>
+      <table><thead><tr><th>Year</th><th>DPS (\u20b9)</th></tr></thead><tbody>{dh_rows}</tbody></table>
+      <div class="cap-note">Source: Screener.in</div>
+    </div>"""
+    else:
+        div_history_html = '<div class="cap-note" style="margin:6px 0">Dividend history unavailable — verify at screener.in</div>'
 
     str_html = "".join(
-        f'<div class="bullet-row"><span class="bicon" style="color:var(--g-accent)">&#10003;</span><span>{s}</span></div>'
+        f'<div class="bullet-row"><span class="bicon" style="color:var(--green)">&#10003;</span><span>{s}</span></div>'
         for s in d["strengths"]
     )
     wat_html = "".join(
-        f'<div class="bullet-row"><span class="bicon" style="color:var(--a-accent)">&#9888;</span><span>{w}</span></div>'
+        f'<div class="bullet-row"><span class="bicon" style="color:var(--amber)">&#9888;</span><span>{w}</span></div>'
         for w in d["watches"]
     )
 
@@ -925,16 +1409,18 @@ def render_panel(d: dict) -> str:
     return f"""
 <div class="stock-panel" id="sp-{t}">
   <div class="ph">
-    <button class="back-btn" onclick="showLanding()">&larr; All Stocks</button>
+    <button class="back-btn" onclick="showLanding()">&larr; All stocks</button>
     <div>
-      <h2>{d["company"]} <span style="font-size:13px;font-weight:400;color:var(--txt2)">({t})</span></h2>
-      <div class="sub">{d["sector"]} &middot; {d["industry"]}</div>
+      <h2>{d["company"]} <span style="font-size:13px;font-weight:400;color:var(--txt3)">({t})</span></h2>
+      <div class="sub">{d["sector"]} &middot; {d["industry"]} &middot; NSE: {t}</div>
     </div>
+    <div style="margin-left:auto"><span class="badge {d["conf_cls"] if d["conf_cls"] in ("ok","warn","bad") else "blu"}">CONF: {d["conf_lbl"]} &middot; {d["live"]}/12</span></div>
   </div>
   <div class="conf {d["conf_cls"]}">
-    <strong>Data confidence: {d["conf_lbl"]}</strong> &nbsp;&middot;&nbsp;
-    {d["live"]}/12 metrics live &nbsp;&middot;&nbsp;
-    Sources: yfinance{"+ Screener.in" if d["screener_ok"] else " only"}
+    <span class="cl">Data confidence:</span><strong>{d["conf_lbl"]}</strong>
+    <span class="cl">Live metrics:</span><strong>{d["live"]}/12</strong>
+    <span class="cl">Sources:</span><strong>yfinance{"+ Screener.in" if d["screener_ok"] else " only"}</strong>
+    <span class="cl">Primary metric:</span><strong>{d["primary_metric_name"]}</strong>
   </div>
   <div class="tab-row">
     <button class="tab-btn" onclick="showTab('{t}',0)">Snapshot</button>
@@ -981,9 +1467,16 @@ def render_panel(d: dict) -> str:
             <td style="color:var(--txt2)">Full business value</td></tr>
         </tbody>
       </table>
+      <div style="margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--blue-dim);border:1px solid var(--blue-bdr);font-size:12px;color:var(--blue)">
+        &#9432; <strong>Primary metric for {d["sector"]}:</strong> {d["primary_metric_name"]}
+        &nbsp;&middot;&nbsp; Current: <strong>{xfmt(d["primary_metric_val"])}</strong>
+        &nbsp;&middot;&nbsp; Sector avg: <strong>{xfmt(d["primary_avg"])}</strong>
+        &nbsp;&middot;&nbsp; <span class="badge {d["primary_cls"]}">{d["primary_sig"]}</span>
+        &nbsp;&middot;&nbsp; Secondary: {d["sector_secondary"]}
+      </div>
     </div>
     <div class="score-box">Overall: <strong>{d["overall_val"]}</strong> &nbsp;&middot;&nbsp;
-      Trailing P/E {xfmt(d["pe"])} vs {d["sector"]} sector avg {xfmt(d["sp"])}
+      Primary ({d["primary_metric_name"]}) {xfmt(d["primary_metric_val"])} vs sector avg {xfmt(d["primary_avg"])}
     </div>
   </div>
 
@@ -1015,8 +1508,8 @@ def render_panel(d: dict) -> str:
         <tbody>
           <tr><td>Debt / Equity</td><td>{xfmt(d["d_e"])}</td><td>{d["de_trend"]}</td>
             <td><span class="badge {d["de_cls"]}">{d["de_lbl"]}</span></td><td style="color:var(--txt2)">Below 1 = safe</td></tr>
-          <tr><td>Interest Coverage</td><td>N/A</td><td>&rarr;</td>
-            <td><span class="badge neu">N/A</span></td><td style="color:var(--txt2)">Above 3x = healthy</td></tr>
+          <tr><td>Interest Coverage</td><td>{xfmt(d["icr"])}</td><td>&rarr;</td>
+            <td><span class="badge {d["icr_cls"]}">{d["icr_lbl"]}</span></td><td style="color:var(--txt2)">Above 3x = healthy</td></tr>
           <tr><td>Current Ratio</td><td>{xfmt(d["cr"])}</td><td>&rarr;</td>
             <td><span class="badge {d["cr_cls"]}">{d["cr_lbl"]}</span></td><td style="color:var(--txt2)">Above 1.5 = comfortable</td></tr>
           <tr><td>Free Cash Flow</td><td>{fmt_inr_cr(d["fcfc"])}</td><td>&rarr;</td>
@@ -1054,6 +1547,7 @@ def render_panel(d: dict) -> str:
       </table>
       <div class="cap-note">ROE above 15% = good &middot; ROCE above 15% = efficient capital use</div>
     </div>
+    {div_history_html}
     <div class="score-box">Return quality: <strong>{d["ret_q"]}</strong> &nbsp;&middot;&nbsp;
       ROE {pct(d["roe_pct"])} &middot; ROCE {pct(d["roce_raw"])} &middot; Div yield {pct(d["div_y"])}
     </div>
@@ -1062,20 +1556,21 @@ def render_panel(d: dict) -> str:
   <div class="tpanel" id="tp-{esc}-5">
     <div class="card">
       <table>
-        <thead><tr><th>Company</th><th>P/E</th><th>P/B</th><th>ROE</th><th>Rev growth</th><th>D/E</th></tr></thead>
+        <thead><tr><th>Company</th><th>{d["primary_metric_name"]}</th><th>P/E</th><th>ROE</th><th>Rev growth</th><th>D/E</th></tr></thead>
         <tbody>
           <tr class="peer-you">
             <td><strong>{t} &laquo; you</strong></td>
-            <td>{xfmt(d["pe"])}</td><td>{xfmt(d["pb"])}</td>
+            <td>{xfmt(d["primary_metric_val"])}</td>
+            <td>{xfmt(d["pe"])}</td>
             <td>{pct(d["roe_pct"])}</td><td>{pct(d["rev5"] or d["rev3"])}</td><td>{xfmt(d["d_e"])}</td>
           </tr>
           {peer_rows}
         </tbody>
       </table>
-      <div class="cap-note">Source: Screener.in</div>
+      <div class="cap-note">Source: Screener.in &middot; Primary metric: {d["primary_metric_name"]} ({d["sector"]})</div>
     </div>
     <div class="score-box">Peer standing: <strong>{d["peer_stand"]}</strong> &nbsp;&middot;&nbsp;
-      P/E {xfmt(d["pe"])} vs sector avg {xfmt(d["sp"])} ({d["sector"]})
+      {d["primary_metric_name"]} {xfmt(d["primary_metric_val"])} vs sector avg {xfmt(d["primary_avg"])}
     </div>
   </div>
 
@@ -1123,16 +1618,16 @@ def render_panel(d: dict) -> str:
     </div>
     <div class="two-col">
       <div class="card green">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--g-text);margin-bottom:7px">Opportunities</div>
-        <div class="bullet-row" style="border-color:var(--g-border)"><span class="bicon" style="color:var(--g-accent)">+</span><span style="color:var(--g-text);font-size:12px">Long-term tailwinds in {d["industry"]}</span></div>
-        <div class="bullet-row" style="border-color:var(--g-border)"><span class="bicon" style="color:var(--g-accent)">+</span><span style="color:var(--g-text);font-size:12px">Revenue CAGR {pct(d["rev5"] or d["rev3"])} historical compounding</span></div>
-        <div class="bullet-row" style="border-color:var(--g-border);border-bottom:none"><span class="bicon" style="color:var(--g-accent)">+</span><span style="color:var(--g-text);font-size:12px">{opp3}</span></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:7px">Opportunities</div>
+        <div class="bullet-row"><span class="bicon" style="color:var(--green)">+</span><span>Long-term tailwinds in {d["industry"]}</span></div>
+        <div class="bullet-row"><span class="bicon" style="color:var(--green)">+</span><span>Revenue CAGR {pct(d["rev5"] or d["rev3"])} historical compounding</span></div>
+        <div class="bullet-row" style="border-bottom:none"><span class="bicon" style="color:var(--green)">+</span><span>{opp3}</span></div>
       </div>
       <div class="card red">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--r-text);margin-bottom:7px">Risks</div>
-        <div class="bullet-row" style="border-color:var(--r-border)"><span class="bicon" style="color:var(--r-accent)">&minus;</span><span style="color:var(--r-text);font-size:12px">{risk1}</span></div>
-        <div class="bullet-row" style="border-color:var(--r-border)"><span class="bicon" style="color:var(--r-accent)">&minus;</span><span style="color:var(--r-text);font-size:12px">{risk2}</span></div>
-        <div class="bullet-row" style="border-color:var(--r-border);border-bottom:none"><span class="bicon" style="color:var(--r-accent)">&minus;</span><span style="color:var(--r-text);font-size:12px">Automated report &mdash; verify data on NSE/BSE/Screener.in</span></div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:7px">Risks</div>
+        <div class="bullet-row"><span class="bicon" style="color:var(--red)">&minus;</span><span>{risk1}</span></div>
+        <div class="bullet-row"><span class="bicon" style="color:var(--red)">&minus;</span><span>{risk2}</span></div>
+        <div class="bullet-row" style="border-bottom:none"><span class="bicon" style="color:var(--red)">&minus;</span><span>Automated report &mdash; verify data on NSE/BSE/Screener.in</span></div>
       </div>
     </div>
   </div>
@@ -1149,6 +1644,19 @@ def build_html(all_data: list, generated_at: str) -> str:
 
     panels = "\n".join(render_panel(d) for d in all_data)
 
+    def _mcap_num(d):
+        """Extract numeric market cap (in Cr) from mcap_str for sorting."""
+        s = d.get("mcap_str", "")
+        try:
+            s = s.replace("\u20b9","").replace(",","").strip()
+            if "L Cr" in s:
+                return float(s.replace("L Cr","").strip()) * 1e5
+            if "Cr" in s:
+                return float(s.replace("Cr","").strip())
+        except Exception:
+            pass
+        return 0
+
     js_data = json.dumps([{
         "ticker":     d["ticker"],
         "company":    d["company"],
@@ -1158,6 +1666,7 @@ def build_html(all_data: list, generated_at: str) -> str:
         "view_card":  d["view_card"],
         "overall_val":d["overall_val"],
         "cmp":        d["cmp"],
+        "mcap_num":   _mcap_num(d),
     } for d in all_data], ensure_ascii=False)
 
     return f"""<!DOCTYPE html>
@@ -1170,10 +1679,10 @@ def build_html(all_data: list, generated_at: str) -> str:
 </head>
 <body>
 <div class="topbar">
-  <h1>&#128202; Nifty 50 Fundamentals</h1>
+  <div class="logo"><span class="logo-dot"></span>FundaScope &nbsp;<span style="font-size:11px;font-weight:400;color:var(--txt3)">Nifty 50</span></div>
   <div class="sw">
-    <span class="si">&#128269;</span>
-    <input id="search-input" type="text" placeholder="Search company, sector&hellip;"
+    <span class="si">&#9906;</span>
+    <input id="search-input" type="text" placeholder="Search ticker, company, sector&hellip;"
       oninput="onSearch(this.value)">
   </div>
   <select id="stock-select" class="stock-select" onchange="onSelect(this.value)">
@@ -1182,7 +1691,17 @@ def build_html(all_data: list, generated_at: str) -> str:
   <span class="gen-time">Generated {generated_at}</span>
 </div>
 <div class="landing" id="landing">
-  <h2>All {len(all_data)} stocks &mdash; click any card to open full report</h2>
+  <div style="padding:4px 0 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <span style="font-size:12px;color:var(--txt3)">{len(all_data)} stocks &mdash; click any card to open full report</span>
+  </div>
+  <div class="sort-row">
+    <span class="sort-lbl">Sort</span>
+    <button class="sort-btn active" data-key="ticker" onclick="setSort('ticker')">A–Z</button>
+    <button class="sort-btn" data-key="verdict" onclick="setSort('verdict')">Verdict</button>
+    <button class="sort-btn" data-key="val" onclick="setSort('val')">Valuation</button>
+    <button class="sort-btn" data-key="mcap" onclick="setSort('mcap')">Market cap</button>
+    <button class="sort-btn" data-key="cmp" onclick="setSort('cmp')">Price</button>
+  </div>
   <div class="sgrid" id="sgrid"></div>
 </div>
 {panels}
@@ -1198,42 +1717,83 @@ def build_html(all_data: list, generated_at: str) -> str:
 
 def parse_args():
     p = argparse.ArgumentParser(description="Nifty 50 Fundamental Analyser")
-    p.add_argument("--out",     default="reports", help="Output directory (default: reports/)")
-    p.add_argument("--tickers", nargs="*",          help="Override ticker list. Default: all Nifty 50")
+    p.add_argument("--out",          default="reports",  help="Output directory (default: reports/)")
+    p.add_argument("--tickers",      nargs="*",           help="Override ticker list. Default: all Nifty 50")
+    p.add_argument("--ticker-file",  metavar="FILE",      help="Path to .txt file with one ticker per line")
+    p.add_argument("--cache",        action="store_true", help="Cache fetched data for 6 hours (speeds up reruns)")
+    p.add_argument("--cache-hours",  type=int, default=6, help="Cache max age in hours (default: 6)")
+    p.add_argument("--workers",      type=int, default=10,help="Parallel fetch workers (default: 10)")
     return p.parse_args()
 
 
 def main():
     args    = parse_args()
-    tickers = args.tickers if args.tickers else NIFTY50
-    total   = len(tickers)
 
-    print(f"\n[Nifty 50 Analyser] Processing {total} stocks in parallel (10 workers) ...\n")
+    # ── Build ticker list ────────────────────────────────────────
+    tickers = NIFTY50
+    if args.tickers:
+        tickers = args.tickers
+    if args.ticker_file:
+        tf = Path(args.ticker_file)
+        if not tf.exists():
+            print(f"ERROR: ticker file not found: {tf}")
+            sys.exit(1)
+        extra = [ln.strip().upper() for ln in tf.read_text().splitlines() if ln.strip()]
+        tickers = extra if not args.tickers else list(dict.fromkeys(tickers + extra))
+
+    total = len(tickers)
+    print(f"\n[Nifty 50 Analyser] Processing {total} stocks ({args.workers} workers)"
+          + (" [cache ON]" if args.cache else "") + " ...\n")
 
     results   = []
-    completed = 0
+    errors    = []
     lock      = threading.Lock()
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        future_to_ticker = {executor.submit(analyse, t): t for t in tickers}
+    def _run(ticker):
+        return analyse(ticker, use_cache=args.cache, cache_hours=args.cache_hours)
+
+    if _TQDM:
+        pbar = tqdm(total=total, desc="Fetching", unit="stock", ncols=72)
+
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        future_to_ticker = {executor.submit(_run, t): t for t in tickers}
         for future in as_completed(future_to_ticker):
             ticker = future_to_ticker[future]
-            with lock:
-                completed += 1
-                idx = completed
             try:
                 d = future.result()
                 with lock:
                     results.append(d)
-                print(f"  [{idx:02d}/{total}] {ticker:15s} conf={d['conf_lbl']:<12} growth={d['gclass']:<14} val={d['overall_val']}")
+                    if d.get("errors"):
+                        errors.append((ticker, d["errors"]))
+                if not _TQDM:
+                    with lock:
+                        idx = len(results) + len(errors)
+                    print(f"  [{idx:02d}/{total}] {ticker:15s} conf={d['conf_lbl']:<12} growth={d['gclass']:<14} val={d['overall_val']}")
             except Exception as e:
-                print(f"  [{idx:02d}/{total}] {ticker:15s} ERROR: {e}")
+                with lock:
+                    errors.append((ticker, {"fatal": str(e)}))
+                log.error("analyse %s: %s", ticker, e)
+                if not _TQDM:
+                    print(f"  [??/{total}] {ticker:15s} FATAL: {e}")
+            finally:
+                if _TQDM:
+                    pbar.update(1)
+
+    if _TQDM:
+        pbar.close()
+
+    # ── Error summary ────────────────────────────────────────────
+    if errors:
+        print(f"\n  \u26a0  {len(errors)} ticker(s) had fetch issues (see analyser_errors.log):")
+        for t, errs in errors:
+            keys = ", ".join(errs.keys())
+            print(f"     {t}: {keys}")
 
     if not results:
         print("\nNo data retrieved. Check network connection.")
         sys.exit(1)
 
-    # Restore original NIFTY50 order for consistent HTML output
+    # Restore original order
     order = {t: i for i, t in enumerate(tickers)}
     results.sort(key=lambda d: order.get(d["ticker"], 9999))
 
