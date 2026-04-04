@@ -1056,58 +1056,62 @@ CSS = """<style>
   --red:#ff453a;--red-dim:rgba(255,69,58,0.12);--red-bdr:rgba(255,69,58,0.22);
   --neu-dim:rgba(180,185,210,0.1);--neu-bdr:rgba(180,185,210,0.22);
 }
-body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
+body{font-family:system-ui,sans-serif;font-size:15px;line-height:1.6;
   color:var(--txt);background:var(--bg);margin:0;padding:0;min-height:100vh}
 
 /* ── Topbar ─────────────────────────────────────────────────── */
 .topbar{position:sticky;top:0;z-index:100;background:var(--bg);
-  border-bottom:1px solid var(--bdr);padding:11px 20px;
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
-.sw{position:relative;flex:1;min-width:180px;max-width:320px}
-.sw input{width:100%;padding:7px 10px 7px 32px;border-radius:8px;
+  border-bottom:1px solid var(--bdr);padding:12px 24px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--txt);white-space:nowrap}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--blue)}
+.sw{position:relative;flex:1;min-width:200px;max-width:360px}
+.sw input{width:100%;padding:8px 12px 8px 36px;border-radius:8px;
   border:1px solid var(--bdr2);background:var(--bg3);color:var(--txt);
-  font-size:12px;outline:none;font-family:inherit}
+  font-size:14px;outline:none;font-family:inherit}
 .sw input:focus{border-color:var(--blue)}
 .sw input::placeholder{color:var(--txt3)}
-.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);
-  color:var(--txt3);font-size:13px;pointer-events:none}
-.stock-select{padding:7px 10px;border-radius:8px;border:1px solid var(--bdr2);
-  background:var(--bg3);color:var(--txt2);font-size:12px;font-family:inherit;cursor:pointer}
-.gen-time{font-size:11px;color:var(--txt3);white-space:nowrap;margin-left:auto;
-  background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:4px 10px}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--txt3);font-size:14px;pointer-events:none}
+.stock-select{padding:8px 12px;border-radius:8px;border:1px solid var(--bdr2);
+  background:var(--bg3);color:var(--txt2);font-size:14px;font-family:inherit;cursor:pointer}
+.gen-time{font-size:12px;color:var(--txt3);white-space:nowrap;margin-left:auto;
+  background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:5px 12px}
 
 /* ── Landing grid ──────────────────────────────────────────── */
-.landing{max-width:1100px;margin:0 auto;padding:20px}
-.sort-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.sort-lbl{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-right:2px}
-.sort-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;
-  color:var(--txt3);font-size:11px;cursor:pointer;font-family:inherit;transition:.15s}
+.landing{width:100%;max-width:100%;margin:0;padding:24px 28px}
+.sort-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.sort-lbl{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-right:2px}
+.sort-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;
+  color:var(--txt3);font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
 .sort-btn:hover{border-color:var(--blue);color:var(--blue)}
 .sort-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
-.sgc{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
-  padding:14px 16px;cursor:pointer;transition:border-color .15s,transform .12s}
-.sgc:hover{border-color:var(--bdr3);transform:translateY(-1px)}
-.sgc .sn{font-size:12px;font-weight:500;color:var(--txt);margin-bottom:2px;
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.sgc{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;
+  padding:18px 20px;cursor:pointer;transition:border-color .15s,transform .12s}
+.sgc:hover{border-color:var(--bdr3);transform:translateY(-2px)}
+.sgc .sn{font-size:14px;font-weight:500;color:var(--txt);margin-bottom:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sgc .st{font-size:10px;color:var(--txt3);letter-spacing:.6px;margin-bottom:9px}
-.sgc .sb{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-.sgc .sc{font-size:20px;font-weight:600;color:var(--txt);letter-spacing:-.5px}
-.sgc .stk{font-size:11px;font-weight:600;color:var(--blue);letter-spacing:.4px;margin-bottom:4px}
+.sgc .st{font-size:12px;color:var(--txt3);letter-spacing:.4px;margin-bottom:11px}
+.sgc .sb{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sgc .sc{font-size:24px;font-weight:600;color:var(--txt);letter-spacing:-.5px}
+.sgc .stk{font-size:13px;font-weight:700;color:var(--blue);letter-spacing:.4px;margin-bottom:5px}
+/* ── Sector group header ─────────────────────────────────────── */
+.sector-header{grid-column:1/-1;margin:18px 0 4px;padding:8px 0 8px 4px;
+  border-bottom:2px solid var(--bdr2);font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.4px;color:var(--blue)}
 
 /* ── Stock panel ───────────────────────────────────────────── */
-.stock-panel{display:none;max-width:920px;margin:0 auto;padding:18px 20px 56px}
+.stock-panel{display:none;max-width:980px;margin:0 auto;padding:22px 24px 60px}
 .stock-panel.active{display:block}
-.ph{margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
-.ph h2{font-size:21px;font-weight:600;color:var(--txt);letter-spacing:-.4px}
-.ph .sub{font-size:12px;color:var(--txt3);margin-top:3px}
+.ph{margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ph h2{font-size:24px;font-weight:600;color:var(--txt);letter-spacing:-.4px}
+.ph .sub{font-size:14px;color:var(--txt3);margin-top:3px}
 .back-btn{background:transparent;border:1px solid var(--bdr2);border-radius:8px;
-  padding:5px 12px;font-size:12px;cursor:pointer;color:var(--txt2);font-family:inherit;
+  padding:6px 14px;font-size:14px;cursor:pointer;color:var(--txt2);font-family:inherit;
   white-space:nowrap;transition:.15s}
 .back-btn:hover{border-color:var(--blue);color:var(--blue)}
-.conf{padding:9px 14px;border-radius:8px;margin-bottom:14px;font-size:12px;
+.conf{padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   background:var(--bg2);border:1px solid var(--bdr)}
 .conf .cl{color:var(--txt3)}
@@ -1115,11 +1119,11 @@ body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
 .conf.high .cl,.conf.moderate .cl{color:var(--green)}
 
 /* ── Tabs ──────────────────────────────────────────────────── */
-.tab-row{display:flex;gap:3px;margin-bottom:16px;
+.tab-row{display:flex;gap:4px;margin-bottom:18px;
   background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
   padding:4px;flex-wrap:wrap}
-.tab-btn{padding:6px 14px;border-radius:7px;border:none;background:transparent;
-  color:var(--txt3);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.tab-btn{padding:7px 16px;border-radius:7px;border:none;background:transparent;
+  color:var(--txt3);font-size:14px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
 .tab-btn:hover{color:var(--txt2)}
 .tab-btn.active{background:var(--bg4);color:var(--txt);font-weight:500}
 .tpanel{display:none}.tpanel.on{display:block}
@@ -1133,22 +1137,22 @@ body{font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;
 .card.blue-hi{background:var(--blue-dim);border-color:var(--blue-bdr)}
 
 /* ── Metric grid ───────────────────────────────────────────── */
-.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px;margin:10px 0}
-.mc{background:var(--bg3);border-radius:8px;padding:11px 13px;border:1px solid var(--bdr)}
-.mc .ml{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);margin-bottom:3px}
-.mc .mv{font-size:17px;font-weight:600;color:var(--txt)}
-.mc .ms{font-size:10px;color:var(--txt3);margin-top:2px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin:10px 0}
+.mc{background:var(--bg3);border-radius:8px;padding:13px 15px;border:1px solid var(--bdr)}
+.mc .ml{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);margin-bottom:4px}
+.mc .mv{font-size:20px;font-weight:600;color:var(--txt)}
+.mc .ms{font-size:12px;color:var(--txt3);margin-top:3px}
 
 /* ── Info rows & tables ────────────────────────────────────── */
 .info-row{display:flex;justify-content:space-between;align-items:baseline;
-  padding:8px 0;border-bottom:1px solid var(--bdr);gap:12px}
+  padding:9px 0;border-bottom:1px solid var(--bdr);gap:12px}
 .info-row:last-child{border-bottom:none}
-.il{font-size:12px;color:var(--txt2)}
-.iv{font-size:12px;font-weight:500;text-align:right;max-width:380px;color:var(--txt)}
-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
-th{text-align:left;padding:8px 10px;font-weight:500;font-size:10px;text-transform:uppercase;
+.il{font-size:14px;color:var(--txt2)}
+.iv{font-size:14px;font-weight:500;text-align:right;max-width:380px;color:var(--txt)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0}
+th{text-align:left;padding:9px 10px;font-weight:500;font-size:12px;text-transform:uppercase;
   letter-spacing:.6px;color:var(--txt3);border-bottom:1px solid var(--bdr)}
-td{padding:9px 10px;border-bottom:1px solid var(--bdr);color:var(--txt2)}
+td{padding:10px 10px;border-bottom:1px solid var(--bdr);color:var(--txt2)}
 td:first-child{color:var(--txt)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--bg3)}
@@ -1156,7 +1160,7 @@ tr:hover td{background:var(--bg3)}
 .peer-you:hover td{background:rgba(79,142,247,0.18)}
 
 /* ── Badges ────────────────────────────────────────────────── */
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.3px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.3px}
 .badge.ok{background:var(--green-dim);color:var(--green);border:1px solid var(--green-bdr)}
 .badge.warn{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-bdr)}
 .badge.bad{background:var(--red-dim);color:var(--red);border:1px solid var(--red-bdr)}
@@ -1164,37 +1168,37 @@ tr:hover td{background:var(--bg3)}
 .badge.blu{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-bdr)}
 
 /* ── Section labels ────────────────────────────────────────── */
-.sec-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;
-  color:var(--txt3);margin:13px 0 7px}
+.sec-label{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:1px;
+  color:var(--txt3);margin:15px 0 8px}
 
 /* ── Bullet rows ───────────────────────────────────────────── */
-.bullet-row{display:flex;gap:8px;align-items:flex-start;padding:6px 0;
-  border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2)}
+.bullet-row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;
+  border-bottom:1px solid var(--bdr);font-size:14px;color:var(--txt2)}
 .bullet-row:last-child{border-bottom:none}
-.bicon{font-size:13px;min-width:16px;margin-top:1px}
+.bicon{font-size:14px;min-width:16px;margin-top:1px}
 
 /* ── Score box ─────────────────────────────────────────────── */
-.score-box{background:var(--bg3);border-radius:8px;padding:11px 14px;
-  margin-top:10px;font-size:12px;color:var(--txt2);border:1px solid var(--bdr)}
+.score-box{background:var(--bg3);border-radius:8px;padding:13px 16px;
+  margin-top:10px;font-size:14px;color:var(--txt2);border:1px solid var(--bdr)}
 .score-box strong{color:var(--txt)}
 
 /* ── EPS chips ─────────────────────────────────────────────── */
-.eps-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.eps-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .eps-chip{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;
-  padding:8px 11px;text-align:center;min-width:78px}
-.eps-q{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
-.eps-v{font-size:14px;font-weight:600;color:var(--txt);margin:2px 0}
-.eps-y{font-size:11px}
+  padding:10px 13px;text-align:center;min-width:90px}
+.eps-q{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
+.eps-v{font-size:16px;font-weight:600;color:var(--txt);margin:3px 0}
+.eps-y{font-size:12px}
 .pos{color:var(--green);font-weight:500}.neg{color:var(--red);font-weight:500}
 
 /* ── Flag cards ────────────────────────────────────────────── */
 .flag-card{border-left:3px solid var(--amber);background:var(--amber-dim);
-  border-radius:0 8px 8px 0;padding:9px 13px;margin-bottom:8px}
-.flag-title{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:2px}
-.flag-note{font-size:12px;color:var(--txt2)}
+  border-radius:0 8px 8px 0;padding:11px 15px;margin-bottom:8px}
+.flag-title{font-size:14px;font-weight:600;color:var(--amber);margin-bottom:3px}
+.flag-note{font-size:14px;color:var(--txt2)}
 
 /* ── View tab ──────────────────────────────────────────────── */
-.view-label{font-size:16px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.view-label{font-size:19px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
 .view-label.green{color:var(--green)}
 .view-label.amber{color:var(--amber)}
 .view-label.red{color:var(--red)}
@@ -1202,11 +1206,11 @@ tr:hover td{background:var(--bg3)}
 @media(max-width:520px){.two-col{grid-template-columns:1fr}}
 
 /* ── Misc ──────────────────────────────────────────────────── */
-.cap-note{font-size:11px;color:var(--txt3);margin-top:7px}
-.disc{font-size:11px;color:var(--txt3);border-top:1px solid var(--bdr);
+.cap-note{font-size:13px;color:var(--txt3);margin-top:7px}
+.disc{font-size:13px;color:var(--txt3);border-top:1px solid var(--bdr);
   padding-top:11px;margin-top:20px;line-height:1.7}
-details summary{font-size:12px;color:var(--txt2);cursor:pointer;padding:6px 0}
-details p{font-size:12px;color:var(--txt2);padding:4px 0;border-bottom:1px solid var(--bdr)}
+details summary{font-size:14px;color:var(--txt2);cursor:pointer;padding:6px 0}
+details p{font-size:14px;color:var(--txt2);padding:5px 0;border-bottom:1px solid var(--bdr)}
 details p:last-child{border-bottom:none}
 details strong{color:var(--txt);font-weight:500}
 </style>"""
@@ -1242,6 +1246,10 @@ function _sortedStocks(stocks){
       var order={green:0,amber:1,red:2};
       return (order[a.view_card]||1)-(order[b.view_card]||1);
     }
+    if(k==='sector'){
+      var sc=(a.sector||'').localeCompare(b.sector||'');
+      return sc!==0?sc:(a.ticker||'').localeCompare(b.ticker||'');
+    }
     if(k==='val'){
       var vo={UNDERVALUED:0,'FAIRLY VALUED':1,MIXED:2,OVERVALUED:3};
       return (vo[a.overall_val]||2)-(vo[b.overall_val]||2);
@@ -1273,22 +1281,45 @@ function setSort(key){
 function renderGrid(stocks){
   var g=document.getElementById('sgrid');
   g.innerHTML='';
-  _sortedStocks(stocks).forEach(function(s){
-    var vc=s.view_card==='green'?'ok':(s.view_card==='red'?'bad':'warn');
-    var el=document.createElement('div');
-    el.className='sgc';
-    el.onclick=function(){openStock(s.ticker);};
-    el.innerHTML=
-      '<div class="stk">'+s.ticker+'</div>'+
-      '<div class="sn">'+s.company+'</div>'+
-      '<div class="st">'+(s.sector||'')+'</div>'+
-      '<div class="sb">'+
-        '<span class="badge '+vc+'">'+s.view_label.replace(' FUNDAMENTALS','')+'</span>'+
-        '<span class="badge neu">'+s.overall_val+'</span>'+
-      '</div>'+
-      '<div class="sc">'+(s.cmp?'\u20b9'+parseFloat(s.cmp).toFixed(2):'N/A')+'</div>';
-    g.appendChild(el);
-  });
+  var sorted=_sortedStocks(stocks);
+  // If sorting by sector (or default A-Z), group by sector
+  var useSectorGroups=(_sortKey==='ticker'||_sortKey==='sector');
+  if(useSectorGroups){
+    // Group by sector
+    var sectors={};
+    sorted.forEach(function(s){
+      var sec=s.sector||'Other';
+      if(!sectors[sec]) sectors[sec]=[];
+      sectors[sec].push(s);
+    });
+    var secKeys=Object.keys(sectors).sort();
+    secKeys.forEach(function(sec){
+      var hdr=document.createElement('div');
+      hdr.className='sector-header';
+      hdr.textContent=sec+' ('+sectors[sec].length+')';
+      g.appendChild(hdr);
+      sectors[sec].forEach(function(s){ g.appendChild(_makeCard(s)); });
+    });
+  } else {
+    sorted.forEach(function(s){ g.appendChild(_makeCard(s)); });
+  }
+}
+
+function _makeCard(s){
+  var vc=s.view_card==='green'?'ok':(s.view_card==='red'?'bad':'warn');
+  var el=document.createElement('div');
+  el.className='sgc';
+  el.onclick=function(){openStock(s.ticker);};
+  el.innerHTML=
+    '<div class="stk">'+s.ticker+'</div>'+
+    '<div class="sn">'+s.company+'</div>'+
+    '<div class="st">'+(s.sector||'')+'</div>'+
+    '<div class="sb">'+
+      '<span class="badge '+vc+'">'+s.view_label.replace(' FUNDAMENTALS','')+'</span>'+
+      '<span class="badge neu">'+s.overall_val+'</span>'+
+    '</div>'+
+    '<div class="sc">'+(s.cmp?'\u20b9'+parseFloat(s.cmp).toFixed(2):'N/A')+'</div>';
+  return el;
 }
 function openStock(ticker){
   document.getElementById('landing').style.display='none';
@@ -1364,7 +1395,7 @@ def render_panel(d: dict) -> str:
             for row in dh
         )
         div_history_html = f"""<div class="card">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt3);margin-bottom:8px">Dividend history &mdash; last 5 years</div>
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt3);margin-bottom:8px">Dividend history &mdash; last 5 years</div>
       <table><thead><tr><th>Year</th><th>DPS (\u20b9)</th></tr></thead><tbody>{dh_rows}</tbody></table>
       <div class="cap-note">Source: Screener.in</div>
     </div>"""
@@ -1412,7 +1443,7 @@ def render_panel(d: dict) -> str:
   <div class="ph">
     <button class="back-btn" onclick="showLanding()">&larr; All stocks</button>
     <div>
-      <h2>{d["company"]} <span style="font-size:13px;font-weight:400;color:var(--txt3)">({t})</span></h2>
+      <h2>{d["company"]} <span style="font-size:15px;font-weight:400;color:var(--txt3)">({t})</span></h2>
       <div class="sub">{d["sector"]} &middot; {d["industry"]} &middot; NSE: {t}</div>
     </div>
     <div style="margin-left:auto"><span class="badge {d["conf_cls"] if d["conf_cls"] in ("ok","warn","bad") else "blu"}">CONF: {d["conf_lbl"]} &middot; {d["live"]}/12</span></div>
@@ -1468,7 +1499,7 @@ def render_panel(d: dict) -> str:
             <td style="color:var(--txt2)">Full business value</td></tr>
         </tbody>
       </table>
-      <div style="margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--blue-dim);border:1px solid var(--blue-bdr);font-size:12px;color:var(--blue)">
+      <div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:var(--blue-dim);border:1px solid var(--blue-bdr);font-size:14px;color:var(--blue)">
         &#9432; <strong>Primary metric for {d["sector"]}:</strong> {d["primary_metric_name"]}
         &nbsp;&middot;&nbsp; Current: <strong>{xfmt(d["primary_metric_val"])}</strong>
         &nbsp;&middot;&nbsp; Sector avg: <strong>{xfmt(d["primary_avg"])}</strong>
@@ -1494,7 +1525,7 @@ def render_panel(d: dict) -> str:
       </table>
     </div>
     <div class="card">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:8px">EPS &mdash; last 8 quarters</div>
+      <div style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:8px">EPS &mdash; last 8 quarters</div>
       <div class="eps-row">{chips_html}</div>
     </div>
     <div class="score-box">Growth: <strong>{d["gclass"]}</strong> &nbsp;&middot;&nbsp;
@@ -1519,7 +1550,7 @@ def render_panel(d: dict) -> str:
       </table>
     </div>
     <div class="card">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:8px">Forward projections &mdash; 5 year horizon (CAGR-based)</div>
+      <div style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:8px">Forward projections &mdash; 5 year horizon (CAGR-based)</div>
       <table>
         <thead><tr><th>Scenario</th><th>Assumption</th><th>Est. revenue</th><th>Est. net profit</th><th>Est. EPS</th></tr></thead>
         <tbody>
@@ -1603,7 +1634,7 @@ def render_panel(d: dict) -> str:
   <div class="tpanel on" id="tp-{esc}-7">
     <div class="card {d["view_card"]}">
       <div class="view-label {d["view_card"]}">{d["view_label"]}</div>
-      <div style="font-size:13px;color:var(--txt2);margin-bottom:13px;line-height:1.65">
+      <div style="font-size:15px;color:var(--txt2);margin-bottom:13px;line-height:1.65">
         {d["company"]} shows {d["gclass"].lower()} growth with {quality_word} returns on equity
         and {health_word} financial risk based on available data.
       </div>
@@ -1613,19 +1644,19 @@ def render_panel(d: dict) -> str:
       {wat_html}
       <div class="sec-label">Track going forward</div>
       <div class="bullet-row"><span class="bicon" style="color:var(--txt3)">&rarr;</span><span style="color:var(--txt2)">{d["track"]}</span></div>
-      <div style="margin-top:13px;font-size:11px;color:var(--txt3);font-style:italic">
+      <div style="margin-top:14px;font-size:13px;color:var(--txt3);font-style:italic">
         This is a VIEW based on fundamentals only. Not a buy/sell recommendation. The decision is always yours.
       </div>
     </div>
     <div class="two-col">
       <div class="card green">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:7px">Opportunities</div>
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:8px">Opportunities</div>
         <div class="bullet-row"><span class="bicon" style="color:var(--green)">+</span><span>Long-term tailwinds in {d["industry"]}</span></div>
         <div class="bullet-row"><span class="bicon" style="color:var(--green)">+</span><span>Revenue CAGR {pct(d["rev5"] or d["rev3"])} historical compounding</span></div>
         <div class="bullet-row" style="border-bottom:none"><span class="bicon" style="color:var(--green)">+</span><span>{opp3}</span></div>
       </div>
       <div class="card red">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:7px">Risks</div>
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:8px">Risks</div>
         <div class="bullet-row"><span class="bicon" style="color:var(--red)">&minus;</span><span>{risk1}</span></div>
         <div class="bullet-row"><span class="bicon" style="color:var(--red)">&minus;</span><span>{risk2}</span></div>
         <div class="bullet-row" style="border-bottom:none"><span class="bicon" style="color:var(--red)">&minus;</span><span>Automated report &mdash; verify data on NSE/BSE/Screener.in</span></div>
@@ -1693,11 +1724,12 @@ def build_html(all_data: list, generated_at: str) -> str:
 </div>
 <div class="landing" id="landing">
   <div style="padding:4px 0 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <span style="font-size:12px;color:var(--txt3)">{len(all_data)} stocks &mdash; click any card to open full report</span>
+    <span style="font-size:14px;color:var(--txt3)">{len(all_data)} stocks &mdash; click any card to open full report</span>
   </div>
   <div class="sort-row">
     <span class="sort-lbl">Sort</span>
     <button class="sort-btn active" data-key="ticker" onclick="setSort('ticker')">A–Z</button>
+    <button class="sort-btn" data-key="sector" onclick="setSort('sector')">Sector</button>
     <button class="sort-btn" data-key="verdict" onclick="setSort('verdict')">Verdict</button>
     <button class="sort-btn" data-key="val" onclick="setSort('val')">Valuation</button>
     <button class="sort-btn" data-key="mcap" onclick="setSort('mcap')">Market cap</button>
