@@ -121,6 +121,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
+import time                                                  # FIX: for yFinance rate-limiting
 
 warnings.filterwarnings('ignore')
 
@@ -159,8 +160,7 @@ class Nifty100CompleteAnalyzer:
             'ONGC.NS':        'ONGC',
             'TECHM.NS':       'Tech Mahindra',
             'M&M.NS':         'M&M',
-            'TMCV.NS':        'Tata Motors Commercial',
-            'TMPV.NS':        'Tata Motors Passenger',
+            'TATAMOTORS.NS':  'Tata Motors',              # FIX: was TMCV/TMPV (invalid)
             'TATASTEEL.NS':   'Tata Steel',
             'INDUSINDBK.NS':  'IndusInd Bank',
             'ADANIPORTS.NS':  'Adani Ports',
@@ -277,7 +277,7 @@ class Nifty100CompleteAnalyzer:
             'MCDOWELL-N': 'FMCG', 'PAGEIND':   'FMCG',
             # Auto
             'MARUTI':     'Automobile', 'M&M':        'Automobile',
-            'TMCV':       'Automobile', 'TMPV':       'Automobile',
+            'TATAMOTORS': 'Automobile',                                    # FIX: was TMCV/TMPV
             'HEROMOTOCO': 'Automobile', 'EICHERMOT':  'Automobile',
             'BAJAJ-AUTO': 'Automobile', 'MOTHERSON':  'Automobile',
             'BALKRISIND': 'Automobile',
@@ -469,7 +469,7 @@ class Nifty100CompleteAnalyzer:
         low   = df['Low']
         close = df['Close']
         plus_dm  = high.diff()
-        minus_dm = low.diff().abs()
+        minus_dm = -low.diff()          # FIX: Wilder's -DM = previous_low - current_low
         plus_dm[plus_dm < 0]        = 0
         minus_dm[minus_dm < 0]      = 0
         plus_dm[plus_dm < minus_dm] = 0
@@ -482,7 +482,8 @@ class Nifty100CompleteAnalyzer:
         atr14    = tr.ewm(alpha=1/period, adjust=False).mean()
         plus_di  = 100 * (plus_dm.ewm(alpha=1/period, adjust=False).mean() / atr14)
         minus_di = 100 * (minus_dm.ewm(alpha=1/period, adjust=False).mean() / atr14)
-        dx       = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+        dx       = (100 * abs(plus_di - minus_di) / (plus_di + minus_di)).where(
+                       (plus_di + minus_di) != 0, 0)           # FIX: div-by-zero guard
         adx      = dx.ewm(alpha=1/period, adjust=False).mean()
         return round(adx.iloc[-1], 1)
 
@@ -737,6 +738,8 @@ class Nifty100CompleteAnalyzer:
         elif pb  and 3 <= pb  < 5:   score += 3
         if peg and 0 < peg < 1:      score += 10
         elif peg and 1 <= peg < 2:   score += 5
+        elif peg and peg >= 2:       score += 0    # FIX: overvalued — no credit
+        elif peg and peg < 0:        score += 0    # FIX: negative growth — no credit
         else:                        score += 3   # CAL-5: partial credit if PEG missing
 
         # Profitability
@@ -800,13 +803,13 @@ class Nifty100CompleteAnalyzer:
         try:
             stock = yf.Ticker(symbol)
 
-            # V55-DATA: Fetch with explicit end=today to force yFinance to include
-            # the most recent candle. Without this, yFinance period='1y' can lag
-            # by 1-3 days, causing RSI/MACD to be calculated on stale data.
-            # auto_adjust=False: TradingView uses unadjusted prices — we match that
-            # so RSI values align with what you see on TradingView charts.
+            # V59-FIX: Use auto_adjust=True (default) to get split-adjusted prices.
+            # auto_adjust=False was causing SMA200 corruption on stocks that split
+            # within the last year — the raw price series has a step-function discontinuity
+            # that makes all rolling averages meaningless across the split date.
+            # TradingView uses adjusted prices for all historical indicator calculations.
             today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
-            df    = stock.history(period='1y', auto_adjust=False)
+            df    = stock.history(period='1y', auto_adjust=True)
 
             if df.empty or len(df) < 200:
                 return None
@@ -819,9 +822,8 @@ class Nifty100CompleteAnalyzer:
             if days_lag > 5:
                 print(f"  ⚠ {symbol}: Data lag {days_lag} days (last candle: {last_candle_date})")
 
-            # auto_adjust=False gives columns: Open, High, Low, Close, Adj Close, Volume
-            # We use 'Close' (unadjusted) to match TradingView's default RSI calculation.
-            # Rename for safety in case column names vary across yFinance versions.
+            # auto_adjust=True gives columns: Open, High, Low, Close, Volume
+            # 'Close' is already split-adjusted. No rename needed.
             if 'Close' not in df.columns and 'Adj Close' in df.columns:
                 df = df.rename(columns={'Adj Close': 'Close'})
 
@@ -1028,15 +1030,17 @@ class Nifty100CompleteAnalyzer:
                 elif rsi_direction == 'Rising':
                     tech_score = min(tech_score + 1, 6)
                     rsi_signal = f"Momentum ↑ ({rsi_5bar:.0f}→{rsi:.0f})"
+                elif rsi_divergence == 'Bullish Divergence':
+                    # FIX: moved BEFORE falling checks — divergence is a stronger
+                    # signal than direction; was previously unreachable dead code
+                    tech_score = min(tech_score + 1, 6)
+                    rsi_signal = "Bullish Divergence ✅"
                 elif rsi_direction == 'Falling' and rsi_slope_strong:
                     tech_score -= 2
                     rsi_signal = f"Rolling Over ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
                 elif rsi_direction == 'Falling':
                     tech_score -= 1
                     rsi_signal = f"Softening ↓ ({rsi_5bar:.0f}→{rsi:.0f})"
-                elif rsi_divergence == 'Bullish Divergence':
-                    tech_score = min(tech_score + 1, 6)
-                    rsi_signal = "Bullish Divergence ✅"
                 else:
                     rsi_signal = f"Healthy ({rsi:.0f})"
 
@@ -1223,7 +1227,8 @@ class Nifty100CompleteAnalyzer:
             #   This rewards early trend reversals like Infosys oversold + MACD flip
             is_reversal = (rsi_direction == 'Rising' and rsi_slope > 5
                            and macd > signal
-                           and rsi < 55)  # only in recovery zone, not already overbought
+                           and rsi < 55           # only in recovery zone, not already overbought
+                           and fund_score >= 35)   # FIX: don't let junk stocks ride reversal mode
 
             if bearish_signal_count >= 2 and not is_reversal:
                 tech_weight  = 0.50
@@ -1506,6 +1511,7 @@ class Nifty100CompleteAnalyzer:
                 self.results.append(result)
             if idx % 10 == 0:
                 print(f"  [{idx}/{len(self.nifty100_stocks)}] processed")
+            time.sleep(0.3)       # FIX: rate-limit to avoid yFinance 429 throttling
         print(f"\n✅ {len(self.results)} stocks analyzed\n")
 
     # =========================================================================
@@ -1671,7 +1677,7 @@ class Nifty100CompleteAnalyzer:
         for _, row in sorted_buys.iterrows():
             sec = row.get('Sector', 'N/A')
             sector_counts[sec] = sector_counts.get(sec, 0)
-            if sector_counts[sec] < 4:
+            if sector_counts[sec] < MAX_PICKS_PER_SECTOR:       # FIX: was hardcoded 4
                 top_buys_rows.append(row)
                 sector_counts[sec] += 1
             if len(top_buys_rows) >= 20:
@@ -1699,7 +1705,7 @@ class Nifty100CompleteAnalyzer:
             for _, row in backfill_pool.iterrows():
                 sec = row.get('Sector', 'N/A')
                 bf_sector_counts[sec] = bf_sector_counts.get(sec, 0)
-                if bf_sector_counts[sec] < 4:
+                if bf_sector_counts[sec] < MAX_PICKS_PER_SECTOR:  # FIX: was hardcoded 4
                     backfill_rows.append(row)
                     bf_sector_counts[sec] += 1
                 if len(backfill_rows) >= needed:
@@ -2385,7 +2391,7 @@ footer strong {{ color: var(--accent2); }}
                 return (f'<div style="margin-top:3px;display:inline-block;padding:2px 6px;'
                         f'border-radius:3px;background:rgba(253,121,168,0.15);color:#ffd93d;'
                         f'border:1px solid #ffd93d;font-size:12px;font-weight:700;">'
-                        f'🚫 Trend Veto ({bearish_signals}/5)</div>')
+                        f'🚫 Trend Veto ({bearish_signals}/7)</div>')
             return ''
 
         def score_cell(val, color, bar_color):
@@ -2778,13 +2784,13 @@ footer strong {{ color: var(--accent2); }}
 
             # Bearish signal count pill
             if bs >= 4:
-                sig_pill = f'<span style="color:#fd79a8;font-size:13px">🔴 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#fd79a8;font-size:13px">🔴 {bs}/7 Bear</span>'
             elif bs >= 3:
-                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟠 {bs}/5 Bear</span>'
+                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟠 {bs}/7 Bear</span>'
             elif bs >= 1:
-                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟡 {bs}/5</span>'
+                sig_pill = f'<span style="color:#ffd93d;font-size:13px">🟡 {bs}/7</span>'
             else:
-                sig_pill = f'<span style="color:#00e676;font-size:13px">🟢 0/5</span>'
+                sig_pill = f'<span style="color:#00e676;font-size:13px">🟢 0/7</span>'
 
             # Score colour
             if row['Combined_Score'] >= 70:   sc = '#00e676'
@@ -3452,7 +3458,7 @@ th.sortable:hover {{ color: #a29bfe !important; }}
                                   output_file='index.html'):
         now = self.get_ist_time()
         print("=" * 70)
-        print("💎 NIFTY 100 ANALYZER v5.4 - Trend Veto · Dynamic Weights · SMA200 Slope")
+        print("💎 NIFTY 100 ANALYZER v5.9 - ADX Fix · Split-Safe · Trend Veto · Dynamic Weights")
         print(f"   {now.strftime('%d %b %Y, %I:%M %p IST')}")
         print("=" * 70)
         self.analyze_all_stocks()
