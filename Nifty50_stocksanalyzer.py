@@ -837,9 +837,6 @@ class Nifty100CompleteAnalyzer:
             # ==================================================================
 
             current_price = df['Close'].iloc[-1]
-            prev_close    = df['Close'].iloc[-2] if len(df) >= 2 else current_price
-            day_change    = round(((current_price - prev_close) / prev_close) * 100, 2)
-
             sma_20  = df['Close'].rolling(20).mean().iloc[-1]
             sma_50  = df['Close'].rolling(50).mean().iloc[-1]
             sma_200 = df['Close'].rolling(200).mean().iloc[-1]
@@ -1444,7 +1441,6 @@ class Nifty100CompleteAnalyzer:
                 'Symbol':            symbol.replace('.NS', ''),
                 'Name':              name,
                 'Price':             round(current_price, 2),
-                'Day_Change':        day_change,
                 'Sector':            sector,
                 'RSI':               round(rsi, 2),
                 'RSI_Signal':        rsi_signal,
@@ -1777,8 +1773,7 @@ class Nifty100CompleteAnalyzer:
 
             return True
 
-        _valid_sells = s3[s3.apply(sell_is_valid, axis=1)]
-        top_sells = _valid_sells.nsmallest(20, 'Combined_Score') if not _valid_sells.empty else pd.DataFrame()
+        top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
@@ -2490,7 +2485,7 @@ footer strong {{ color: var(--accent2); }}
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th class="grp-trade gsep" colspan="7">TRADE SETUP</th>
+        <th class="grp-trade gsep" colspan="6">TRADE SETUP</th>
         <th class="grp-tech gsep"  colspan="6">TECHNICALS</th>
         <th class="grp-fund gsep"  colspan="4">FUNDAMENTALS</th>
         <th class="grp-meta gsep"  colspan="3">META</th>
@@ -2500,7 +2495,6 @@ footer strong {{ color: var(--accent2); }}
         <th class="ch-stock">Stock / Sector</th>
         <th class="ch-stock">Price</th>
         <th class="ch-trade gsep">Rating / Score</th>
-        <th class="ch-trade">Day Chg</th>
         <th class="ch-trade">Upside</th>
         <th class="ch-trade">Target (S/R)</th>
         <th class="ch-trade">Stop Loss</th>
@@ -2563,7 +2557,6 @@ footer strong {{ color: var(--accent2); }}
           {score_cell(row['Combined_Score'], sc_color, sc_bar)}
           {veto_badge(bs, wm)}
         </td>
-        <td><span class="upside-val {'up' if row.get('Day_Change',0)>=0 else 'dn'}">{row.get('Day_Change',0):+.2f}%</span></td>
         <td><span class="upside-val {upcls}">{row['Upside']:+.1f}%</span></td>
         <td>
           <span class="target-badge {tbcls}">{tbtxt}</span>
@@ -2614,7 +2607,7 @@ footer strong {{ color: var(--accent2); }}
     <thead>
       <tr class="grp-row">
         <th class="grp-stock" colspan="3">STOCK INFO</th>
-        <th class="grp-trade gsep" colspan="7">TRADE SETUP</th>
+        <th class="grp-trade gsep" colspan="6">TRADE SETUP</th>
         <th class="grp-tech gsep"  colspan="5">TECHNICALS</th>
         <th class="grp-fund gsep"  colspan="4">FUNDAMENTALS</th>
         <th class="grp-meta gsep"  colspan="3">META</th>
@@ -2624,7 +2617,6 @@ footer strong {{ color: var(--accent2); }}
         <th class="ch-stock">Stock / Sector</th>
         <th class="ch-stock">Price</th>
         <th class="ch-trade gsep">Rating / Score</th>
-        <th class="ch-trade">Day Chg</th>
         <th class="ch-trade">Downside</th>
         <th class="ch-trade">Target (S/R)</th>
         <th class="ch-trade">Stop Loss</th>
@@ -2672,7 +2664,6 @@ footer strong {{ color: var(--accent2); }}
           {rating_badge(rec, {'STRONG BUY':'⭐⭐⭐⭐⭐ STRONG BUY','BUY':'⭐⭐⭐⭐ BUY','HOLD':'⭐⭐⭐ HOLD','SELL':'⭐⭐ SELL','STRONG SELL':'⭐ STRONG SELL'}.get(rec, rec))}
           {score_cell(row['Combined_Score'], '#fd79a8', '#c62828')}
         </td>
-        <td><span class="upside-val {'up' if row.get('Day_Change',0)>=0 else 'dn'}">{row.get('Day_Change',0):+.2f}%</span></td>
         <td><span class="upside-val {dncls}">{row['Upside']:+.1f}%</span></td>
         <td>
           <span class="target-badge {tbcls}">{tbtxt}</span>
@@ -3068,14 +3059,14 @@ footer strong {{ color: var(--accent2); }}
         <th class="grp-stock" colspan="3">STOCK INFO</th>
         <th style="background:#28124a;color:#a29bfe;text-shadow:0 0 8px rgba(204,153,255,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="2">TECH SCORE</th>
         <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
-        <th class="grp-trade gsep" colspan="6">TRADE SETUP (BUY SIDE)</th>
+        <th class="grp-trade gsep" colspan="5">TRADE SETUP (BUY SIDE)</th>
       </tr>
       <tr class="col-row">
         <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
         <th style="border-top:3px solid #a29bfe;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;" class="gsep">Score</th>
         <th style="border-top:3px solid #a29bfe;color:#e8d0ff;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;">Signal</th>
         <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
-        <th class="ch-trade gsep">Day Chg</th><th class="ch-trade">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Upside</th><th class="ch-trade">ATR</th>
+        <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Upside</th><th class="ch-trade">ATR</th>
       </tr>
     </thead><tbody>
 """
@@ -3099,8 +3090,7 @@ footer strong {{ color: var(--accent2); }}
         <td>{tech_sma_cell(row['Price'], row.get('SMA_200',0))}</td>
         <td>{adx_cell(row.get('ADX',0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio',1.0))}</td>
-        <td class="gsep"><span class="upside-val {'up' if row.get('Day_Change',0)>=0 else 'dn'}">{row.get('Day_Change',0):+.2f}%</span></td>
-        <td><div class="t1-val">₹{bt1:,.2f}</div><div class="t2-val">T2: ₹{bt2:,.2f}</div></td>
+        <td class="gsep"><div class="t1-val">₹{bt1:,.2f}</div><div class="t2-val">T2: ₹{bt2:,.2f}</div></td>
         <td><div class="sl-val">₹{bsl:,.2f}</div><div class="sl-pct">-{bslp:.1f}%</div></td>
         <td><span class="rr-val" style="color:{rr_color(brr)}">{brr:.1f}×</span></td>
         <td><span class="upside-val {upcls}">{bup:+.1f}%</span></td>
@@ -3122,13 +3112,13 @@ footer strong {{ color: var(--accent2); }}
         <th class="grp-stock" colspan="3">STOCK INFO</th>
         <th style="background:rgba(253,121,168,0.12);color:#fd79a8;text-shadow:0 0 8px rgba(255,68,102,0.6);font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap;" class="gsep" colspan="1">TECH SCORE</th>
         <th class="grp-tech gsep" colspan="7">TECHNICAL SIGNALS</th>
-        <th class="grp-trade gsep" colspan="6">TRADE SETUP (SELL SIDE)</th>
+        <th class="grp-trade gsep" colspan="5">TRADE SETUP (SELL SIDE)</th>
       </tr>
       <tr class="col-row">
         <th class="ch-stock" style="width:26px">#</th><th class="ch-stock">Stock / Sector</th><th class="ch-stock">Price</th>
         <th style="border-top:3px solid #fd79a8;color:#ffb0b0;font-size:13px;font-weight:800;padding:9px 10px;background:#0d1525;border-bottom:3px solid #1a2540;white-space:nowrap;text-align:left;" class="gsep">Score</th>
         <th class="ch-tech gsep">RSI / Slope</th><th class="ch-tech">MACD</th><th class="ch-tech">SMA 20</th><th class="ch-tech">SMA 50</th><th class="ch-tech">SMA 200</th><th class="ch-tech">ADX</th><th class="ch-tech">Vol</th>
-        <th class="ch-trade gsep">Day Chg</th><th class="ch-trade">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Downside</th><th class="ch-trade">ATR</th>
+        <th class="ch-trade gsep">Target</th><th class="ch-trade">Stop</th><th class="ch-trade">R:R</th><th class="ch-trade">Downside</th><th class="ch-trade">ATR</th>
       </tr>
     </thead><tbody>
 """
@@ -3149,8 +3139,7 @@ footer strong {{ color: var(--accent2); }}
         <td>{tech_sma_cell(row['Price'], row.get('SMA_200',0))}</td>
         <td>{adx_cell(row.get('ADX',0))}</td>
         <td>{vol_cell(row.get('Vol_Ratio',1.0))}</td>
-        <td class="gsep"><span class="upside-val {'up' if row.get('Day_Change',0)>=0 else 'dn'}">{row.get('Day_Change',0):+.2f}%</span></td>
-        <td><div class="t1-val">₹{st1:,.2f}</div><div class="t2-val">T2: ₹{st2:,.2f}</div></td>
+        <td class="gsep"><div class="t1-val">₹{st1:,.2f}</div><div class="t2-val">T2: ₹{st2:,.2f}</div></td>
         <td><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:#ffd93d">₹{ssl:,.2f}</div><div class="sl-pct">+{sslp:.1f}%</div></td>
         <td><span class="rr-val" style="color:{rr_color(srr)}">{srr:.1f}×</span></td>
         <td><span class="upside-val dn">{sdwn:+.1f}%</span></td>
