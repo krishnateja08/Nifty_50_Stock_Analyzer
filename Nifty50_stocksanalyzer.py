@@ -1773,8 +1773,7 @@ class Nifty100CompleteAnalyzer:
 
             return True
 
-        valid_sells = s3[s3.apply(sell_is_valid, axis=1)] if len(s3) > 0 else s3
-        top_sells = valid_sells.nsmallest(20, 'Combined_Score') if len(valid_sells) > 0 else pd.DataFrame(columns=df.columns)
+        top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
