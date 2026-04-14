@@ -160,7 +160,8 @@ class Nifty100CompleteAnalyzer:
             'ONGC.NS':        'ONGC',
             'TECHM.NS':       'Tech Mahindra',
             'M&M.NS':         'M&M',
-            'TATAMOTORS.NS':  'Tata Motors',              # FIX: was TMCV/TMPV (invalid)
+            'TMPV.NS':  'Tata Motors Passengers',
+            'TMCV.NS':  'Tata Motors Commercial',                                   # FIX: was TMCV/TMPV (invalid)
             'TATASTEEL.NS':   'Tata Steel',
             'INDUSINDBK.NS':  'IndusInd Bank',
             'ADANIPORTS.NS':  'Adani Ports',
