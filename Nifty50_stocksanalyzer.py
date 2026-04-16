@@ -1774,7 +1774,16 @@ class Nifty100CompleteAnalyzer:
 
             return True
 
-        top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
+        # V59-9 FIX: Guard against empty s3. When no stocks pass the SELL
+        # pre-filters (Upside / Risk_Reward / Target_1 < Price), s3 is empty.
+        # Calling .apply() on an empty DataFrame returns an empty Series with
+        # dtype float64 (not bool). Used as a boolean mask it drops ALL
+        # columns, causing KeyError: 'Combined_Score' on .nsmallest().
+        if s3.empty:
+            top_sells = s3.copy()   # preserve column schema, zero rows
+        else:
+            valid_mask = s3.apply(sell_is_valid, axis=1)
+            top_sells = s3[valid_mask].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
