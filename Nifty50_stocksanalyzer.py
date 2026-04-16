@@ -542,9 +542,17 @@ class Nifty100CompleteAnalyzer:
         result = {}
         for label, sym in indices.items():
             try:
-                d     = yf.Ticker(sym).history(period='2d')
-                price = d['Close'].iloc[-1]
-                prev  = d['Close'].iloc[-2]
+                # DIAGNOSTIC FIX: use period='5d' instead of '2d' so we always
+                # have enough rows to pick 2 valid closes after dropping NaNs.
+                # yfinance 1.x (Dec 2025+) can return the latest bar with NaN
+                # values during partial/incomplete trading sessions, which
+                # caused all three indices to silently fall back to 'N/A'.
+                d = yf.Ticker(sym).history(period='5d')
+                closes = d['Close'].dropna()
+                if len(closes) < 2:
+                    raise ValueError(f"only {len(closes)} valid close(s) returned")
+                price = closes.iloc[-1]
+                prev  = closes.iloc[-2]
                 chg   = price - prev
                 pct   = chg / prev * 100
                 cls   = 'up' if chg >= 0 else 'dn'
@@ -555,7 +563,9 @@ class Nifty100CompleteAnalyzer:
                     'pct':   f"{sign}{pct:.2f}%",
                     'cls':   cls,
                 }
-            except Exception:
+            except Exception as _e:
+                # Surface the real reason so future failures are diagnosable.
+                print(f"  ⚠ fetch_index_data({label}) failed: {type(_e).__name__}: {_e}")
                 result[label] = {'price': 'N/A', 'pts': '-', 'pct': '-', 'cls': ''}
         return result
 
