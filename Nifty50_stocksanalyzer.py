@@ -182,7 +182,6 @@ class Nifty100CompleteAnalyzer:
             'SBILIFE.NS':     'SBI Life',
             'BPCL.NS':        'BPCL',
             'HDFCLIFE.NS':    'HDFC Life',
-            'LTIM.NS':        ,
             'ADANIENT.NS':    'Adani Enterprises',
             'SIEMENS.NS':     'Siemens India',
             # == NIFTY NEXT 50 =====================================
