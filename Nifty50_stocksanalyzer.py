@@ -1782,7 +1782,11 @@ class Nifty100CompleteAnalyzer:
 
             return True
 
-        top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
+        # Guard: if s3 is empty, .apply() returns a column-less DataFrame → nsmallest raises KeyError
+        if s3.empty:
+            top_sells = s3.copy()
+        else:
+            top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
