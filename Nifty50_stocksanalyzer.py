@@ -1497,7 +1497,13 @@ class Nifty100CompleteAnalyzer:
                 'Analyst':           analyst_label,
                 'Earnings_Date':     earnings_date,
             }
-        except Exception:
+        except Exception as _err:
+            # DIAGNOSTIC: print the real error instead of silently returning None.
+            # This is a diagnostic-only change — business logic is untouched.
+            # We still return None so the main loop keeps processing other stocks.
+            import traceback as _tb
+            print(f"  ⚠ analyze_stock({symbol}) FAILED: {type(_err).__name__}: {_err}")
+            _tb.print_exc()
             return None
 
     # =========================================================================
@@ -1774,16 +1780,15 @@ class Nifty100CompleteAnalyzer:
 
             return True
 
-        # V59-9 FIX: Guard against empty s3. When no stocks pass the SELL
-        # pre-filters (Upside / Risk_Reward / Target_1 < Price), s3 is empty.
-        # Calling .apply() on an empty DataFrame returns an empty Series with
-        # dtype float64 (not bool). Used as a boolean mask it drops ALL
-        # columns, causing KeyError: 'Combined_Score' on .nsmallest().
+        # DIAGNOSTIC FIX: Guard against empty s3. When no stocks pass the SELL
+        # pre-filters, s3 is empty, and .apply() on an empty DataFrame returns
+        # an empty Series with dtype float64 (not bool). Used as a boolean mask
+        # it drops all columns → KeyError: 'Combined_Score' on .nsmallest().
+        # Business logic unchanged — this only handles the empty-input case.
         if s3.empty:
-            top_sells = s3.copy()   # preserve column schema, zero rows
+            top_sells = s3.copy()
         else:
-            valid_mask = s3.apply(sell_is_valid, axis=1)
-            top_sells = s3[valid_mask].nsmallest(20, 'Combined_Score')
+            top_sells = s3[s3.apply(sell_is_valid, axis=1)].nsmallest(20, 'Combined_Score')
 
         return top_buys, top_sells
 
