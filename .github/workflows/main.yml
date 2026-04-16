@@ -1,5 +1,4 @@
 name: NIFTY 50 Stock Analyzer
-
 on:
   push:
     branches: [ main ]
@@ -8,7 +7,6 @@ on:
     - cron: '7 11 * * *'   # 4:37 PM IST
   workflow_dispatch:
 
-# Add permissions for GitHub Pages deployment
 permissions:
   contents: write
   pages: write
@@ -30,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install yfinance pandas numpy tabulate openpyxl pytz
+        pip install "yfinance==0.2.66" "pandas>=2.0,<3.0" "numpy<2.0" tabulate openpyxl pytz
     
     - name: Run stock analyzer
       env:
