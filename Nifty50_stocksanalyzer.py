@@ -182,6 +182,7 @@ class Nifty100CompleteAnalyzer:
             'SBILIFE.NS':     'SBI Life',
             'BPCL.NS':        'BPCL',
             'HDFCLIFE.NS':    'HDFC Life',
+            'LTIM.NS':        'LTIMindtree',
             'ADANIENT.NS':    'Adani Enterprises',
             'SIEMENS.NS':     'Siemens India',
             # == NIFTY NEXT 50 =====================================
@@ -840,6 +841,30 @@ class Nifty100CompleteAnalyzer:
             sma_20  = df['Close'].rolling(20).mean().iloc[-1]
             sma_50  = df['Close'].rolling(50).mean().iloc[-1]
             sma_200 = df['Close'].rolling(200).mean().iloc[-1]
+
+            # DIAGNOSTIC FIX: In yfinance 1.x (Dec 2025+), stock.history() can
+            # return the latest bar with NaN values if Yahoo has partial data
+            # for the trading session — especially when the analyzer runs near
+            # market open or before the daily bar is finalized. Previously
+            # (yfinance 0.2.x) such rows were simply omitted. Now they pass
+            # through and cause "ValueError: cannot convert float NaN to integer"
+            # downstream in find_resistance_levels → int(current_price).
+            # Fallback: walk back to the last row with valid Close data.
+            import math
+            if current_price is None or (isinstance(current_price, float) and math.isnan(current_price)):
+                valid_close = df['Close'].dropna()
+                if len(valid_close) < 200:
+                    return None
+                current_price = valid_close.iloc[-1]
+                sma_20  = valid_close.rolling(20).mean().iloc[-1]
+                sma_50  = valid_close.rolling(50).mean().iloc[-1]
+                sma_200 = valid_close.rolling(200).mean().iloc[-1]
+                print(f"  ℹ {symbol}: last bar had NaN Close, using most recent valid close {current_price:.2f}")
+            # Final sanity: if any core value is still NaN, skip cleanly.
+            if (math.isnan(current_price) or math.isnan(sma_20)
+                    or math.isnan(sma_50) or math.isnan(sma_200)):
+                print(f"  ⚠ Skipping {symbol}: core price/SMA contains NaN after fallback")
+                return None
 
             # V53-1: SMA20 slope - compare today's SMA20 vs 5 bars ago.
             # A declining SMA20 means short-term momentum is falling NOW,
