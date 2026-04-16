@@ -470,11 +470,14 @@ class Nifty100CompleteAnalyzer:
         low   = df['Low']
         close = df['Close']
         plus_dm  = high.diff()
-        minus_dm = -low.diff()          # FIX: Wilder's -DM = previous_low - current_low
+        minus_dm = -low.diff()          # Wilder's -DM = previous_low - current_low
         plus_dm[plus_dm < 0]        = 0
         minus_dm[minus_dm < 0]      = 0
-        plus_dm[plus_dm < minus_dm] = 0
-        minus_dm[minus_dm < plus_dm]= 0
+        # Issue 3 FIX: zero both DMs simultaneously to avoid sequential race condition
+        # (sequential zeroing can set both to 0 when they should cancel only one)
+        _mask = plus_dm >= minus_dm
+        minus_dm[_mask]  = 0
+        plus_dm[~_mask]  = 0
         tr = pd.concat([
             high - low,
             abs(high - close.shift(1)),
@@ -812,7 +815,7 @@ class Nifty100CompleteAnalyzer:
             today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
             df    = stock.history(period='1y', auto_adjust=True)
 
-            if df.empty or len(df) < 200:
+            if df.empty or len(df) < 220:   # Issue 5 FIX: raised from 200→220 to give all indicators (SMA200, RSI lookbacks, iloc[-6]) headroom
                 return None
 
             # V55-FRESHNESS: Confirm the last candle is within 3 trading days of today.
@@ -962,6 +965,7 @@ class Nifty100CompleteAnalyzer:
 
             # FIX-3: RSI context-aware + V52-2: weak-momentum zone
             # V55: RSI slope now integrated — direction matters as much as value
+            rsi_signal = "N/A"  # Issue 4 FIX: safe default in case RSI is NaN or falls through all branches
             if rsi < 30:
                 if current_price > sma_200:
                     tech_score += 2
@@ -1244,8 +1248,12 @@ class Nifty100CompleteAnalyzer:
                 fund_weight  = 0.65
                 weight_label = "35/65 (Normal)"
 
-            # FIX-1: Combined score with dynamic weights
-            tech_score_normalized = ((tech_score + 6) / 12) * 100
+            # Bug 1 FIX: correct normalization range.
+            # Actual tech_score range is approx -15 to +12 (not -6 to +6).
+            # Old formula (tech_score + 6) / 12 produced values > 100 for strong
+            # stocks and negative values for weak ones, quietly skewing combined_score.
+            tech_score_clamped    = max(min(tech_score, 12), -15)
+            tech_score_normalized = ((tech_score_clamped + 15) / 27) * 100
             combined_score        = (tech_score_normalized * tech_weight) + (fund_score * fund_weight)
 
             # FIX-7 + V53-3 + V54-3: Analyst consensus +/-5.
